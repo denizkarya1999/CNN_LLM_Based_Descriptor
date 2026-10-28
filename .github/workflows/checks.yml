@@ -73,45 +73,89 @@ jobs:
           except ValueError:
               pass
           from dataclasses import replace
-          import itertools, math, numpy as np
-          from cnn_llm_based_descriptor.classical import ClassicalClient, infer_setting, load_scene_model, review_targets, search_review_plan
-          from cnn_llm_based_descriptor.descriptor import OllamaVisionClient, FrameDescriber
-          def record(label, score=.9, x=0, y=0):
-              return {'name':label,'confidence':score,'box':{'x1':x,'y1':y,'x2':x+10,'y2':y+10}}
-          def facts(records):
-              return detection_evidence(records,100,100,30,require_boxes=True)[0]
-          cfg=RunConfig(describe_backend='CIS 579',describe_url='unavailable')
-          cfg.validate_descriptor()
-          table=load_scene_model()
-          posterior=infer_setting(facts([record('laptop')]),table)['posterior']
-          weights={name:row['prior']*row['likelihoods'].get('laptop',row['default_likelihood']) for name,row in table['scenes'].items()}
-          assert math.isclose(sum(posterior.values()),1)
-          assert all(math.isclose(posterior[name],weight/sum(weights.values())) for name,weight in weights.items())
-          assert infer_setting(facts([record('laptop'),record('laptop',.8)]),table)['posterior']==posterior
-          assert infer_setting(facts([record('laptop',.49)]),table)['setting']=='unclear'
-          frame=np.zeros((100,100,3),dtype=np.uint8)
+          from pathlib import Path
+          import itertools, math, queue, random, threading
+          import numpy as np
+          from cnn_llm_based_descriptor.config import RunConfig
+          from cnn_llm_based_descriptor.classical import ClassicalClient,load_scene_model,infer_setting,assess_detections,review_targets,search_review_plan
+          from cnn_llm_based_descriptor.descriptor import detection_evidence,FrameDescriber,OllamaVisionClient
+          from cnn_llm_based_descriptor.grounding import action_choices,parse_choice
+          from cnn_llm_based_descriptor.methods import SEARCH_ALGORITHMS,DESCRIBE_BACKENDS,latency_text
+          from cnn_llm_based_descriptor.search import search_batch,heuristic
+          model=load_scene_model();frame=np.zeros((100,100,3),dtype=np.uint8)
+          def record(label,score=.9,x=10,y=10):return {'name':label,'confidence':score,'box':{'x1':x,'y1':y,'x2':x+10,'y2':y+10}}
+          def facts(records):return detection_evidence(records,100,100,None,require_boxes=True)[0]
+          assert len(model['labels'])==80
+          assert all(set(row['likelihoods'])==set(model['labels']) for row in model['scenes'].values())
+          # Every default label and a custom label reaches both the scene and decision stages.
+          records=[record(label) for label in model['labels']]+[record('custom gauge')]
           with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Unexpected LLM request')):
-              client=ClassicalClient(cfg)
-              for labels,setting in [(('laptop','keyboard','mouse'),'office'),(('couch','tv','remote'),'home'),(('person',),'unclear')]:
-                  result=client.describe(frame,[record(label) for label in labels])
-                  assert result['setting']==setting and result['action_decision']=='No Action'
-              assert client.describe(frame,[])['grounding_status']=='no_detections'
-              assert ClassicalClient(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
-              assert client.describe(frame,[record('person',.4)])['suggested_action']['kind']=='verify'
-              assert client.describe(frame,[record('traffic light')])['suggested_action']['kind']=='check_signal'
-          evidence=facts([record('knife',x=5,y=70),record('traffic light',x=80,y=20),record('person',.4,x=45,y=45)])
-          plan=search_review_plan(evidence); targets,_=review_targets(evidence)
-          optimum=math.inf
-          for order in itertools.permutations(targets):
-              for choices in itertools.product(*(target['options'] for target in order)):
-                  center=(.5,.5);cost=0
-                  for target,(_,effort) in zip(order,choices):
-                      cost+=effort+sum(abs(a-b) for a,b in zip(center,target['center']));center=target['center']
-                  optimum=min(optimum,cost)
-          assert math.isclose(plan['cost'],optimum)
-          assert all(step['choice'] in action_choices(evidence) for step in plan['steps'])
-          bounded=search_review_plan(facts([record('person',.4,x=i*3) for i in range(12)]))
-          assert len(bounded['steps'])==8 and bounded['omitted_targets']==4
+              for backend in DESCRIBE_BACKENDS[1:]:
+                  cfg=RunConfig(describe_backend=backend,describe_max_objects=1,describe_url='invalid')
+                  cfg.validate_descriptor();packet=ClassicalClient(cfg).describe(frame,records)
+                  assert len(packet['evidence'])==81 and packet['detections_considered']==81
+                  assert packet['descriptor_type']==backend
+                  scene=packet.get('scene_inference',packet.get('scene_associations'))
+                  decision=packet.get('decision_inference',packet.get('decision_search'))
+                  assert len(scene['observed_labels'])==81 and len(decision['assessments'])==81
+                  assert scene['custom_labels']==['custom gauge']
+                  for labels in [('laptop','keyboard','mouse'),('couch','tv','remote')]:
+                      p=ClassicalClient(cfg).describe(frame,[record(l) for l in labels]);assert p['setting'] in {'home','office'},p
+                  assert ClassicalClient(cfg).describe(frame,[])['grounding_status']=='no_detections'
+                  assert ClassicalClient(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
+          # Independent Bayes arithmetic and neutral custom observations.
+          base=infer_setting(facts([record('laptop')]),model)
+          weights={key:row['prior']*row['likelihoods']['laptop'] for key,row in model['scenes'].items()}
+          assert all(math.isclose(base['posterior'][k],v/sum(weights.values())) for k,v in weights.items())
+          assert infer_setting(facts([record('laptop'),record('laptop',.6)]),model)['posterior']==base['posterior']
+          custom=infer_setting(facts([record('laptop'),record('custom gauge')]),model)
+          assert all(math.isclose(base['posterior'][k],custom['posterior'][k]) for k in weights)
+          low=infer_setting(facts([record('laptop',.4)]),model)
+          assert 'laptop' in low['observed_labels'] and low['posterior']!=base['posterior'] and low['setting']=='unclear'
+          # All search algorithms reach the same full goal, and UCS/A* match brute force.
+          random.seed(11)
+          for _ in range(6):
+              evidence=facts([record('knife',x=random.randrange(90),y=random.randrange(90)),record('traffic light',x=random.randrange(90),y=random.randrange(90)),record('custom gauge',.4,x=random.randrange(90),y=random.randrange(90))])
+              targets=review_targets(evidence,assess_detections(evidence,model))
+              optimum=math.inf
+              for order in itertools.permutations(targets):
+                  for choices in itertools.product(*(t['options'] for t in order)):
+                      center=(.5,.5);cost=0
+                      for target,(_,effort) in zip(order,choices):
+                          cost+=effort+sum(abs(a-b) for a,b in zip(center,target['center']));center=target['center']
+                      optimum=min(optimum,cost)
+              assert heuristic(targets,0,(.5,.5))<=optimum+1e-9
+              for algorithm in SEARCH_ALGORITHMS:
+                  plan=search_review_plan(evidence,algorithm,model)
+                  assert plan['algorithm']==algorithm and len(plan['steps'])==3
+                  assert {s['detection_id'] for s in plan['steps']}=={i['id'] for i in evidence}
+                  assert all(s['choice'] in action_choices(evidence) for s in plan['steps'])
+                  assert math.isclose(sum(s['cost'] for s in plan['steps']),plan['cost'])
+                  if algorithm in (SEARCH_ALGORITHMS[3],SEARCH_ALGORITHMS[5]):
+                      assert math.isclose(plan['cost'],optimum),(algorithm,plan['cost'],optimum)
+                      assert plan['globally_cost_optimal']
+          # More than both old caps; every target is planned, including last/lowest-score.
+          for algorithm in SEARCH_ALGORITHMS:
+              packet=ClassicalClient(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm,describe_max_objects=1)).describe(frame,[record('custom gauge',.4,x=i%90) for i in range(17)])
+              plan=packet['decision_search']
+              assert len(plan['steps'])==17 and plan['omitted_targets']==0 and len(plan['batches'])==4
+              assert len({s['detection_id'] for s in plan['steps']})==17
+              assert not plan['globally_cost_optimal']
+          # Precise latency and method identity go through the real async/save path.
+          with tempfile.TemporaryDirectory() as directory:
+              stop=threading.Event();switch=threading.Event();switch.set();messages=queue.Queue()
+              cfg=RunConfig(describe_backend='Probability Algorithm')
+              worker=FrameDescriber(cfg,messages,stop,switch)
+              worker.submit(frame,[record('traffic light')],4,None,time.monotonic(),directory)
+              packet=messages.get(timeout=5);worker.close()
+              saved=json.loads((Path(directory)/'descriptions.jsonl').read_text())
+              assert saved['descriptor_type']=='Probability Algorithm' and saved['algorithm']=='Inference by Enumeration'
+              assert saved['inference_latency_ms']>0
+              assert math.isclose(saved['inference_latency_ms'],saved['elapsed_seconds']*1000)
+              assert saved['decision_inference']['next_step']=='check_signal:d1'
+          assert '0.37 ms' in latency_text(.371) and '1.234 s' in latency_text(1234)
+          print('All 80 labels + custom labels, all six searches, exact costs, probability math, no truncation, routing and saved latency passed.')
+          # Model validation continues to reject unsupported place claims and extra objects.
           for raw in ['{"environment":"outdoor","setting":"ballroom","next_step":"no_action"}',
                       '{"environment":"indoor","setting":"invented place","next_step":"no_action"}',
                       '{"environment":"indoor","setting":"home","next_step":"no_action","objects":["invented"]}']:
@@ -122,7 +166,54 @@ jobs:
                   pass
           llm=OllamaVisionClient(RunConfig());llm.checked=True
           with patch('cnn_llm_based_descriptor.descriptor.request_json',return_value={'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}):
-              assert 'ballroom or event hall' in llm.describe(frame,[record('person')])['text']
+              packet=llm.describe(frame,[record('person')])
+              assert 'ballroom or event hall' in packet['text'] and packet['algorithm']=='qwen3-vl:2b'
+          # Every named method and precise latency stays visible in the descriptor.
+          with patch.object(App,'refresh_devices'), patch.object(App,'refresh_cameras'):
+              root=tk.Tk(); app=App(root)
+              configurations=[RunConfig(describe_backend='Search Algorithm',describe_search=a) for a in SEARCH_ALGORITHMS]
+              configurations.append(RunConfig(describe_backend='Probability Algorithm'))
+              for size in ('1440x900','760x520'):
+                  root.geometry(size)
+                  for cfg in configurations:
+                      packet=ClassicalClient(cfg).describe(frame,[record('traffic light')])
+                      packet.update(type='description',frame=1,source_seconds=None,elapsed_seconds=.000371,inference_latency_ms=.371)
+                      app._handle(packet);settle(root)
+                      assert cfg.describe_backend in app.description_title.get()
+                      assert packet['algorithm'] in app.description_title.get()
+                      assert '0.37 ms' in app.description_latency.get()
+                      assert app.description_body.tag_cget('take_action','foreground')=='#ff6b78'
+                      assert app.description_body.tag_cget('no_action','foreground')=='#65e08c'
+                      for widget in (app.canvas,app.description_body,app.start_button,app.settings_button):visible(widget,root)
+                      assert app.description_body.winfo_height()>=50, (size,cfg.describe_search,app.description_body.winfo_height())
+              app.show_settings();window=app.settings_window;window.geometry('640x480')
+              from tkinter import ttk
+              notebook=next(w for w in window.winfo_children() if isinstance(w,ttk.Notebook));notebook.select(3);settle(root)
+              def descendants(widget):
+                  for child in widget.winfo_children():
+                      yield child
+                      yield from descendants(child)
+              category=next(w for w in descendants(window) if isinstance(w,ttk.Combobox) and w.cget('textvariable')==str(app.vars['describe_backend']))
+              for backend in DESCRIBE_BACKENDS:
+                  category.set(backend);category.event_generate('<<ComboboxSelected>>');settle(root)
+                  assert app.vars['describe_backend'].get()==backend
+                  if backend=='Search Algorithm':
+                      assert tuple(app.description_algorithm_combo['values'])==SEARCH_ALGORITHMS
+                      app.description_algorithm_combo.set('A* Search')
+                      app.description_algorithm_combo.event_generate('<<ComboboxSelected>>')
+                      assert app.vars['describe_search'].get()=='A* Search'
+                  elif backend=='Probability Algorithm':
+                      assert app.description_algorithm_combo.get()=='Inference by Enumeration'
+                  else:
+                      assert app.description_algorithm_combo.get()==app.vars['describe_model'].get()
+              with tempfile.TemporaryDirectory() as d:
+                  app.settings_path=Path(d)/'settings.json'
+                  app.settings_path.write_text('{"describe_backend":"CIS 579"}')
+                  assert app._load_settings().describe_backend=='Search Algorithm'
+                  app.selected_device.set('CPU');app.vars['describe_backend'].set('Search Algorithm')
+                  app._save_settings(app._config())
+                  assert app._load_settings().describe_search=='A* Search'
+              window.destroy();app._destroy()
           assert RunConfig().weights.parent.name == 'Models'
-          print('Desktop and grounding checks passed.')
+          print('Desktop, algorithm, grounding and latency checks passed.')
           PY

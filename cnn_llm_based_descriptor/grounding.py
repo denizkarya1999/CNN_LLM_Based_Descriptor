@@ -7,6 +7,7 @@ can estimate a broad setting and select a suggestion tied to a current box.
 from collections import Counter
 import json
 from .scenes import SETTINGS, environment_text
+from .methods import method_details
 
 ENVIRONMENTS = ("indoor", "outdoor", "unclear")
 LOW_SCORE = 0.5
@@ -144,7 +145,7 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         "model": cfg.describe_model,
         "evidence": evidence, "total_predictions": total, "frame_size": [width, height],
         "grounding_status": status, "environment": environment, "setting": setting,
-        "backend": getattr(cfg, "describe_backend", "LLM"),
+        "backend": cfg.describe_backend, **method_details(cfg),
         "action_decision": decision,
         "reason": reason,
         "suggested_action": {**step, "text": advice},

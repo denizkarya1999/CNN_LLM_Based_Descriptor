@@ -1,168 +1,122 @@
 {
-  "version": "teaching-v1",
+  "version": "teaching-v2-all-labels",
   "calibrated": false,
-  "description": "Illustrative hand-authored probabilities for CIS 579 conditional inference. Not learned from observations; not measured scene accuracy.",
-  "formula": "P(S|E) = normalize(P(S) * product(P(observed_class|S))). Distinct positive observed classes only; missing classes marginalized, not assumed absent.",
+  "description": "Illustrative hand-authored priors and observation likelihoods for all 80 default YOLO labels. Custom labels receive equal neutral likelihoods. No calibrated scene or risk accuracy.",
+  "formula": "P(S|E)=normalize(P(S)*product(P(observed label and score band|S))). Distinct positive classes only; missing labels are unobserved. Low-score likelihoods mix the class table with its across-scene mean.",
+  "labels": [
+    "person",
+    "bicycle",
+    "car",
+    "motorcycle",
+    "airplane",
+    "bus",
+    "train",
+    "truck",
+    "boat",
+    "traffic light",
+    "fire hydrant",
+    "stop sign",
+    "parking meter",
+    "bench",
+    "bird",
+    "cat",
+    "dog",
+    "horse",
+    "sheep",
+    "cow",
+    "elephant",
+    "bear",
+    "zebra",
+    "giraffe",
+    "backpack",
+    "umbrella",
+    "handbag",
+    "tie",
+    "suitcase",
+    "frisbee",
+    "skis",
+    "snowboard",
+    "sports ball",
+    "kite",
+    "baseball bat",
+    "baseball glove",
+    "skateboard",
+    "surfboard",
+    "tennis racket",
+    "bottle",
+    "wine glass",
+    "cup",
+    "fork",
+    "knife",
+    "spoon",
+    "bowl",
+    "banana",
+    "apple",
+    "sandwich",
+    "orange",
+    "broccoli",
+    "carrot",
+    "hot dog",
+    "pizza",
+    "donut",
+    "cake",
+    "chair",
+    "couch",
+    "potted plant",
+    "bed",
+    "dining table",
+    "toilet",
+    "tv",
+    "laptop",
+    "mouse",
+    "remote",
+    "keyboard",
+    "cell phone",
+    "microwave",
+    "oven",
+    "toaster",
+    "sink",
+    "refrigerator",
+    "book",
+    "clock",
+    "vase",
+    "scissors",
+    "teddy bear",
+    "hair drier",
+    "toothbrush"
+  ],
+  "low_score_weight": 0.3,
+  "review_model": {
+    "threshold": 0.5,
+    "probabilities": {
+      "no_action": 0.15,
+      "verify": 0.8,
+      "check_signal": 0.85,
+      "handle_carefully": 0.75
+    },
+    "meaning": "Illustrative P(review useful | detected label, score band); not a danger or object-correctness probability."
+  },
+  "label_actions": {"person": "no_action", "bicycle": "no_action", "car": "no_action", "motorcycle": "no_action", "airplane": "no_action", "bus": "no_action", "train": "no_action", "truck": "no_action", "boat": "no_action", "traffic light": "check_signal", "fire hydrant": "no_action", "stop sign": "check_signal", "parking meter": "no_action", "bench": "no_action", "bird": "no_action", "cat": "no_action", "dog": "no_action", "horse": "no_action", "sheep": "no_action", "cow": "no_action", "elephant": "no_action", "bear": "no_action", "zebra": "no_action", "giraffe": "no_action", "backpack": "no_action", "umbrella": "no_action", "handbag": "no_action", "tie": "no_action", "suitcase": "no_action", "frisbee": "no_action", "skis": "no_action", "snowboard": "no_action", "sports ball": "no_action", "kite": "no_action", "baseball bat": "no_action", "baseball glove": "no_action", "skateboard": "no_action", "surfboard": "no_action", "tennis racket": "no_action", "bottle": "no_action", "wine glass": "no_action", "cup": "no_action", "fork": "no_action", "knife": "handle_carefully", "spoon": "no_action", "bowl": "no_action", "banana": "no_action", "apple": "no_action", "sandwich": "no_action", "orange": "no_action", "broccoli": "no_action", "carrot": "no_action", "hot dog": "no_action", "pizza": "no_action", "donut": "no_action", "cake": "no_action", "chair": "no_action", "couch": "no_action", "potted plant": "no_action", "bed": "no_action", "dining table": "no_action", "toilet": "no_action", "tv": "no_action", "laptop": "no_action", "mouse": "no_action", "remote": "no_action", "keyboard": "no_action", "cell phone": "no_action", "microwave": "no_action", "oven": "no_action", "toaster": "no_action", "sink": "no_action", "refrigerator": "no_action", "book": "no_action", "clock": "no_action", "vase": "no_action", "scissors": "handle_carefully", "teddy bear": "no_action", "hair drier": "no_action", "toothbrush": "no_action"},
   "scenes": {
-    "home": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "couch": 0.85,
-        "tv": 0.8,
-        "remote": 0.8,
-        "potted plant": 0.4,
-        "chair": 0.5,
-        "book": 0.3
-      }
-    },
-    "kitchen": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "refrigerator": 0.9,
-        "oven": 0.85,
-        "microwave": 0.75,
-        "sink": 0.75,
-        "toaster": 0.7,
-        "knife": 0.45,
-        "bowl": 0.45,
-        "cup": 0.5
-      }
-    },
-    "bedroom": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "bed": 0.95,
-        "teddy bear": 0.4,
-        "book": 0.4,
-        "chair": 0.3
-      }
-    },
-    "bathroom": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "toilet": 0.95,
-        "sink": 0.8,
-        "toothbrush": 0.7
-      }
-    },
-    "office": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "laptop": 0.8,
-        "keyboard": 0.85,
-        "mouse": 0.85,
-        "chair": 0.8,
-        "book": 0.45
-      }
-    },
-    "classroom": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "chair": 0.85,
-        "book": 0.8,
-        "laptop": 0.5,
-        "dining table": 0.6
-      }
-    },
-    "restaurant": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "dining table": 0.85,
-        "chair": 0.9,
-        "wine glass": 0.75,
-        "cup": 0.65,
-        "fork": 0.7,
-        "knife": 0.6,
-        "spoon": 0.6,
-        "bowl": 0.65
-      }
-    },
-    "ballroom": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "chair": 0.7,
-        "dining table": 0.7,
-        "wine glass": 0.7
-      }
-    },
-    "shop": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "handbag": 0.6,
-        "bottle": 0.5,
-        "apple": 0.5,
-        "banana": 0.5,
-        "orange": 0.5
-      }
-    },
-    "street": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "car": 0.9,
-        "bus": 0.7,
-        "traffic light": 0.75,
-        "stop sign": 0.65,
-        "motorcycle": 0.7,
-        "bicycle": 0.5,
-        "truck": 0.7
-      }
-    },
-    "park": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "bench": 0.8,
-        "bird": 0.65,
-        "dog": 0.5,
-        "bicycle": 0.4,
-        "potted plant": 0.3
-      }
-    },
-    "sports_area": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "sports ball": 0.9,
-        "baseball bat": 0.9,
-        "baseball glove": 0.9,
-        "tennis racket": 0.85,
-        "skateboard": 0.75,
-        "surfboard": 0.75
-      }
-    },
-    "station": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "train": 0.9,
-        "bench": 0.65,
-        "suitcase": 0.7,
-        "backpack": 0.5
-      }
-    },
-    "vehicle_interior": {
-      "prior": 0.05,
-      "default_likelihood": 0.06,
-      "likelihoods": {
-        "chair": 0.5,
-        "backpack": 0.4,
-        "suitcase": 0.4
-      }
-    },
-    "unclear": {
-      "prior": 0.3,
-      "default_likelihood": 0.18,
-      "likelihoods": {}
-    }
+    "home": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.65, "dog": 0.65, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.5, "couch": 0.85, "potted plant": 0.4, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.8, "laptop": 0.06, "mouse": 0.06, "remote": 0.8, "keyboard": 0.06, "cell phone": 0.65, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.3, "clock": 0.65, "vase": 0.65, "scissors": 0.06, "teddy bear": 0.65, "hair drier": 0.06, "toothbrush": 0.06}},
+    "kitchen": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.65, "wine glass": 0.06, "cup": 0.5, "fork": 0.65, "knife": 0.45, "spoon": 0.65, "bowl": 0.45, "banana": 0.65, "apple": 0.65, "sandwich": 0.65, "orange": 0.65, "broccoli": 0.65, "carrot": 0.65, "hot dog": 0.65, "pizza": 0.65, "donut": 0.65, "cake": 0.65, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.75, "oven": 0.85, "toaster": 0.7, "sink": 0.75, "refrigerator": 0.9, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "bedroom": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.65, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.3, "couch": 0.06, "potted plant": 0.06, "bed": 0.95, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.4, "clock": 0.65, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.4, "hair drier": 0.06, "toothbrush": 0.06}},
+    "bathroom": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.95, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.8, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.65, "toothbrush": 0.7}},
+    "office": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.8, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.8, "mouse": 0.85, "remote": 0.06, "keyboard": 0.85, "cell phone": 0.65, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.45, "clock": 0.65, "vase": 0.06, "scissors": 0.65, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "classroom": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.65, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.85, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.6, "toilet": 0.06, "tv": 0.06, "laptop": 0.5, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.8, "clock": 0.65, "vase": 0.06, "scissors": 0.65, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "restaurant": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.65, "wine glass": 0.75, "cup": 0.65, "fork": 0.7, "knife": 0.6, "spoon": 0.6, "bowl": 0.65, "banana": 0.06, "apple": 0.06, "sandwich": 0.65, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.65, "pizza": 0.65, "donut": 0.65, "cake": 0.65, "chair": 0.9, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.85, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "ballroom": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.65, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.7, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.7, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.7, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.65, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "shop": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.65, "umbrella": 0.06, "handbag": 0.6, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.5, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.5, "apple": 0.5, "sandwich": 0.06, "orange": 0.5, "broccoli": 0.65, "carrot": 0.65, "hot dog": 0.06, "pizza": 0.06, "donut": 0.65, "cake": 0.65, "chair": 0.65, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "street": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.5, "car": 0.9, "motorcycle": 0.7, "airplane": 0.06, "bus": 0.7, "train": 0.06, "truck": 0.7, "boat": 0.06, "traffic light": 0.75, "fire hydrant": 0.65, "stop sign": 0.65, "parking meter": 0.65, "bench": 0.65, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.65, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.65, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "park": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.4, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.8, "bird": 0.65, "cat": 0.06, "dog": 0.5, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.65, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.65, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.65, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.3, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "sports_area": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.65, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.9, "kite": 0.06, "baseball bat": 0.9, "baseball glove": 0.9, "skateboard": 0.75, "surfboard": 0.75, "tennis racket": 0.85, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "station": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.65, "train": 0.9, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.65, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.5, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.7, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "vehicle_interior": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.4, "umbrella": 0.06, "handbag": 0.65, "tie": 0.06, "suitcase": 0.4, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.5, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.65, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "farm": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.65, "cat": 0.06, "dog": 0.06, "horse": 0.65, "sheep": 0.65, "cow": 0.65, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "wildlife_area": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.65, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.65, "bear": 0.65, "zebra": 0.65, "giraffe": 0.65, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "waterfront": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.65, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.65, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.65, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.65, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "snow_area": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.06, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.06, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.06, "frisbee": 0.06, "skis": 0.65, "snowboard": 0.65, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "airport": {"prior": 0.03684210526315789, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.06, "car": 0.06, "motorcycle": 0.06, "airplane": 0.65, "bus": 0.06, "train": 0.06, "truck": 0.06, "boat": 0.06, "traffic light": 0.06, "fire hydrant": 0.06, "stop sign": 0.06, "parking meter": 0.06, "bench": 0.06, "bird": 0.06, "cat": 0.06, "dog": 0.06, "horse": 0.06, "sheep": 0.06, "cow": 0.06, "elephant": 0.06, "bear": 0.06, "zebra": 0.06, "giraffe": 0.06, "backpack": 0.65, "umbrella": 0.06, "handbag": 0.06, "tie": 0.06, "suitcase": 0.65, "frisbee": 0.06, "skis": 0.06, "snowboard": 0.06, "sports ball": 0.06, "kite": 0.06, "baseball bat": 0.06, "baseball glove": 0.06, "skateboard": 0.06, "surfboard": 0.06, "tennis racket": 0.06, "bottle": 0.06, "wine glass": 0.06, "cup": 0.06, "fork": 0.06, "knife": 0.06, "spoon": 0.06, "bowl": 0.06, "banana": 0.06, "apple": 0.06, "sandwich": 0.06, "orange": 0.06, "broccoli": 0.06, "carrot": 0.06, "hot dog": 0.06, "pizza": 0.06, "donut": 0.06, "cake": 0.06, "chair": 0.06, "couch": 0.06, "potted plant": 0.06, "bed": 0.06, "dining table": 0.06, "toilet": 0.06, "tv": 0.06, "laptop": 0.06, "mouse": 0.06, "remote": 0.06, "keyboard": 0.06, "cell phone": 0.06, "microwave": 0.06, "oven": 0.06, "toaster": 0.06, "sink": 0.06, "refrigerator": 0.06, "book": 0.06, "clock": 0.06, "vase": 0.06, "scissors": 0.06, "teddy bear": 0.06, "hair drier": 0.06, "toothbrush": 0.06}},
+    "unclear": {"prior": 0.3, "default_likelihood": 0.1, "likelihoods": {"person": 0.55, "bicycle": 0.18, "car": 0.18, "motorcycle": 0.18, "airplane": 0.18, "bus": 0.18, "train": 0.18, "truck": 0.18, "boat": 0.18, "traffic light": 0.18, "fire hydrant": 0.18, "stop sign": 0.18, "parking meter": 0.18, "bench": 0.18, "bird": 0.18, "cat": 0.18, "dog": 0.18, "horse": 0.18, "sheep": 0.18, "cow": 0.18, "elephant": 0.18, "bear": 0.18, "zebra": 0.18, "giraffe": 0.18, "backpack": 0.18, "umbrella": 0.18, "handbag": 0.18, "tie": 0.18, "suitcase": 0.18, "frisbee": 0.18, "skis": 0.18, "snowboard": 0.18, "sports ball": 0.18, "kite": 0.18, "baseball bat": 0.18, "baseball glove": 0.18, "skateboard": 0.18, "surfboard": 0.18, "tennis racket": 0.18, "bottle": 0.18, "wine glass": 0.18, "cup": 0.18, "fork": 0.18, "knife": 0.18, "spoon": 0.18, "bowl": 0.18, "banana": 0.18, "apple": 0.18, "sandwich": 0.18, "orange": 0.18, "broccoli": 0.18, "carrot": 0.18, "hot dog": 0.18, "pizza": 0.18, "donut": 0.18, "cake": 0.18, "chair": 0.18, "couch": 0.18, "potted plant": 0.18, "bed": 0.18, "dining table": 0.18, "toilet": 0.18, "tv": 0.18, "laptop": 0.18, "mouse": 0.18, "remote": 0.18, "keyboard": 0.18, "cell phone": 0.18, "microwave": 0.18, "oven": 0.18, "toaster": 0.18, "sink": 0.18, "refrigerator": 0.18, "book": 0.18, "clock": 0.18, "vase": 0.18, "scissors": 0.18, "teddy bear": 0.18, "hair drier": 0.18, "toothbrush": 0.18}}
   }
 }

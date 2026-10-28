@@ -22,10 +22,10 @@ from .descriptor import download_model
 from .recording import recording_destinations
 from .cameras import discover_cameras, linux_camera_path
 from .window import resizable_window, FlowRow, ScrollFrame, wrap_label
-from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT, AMBER
+from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT
 from .model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
 from .branding import apply_icon
-from .config import DESCRIBE_BACKENDS
+from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, PROBABILITY_ALGORITHM, method_details, latency_text
 
 
 
@@ -67,7 +67,9 @@ class App:
         self.model_cancel = threading.Event()
         self.model_job = None
         self.model_status = tk.StringVar(value='Qwen3-VL 2B · 4-bit · about 1.9 GB · local Ollama')
-        self.description_title = tk.StringVar(value='Visual description · waiting for a frame')
+        selected = method_details(initial)
+        self.description_title = tk.StringVar(value=f"Descriptor: {selected['descriptor_type']} · {selected['algorithm']}")
+        self.description_latency = tk.StringVar(value=latency_text(None))
         self.description_text = tk.StringVar(value='Enable descriptions in Settings for Detections, Environment, Take Action or No Action, and Reason.')
         self._style()
         self._build()
@@ -82,6 +84,8 @@ class App:
     def _load_settings(self):
         try:
             data = json.loads(self.settings_path.read_text())
+            if data.get('describe_backend') == 'CIS 579':
+                data['describe_backend'] = 'Search Algorithm'
             if data.get('describe_url') in ('http://127.0.0.1:11434', 'http://localhost:11434'):
                 data['describe_url'] = PROJECT_ENDPOINT
             cfg = RunConfig(**{f.name: data[f.name] for f in fields(RunConfig) if f.name in data})
@@ -179,8 +183,10 @@ class App:
         ttk.Label(self.preview_card, textvariable=self.stats, style='Card.TLabel', foreground=MUTED, width=1).grid(row=2, column=0, sticky='ew', pady=(8, 0))
 
         self.description_card = ttk.Frame(self.workspace, style='Card.TFrame', padding=12)
-        ttk.Label(self.description_card, text='Scene understanding', style='Card.TLabel', font=self.bold_font).pack(anchor='w')
-        wrap_label(ttk.Label(self.description_card, textvariable=self.description_title, style='Card.TLabel', foreground=MUTED)).pack(fill='x', pady=(4, 10))
+        self.description_method_label = wrap_label(ttk.Label(self.description_card, textvariable=self.description_title, style='Card.TLabel', foreground=FG))
+        self.description_method_label.pack(fill='x', pady=(0, 2))
+        self.description_latency_label = wrap_label(ttk.Label(self.description_card, textvariable=self.description_latency, style='Card.TLabel', foreground=ACCENT))
+        self.description_latency_label.pack(fill='x', pady=(0, 6))
         body = ttk.Frame(self.description_card, style='Card.TFrame'); body.pack(fill='both', expand=True)
         self.description_body = tk.Text(body, height=1, width=1, wrap='word', bg=PANEL, fg=FG,
                                        font=self.body_font, relief='flat', borderwidth=0, state='disabled', padx=2, pady=4, spacing1=2, spacing3=5)
@@ -214,8 +220,8 @@ class App:
         self.description_body.delete('1.0','end')
         self.description_body.insert('1.0',self.description_text.get())
         self.description_body.tag_configure('section',font=self.bold_font,foreground=ACCENT)
-        self.description_body.tag_configure('take_action',font=self.bold_font,foreground=AMBER,background='#3b3021')
-        self.description_body.tag_configure('no_action',font=self.bold_font,foreground=ACCENT,background='#173b34')
+        self.description_body.tag_configure('take_action',font=self.bold_font,foreground='#ff6b78',background='#4a2028')
+        self.description_body.tag_configure('no_action',font=self.bold_font,foreground='#65e08c',background='#163824')
         for index, line in enumerate(self.description_text.get().splitlines(), 1):
             for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:'):
                 if line.startswith(heading):
@@ -356,6 +362,7 @@ class App:
             self.status.set('Inference on · applies after the current frame' if enabled else 'Inference off · original preview')
         if not enabled:
             self.description_title.set('Visual description · inference off')
+            self.description_latency.set(latency_text(None))
             self.description_text.set('Enable YOLO inference to generate descriptions.')
         if not enabled and not self.recording:
             self.vars['record_mode'].set('Original')
@@ -390,8 +397,10 @@ class App:
         self.snapshot_button.configure(state='disabled')
         self.latest_records = []
         self.latest_description = None
-        self.description_title.set('Visual description · waiting for a frame' if cfg.describe_enabled else 'Visual description · disabled')
-        self.description_text.set(('CIS 579 probability and search are ready; waiting for YOLO detections.' if cfg.describe_backend == 'CIS 579' else 'The local model may take a moment to load.') if cfg.describe_enabled else 'Enable descriptions in Settings.')
+        selected = method_details(cfg)
+        self.description_title.set(f"Descriptor: {selected['descriptor_type']} · {selected['algorithm']}" if cfg.describe_enabled else 'Visual description · disabled')
+        self.description_latency.set(latency_text(None))
+        self.description_text.set(('Waiting for YOLO detections.' if cfg.describe_backend != 'LLM' else 'The local model may take a moment to load.') if cfg.describe_enabled else 'Enable descriptions in Settings.')
         self.record_status.set('Not recording')
         self.record_label.configure(foreground=MUTED)
         self.worker = self.ctx.Process(target=self.worker_target, args=(cfg,self.messages,self.previews,self.stop_event,self.pause_event,self.commands,self.inference_switch,recording_path), daemon=True)
@@ -427,16 +436,22 @@ class App:
                 return
             self.latest_description = packet
             position = f" · source {packet['source_seconds']:.1f}s" if packet.get('source_seconds') is not None else ''
-            method = packet['model'] if packet.get('grounding_status', 'validated') == 'validated' else 'YOLO facts only'
-            self.description_title.set(f"Frame {packet['frame']}{position} · {method} · {packet['elapsed_seconds']:.1f}s")
+            category = packet.get('descriptor_type', packet.get('backend', 'LLM'))
+            algorithm = packet.get('algorithm', packet['model'])
+            facts_only = ' · YOLO facts only' if packet.get('grounding_status', 'validated') != 'validated' else ''
+            self.description_title.set(f"Descriptor: {category} · {algorithm}\nFrame {packet['frame']}{position}{facts_only}")
+            milliseconds = packet.get('inference_latency_ms', packet.get('elapsed_seconds', 0)*1000)
+            self.description_latency.set(latency_text(milliseconds))
             self.description_text.set(packet['text'])
             self.log(f"Description for frame {packet['frame']}: {packet['text']}")
         elif kind in {'description_error','description_save_error'}:
             self.description_title.set('Visual description · unavailable' if kind=='description_error' else 'Visual description · save failed')
+            self.description_latency.set(latency_text(None))
             self.description_text.set(packet['message'])
             self.log(packet['message'])
         elif kind=='reconnecting':
             self.description_title.set('Visual description · camera reconnecting')
+            self.description_latency.set(latency_text(None))
             self.description_text.set('Waiting for a new frame.')
             self.ready = False
             self.status.set(packet['message']); self.log(packet['message']); self._controls()
@@ -591,10 +606,31 @@ class App:
         wrap_label(ttk.Label(output,text='A video filename is requested only when recording starts. Cancel keeps the preview available.\n\nOriginal contains no overlays. Both saves the annotated video at your chosen filename and a second file ending in _original.mp4.\n\nLive clips keep elapsed time by repeating frames when inference is slower than capture. Videos are silent.',foreground=MUTED)).pack(fill='x',pady=8)
 
         ttk.Checkbutton(description,text='Enable scene descriptions',variable=self.vars['describe_enabled']).pack(anchor='w')
-        self._combo(description,'Description method','describe_backend',DESCRIBE_BACKENDS)
+        def method_changed(clear=True):
+            category = self.vars['describe_backend'].get()
+            if category == 'Search Algorithm':
+                self.description_algorithm_combo.configure(textvariable=self.vars['describe_search'], values=SEARCH_ALGORITHMS, state='readonly')
+            elif category == 'Probability Algorithm':
+                self.description_algorithm_combo.configure(textvariable=probability_name, values=(PROBABILITY_ALGORITHM,), state='disabled')
+            else:
+                self.description_algorithm_combo.configure(textvariable=self.vars['describe_model'], values=(), state='disabled')
+            if clear:
+                algorithm = (self.vars['describe_search'].get() if category == 'Search Algorithm' else
+                             PROBABILITY_ALGORITHM if category == 'Probability Algorithm' else self.vars['describe_model'].get())
+                self.latest_description = None
+                self.description_title.set(f'Descriptor: {category} · {algorithm}')
+                self.description_latency.set(latency_text(None))
+                self.description_text.set('Open an input to describe it with the selected method.')
+        self._combo(description,'Descriptor type','describe_backend',DESCRIBE_BACKENDS,method_changed)
+        ttk.Label(description,text='Algorithm / LLM model').pack(anchor='w',pady=(8,3))
+        probability_name = tk.StringVar(value=PROBABILITY_ALGORITHM)
+        self.description_algorithm_combo = ttk.Combobox(description,font=self.body_font)
+        self.description_algorithm_combo.pack(fill='x')
+        self.description_algorithm_combo.bind('<<ComboboxSelected>>',lambda _e: method_changed())
+        method_changed(clear=False)
         self._field(description,'Minimum seconds between frames','describe_interval')
-        wrap_label(ttk.Label(description,text='LLM uses the image to estimate the setting: home, ballroom, office, street, and more. CIS 579 uses only detected objects, conditional probability, rules, and uniform-cost search; no LLM or Ollama is needed.',foreground=MUTED)).pack(fill='x',pady=8)
-        wrap_label(ttk.Label(description,text='Both methods keep object facts tied to YOLO. Settings are estimates. CIS 579 probabilities come from an illustrative table, not measured accuracy. Details shows the probabilities and review plan.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Search options: BFS, DFS, IDS, UCS, Greedy Best-First, and A*. Probability uses Inference by Enumeration. Both evaluate every returned YOLO detection, using label associations and confidence scores; no LLM is needed.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='The knowledge base covers all 80 standard YOLO labels. Custom labels use a neutral scene association and generic review rules. Probabilities are illustrative, not calibrated accuracy. Descriptor inference latency is shown separately from YOLO timing.',foreground=MUTED)).pack(fill='x',pady=8)
         ttk.Separator(description).pack(fill='x',pady=8)
         ttk.Label(description,text='LLM settings (used only in LLM mode)',font=self.bold_font).pack(anchor='w')
         for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Request timeout (seconds)','describe_timeout')]:

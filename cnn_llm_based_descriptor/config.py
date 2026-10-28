@@ -6,6 +6,7 @@ import re
 import math
 from urllib.parse import urlsplit
 from .model_store import PROJECT_ENDPOINT
+from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, DEFAULT_SEARCH
 
 ROOT = Path(__file__).resolve().parent.parent
 TASKS = {
@@ -17,7 +18,6 @@ TASKS = {
 }
 SCALES = {"N · Nano": "n", "S · Small": "s", "M · Medium": "m",
           "L · Large": "l", "X · Extra large": "x"}
-DESCRIBE_BACKENDS = ("LLM", "CIS 579")
 RECORD_MODES = ("Original", "With inference", "Both")
 
 
@@ -65,6 +65,7 @@ class RunConfig:
 
     describe_enabled: bool = True
     describe_backend: str = "LLM"
+    describe_search: str = DEFAULT_SEARCH
     describe_model: str = "qwen3-vl:2b"
     describe_url: str = PROJECT_ENDPOINT
     describe_interval: float = 3.0
@@ -77,14 +78,15 @@ class RunConfig:
         if not self.describe_enabled:
             return
         if self.describe_backend not in DESCRIBE_BACKENDS:
-            raise ValueError("Choose LLM or CIS 579 for scene understanding.")
+            raise ValueError("Choose LLM, Search Algorithm, or Probability Algorithm.")
         for label, value, low, high in (
             ("Description interval", self.describe_interval, .5, 300),
-            ("Description object limit", self.describe_max_objects, 1, 30),
         ):
             if not math.isfinite(value) or not low <= value <= high:
                 raise ValueError(f"{label} must be between {low} and {high}.")
-        if self.describe_backend == "CIS 579":
+        if self.describe_backend == "Search Algorithm" and self.describe_search not in SEARCH_ALGORITHMS:
+            raise ValueError("Choose a supported search algorithm.")
+        if self.describe_backend != "LLM":
             return
         from .descriptor import validate_endpoint
         validate_endpoint(self.describe_url)
@@ -93,6 +95,7 @@ class RunConfig:
         if self.describe_model.endswith("-cloud"):
             raise ValueError("Choose a locally installed vision model, not a cloud model.")
         for label, value, low, high in (
+            ("Description object limit", self.describe_max_objects, 1, 30),
             ("Description timeout", self.describe_timeout, 5, 300),
             ("Description token limit", self.describe_max_tokens, 32, 512),
             ("Description image size", self.describe_image_size, 224, 1280),

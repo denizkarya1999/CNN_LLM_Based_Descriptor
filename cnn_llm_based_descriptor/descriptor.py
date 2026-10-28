@@ -16,6 +16,7 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 
 from .grounding import action_choices, parse_choice, render_description, response_schema
 from .model_store import ensure_project_server
+from .methods import method_details
 
 DEFAULT_MODEL = "qwen3-vl:2b"
 
@@ -65,7 +66,7 @@ def request_json(endpoint, route, payload, timeout):
 
 
 def detection_evidence(records, width, height, limit, threshold=0.0, require_boxes=False):
-    """Keep exact detector scores and clipped, normalized spatial evidence."""
+    """Keep exact scores and spatial evidence. limit=None retains every valid prediction."""
     candidates = []
     for record in records:
         try:
@@ -109,7 +110,8 @@ def build_prompt(evidence, total, width, height, threshold, task):
         "Return only JSON matching response_schema. YOLO is the only source of object facts. "
         "Use the frame to estimate environment (indoor/outdoor/unclear), the setting, and one next_step. "
         "Setting means the kind of place: home, ballroom/event hall, kitchen, bedroom, bathroom, office, "
-        "classroom, restaurant, shop, street, park, sports_area, station, vehicle_interior, or unclear. "
+        "classroom, restaurant, shop, street, park, sports_area, station, vehicle_interior, farm, "
+        "wildlife_area, waterfront, snow_area, airport, or unclear. "
         "Use the setting enum value ballroom for a ballroom/event hall. Setting is an unconfirmed visual "
         "estimate, not an object detection. A room type must agree with indoor/outdoor. "
         "Use unclear when the place is ambiguous; people/chairs alone do not establish a ballroom. "
@@ -235,7 +237,7 @@ class FrameDescriber:
         self.cfg, self.messages, self.stop, self.inference_switch = cfg, messages, stop, inference_switch
         if client is not None:
             self.client = client
-        elif cfg.describe_backend == "CIS 579":
+        elif cfg.describe_backend in {"Search Algorithm", "Probability Algorithm"}:
             from .classical import ClassicalClient
             self.client = ClassicalClient(cfg)
         else:
@@ -291,10 +293,14 @@ class FrameDescriber:
             try:
                 if self.failed or not self.inference_switch.is_set():
                     continue
-                started = time.monotonic()
+                started = time.perf_counter_ns()
                 result = self.client.describe(job["image"], job["records"])
                 packet = {key: value for key, value in job.items() if key not in {"image", "records", "generation", "directory"}}
-                packet.update(result, type="description", elapsed_seconds=round(time.monotonic()-started, 3))
+                elapsed_ns = time.perf_counter_ns() - started
+                packet.update(result)
+                packet.update(method_details(self.cfg), type="description",
+                              elapsed_seconds=elapsed_ns / 1_000_000_000,
+                              inference_latency_ms=elapsed_ns / 1_000_000)
                 with self.lock:
                     if (job["generation"] != self.generation or self.closed.is_set()
                             or self.stop.is_set() or not self.inference_switch.is_set()):

@@ -16,6 +16,11 @@ SETTINGS = {
     "park": ("a park or garden", "outdoor"),
     "sports_area": ("a sports or recreation area", "unclear"),
     "station": ("a transport station or platform", "unclear"),
+    "farm": ("a farm or pasture", "outdoor"),
+    "wildlife_area": ("a wildlife area or animal enclosure", "outdoor"),
+    "waterfront": ("a beach or waterfront", "outdoor"),
+    "snow_area": ("a snowy recreation area", "outdoor"),
+    "airport": ("an airport or airfield", "unclear"),
     "vehicle_interior": ("the inside of a vehicle", "indoor"),
 }
 

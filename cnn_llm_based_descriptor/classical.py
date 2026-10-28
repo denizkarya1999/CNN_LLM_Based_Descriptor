@@ -1,135 +1,191 @@
-"""CIS 579 alternative: conditional probability, rules, and uniform-cost search.
+"""Transparent label associations, exact probability inference and search.
 
-This is an explicit teaching model, not a learned scene classifier. The table's
-priors/likelihoods and the search costs are illustrative and uncalibrated.
+No image pixels or language model are used. All eligible YOLO boxes are
+assessed, including custom labels and low-score predictions. The knowledge
+base and conditional probabilities are illustrative, not calibrated accuracy.
 """
 
-import heapq
-import itertools
 import json
 import math
 from pathlib import Path
 
 from .grounding import LOW_SCORE, action_choices, render_description
+from .methods import DEFAULT_SEARCH, method_details
 from .scenes import SETTINGS, environment_text
+from .search import plan_reviews
 
 MODEL_PATH = Path(__file__).with_name("scene_model.json")
-MAX_REVIEW_TARGETS = 8
 
 
 def load_scene_model(path=MODEL_PATH):
     model = json.loads(Path(path).read_text(encoding="utf-8"))
-    scenes = model["scenes"]
-    if set(scenes) != set(SETTINGS):
-        raise ValueError("Scene table must include every supported setting, including unclear.")
+    labels, scenes = model["labels"], model["scenes"]
+    if len(labels) != len(set(labels)) or set(scenes) != set(SETTINGS):
+        raise ValueError("Knowledge base needs unique labels and every supported setting.")
+    if set(model["label_actions"]) != set(labels):
+        raise ValueError("Every knowledge-base label needs a decision association.")
     for data in scenes.values():
+        if set(data["likelihoods"]) != set(labels):
+            raise ValueError("Every setting must define likelihoods for every knowledge-base label.")
         for value in (data["prior"], data["default_likelihood"], *data["likelihoods"].values()):
             if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value) or not 0 < value < 1:
                 raise ValueError("Scene priors and likelihoods must be strictly between zero and one.")
     if not math.isclose(sum(data["prior"] for data in scenes.values()), 1, abs_tol=1e-8):
         raise ValueError("Scene priors must sum to one.")
+    if len({data["default_likelihood"] for data in scenes.values()}) != 1:
+        raise ValueError("Custom labels need equal neutral likelihoods across settings.")
+    if not 0 <= model["low_score_weight"] <= 1:
+        raise ValueError("Low-score evidence weight must be between zero and one.")
+    review = model["review_model"]
+    if not 0 < review["threshold"] < 1 or any(not 0 <= p <= 1 for p in review["probabilities"].values()):
+        raise ValueError("Review probabilities and threshold must be valid probabilities.")
+    if set(review["probabilities"]) != {"no_action", "verify", "check_signal", "handle_carefully"}:
+        raise ValueError("Unsupported review probability table.")
+    if not set(model["label_actions"].values()) <= {"no_action", "check_signal", "handle_carefully"}:
+        raise ValueError("Unsupported label action in knowledge base.")
+    # Only the matching detected classes may receive these specific suggestions.
+    for label, kind in model["label_actions"].items():
+        if kind == "check_signal" and label not in {"traffic light", "stop sign"}:
+            raise ValueError("Signal advice requires a signal label.")
+        if kind == "handle_carefully" and label not in {"knife", "scissors"}:
+            raise ValueError("Handling advice requires a supported detected label.")
     return model
 
 
-def infer_setting(evidence, model):
-    """Enumerate P(S,E), then normalize to P(S|E) in log space.
+def class_observations(evidence):
+    """Use every class once at its highest returned confidence; retain all boxes elsewhere."""
+    observations = {}
+    for item in evidence:
+        if "box_xyxy_pixels" in item:
+            label = item["label"].casefold()
+            observations[label] = max(observations.get(label, 0), item["confidence"])
+    return observations
 
-Only distinct, sufficiently strong, supported positive class observations are
-conditioned on. Missing classes are unobserved, not negative evidence. The
-conditional independence assumption defines the illustrative joint model.
-YOLO confidence gates observations; it is never substituted for P(E|S).
-"""
-    scenes = model["scenes"]
-    supported = set().union(*(set(data["likelihoods"]) for data in scenes.values()))
-    labels = sorted({item["label"].casefold() for item in evidence
-                     if "box_xyxy_pixels" in item and item["confidence"] >= LOW_SCORE
-                     and item["label"].casefold() in supported})
+
+def label_likelihood(data, label):
+    return data["likelihoods"].get(label, data["default_likelihood"])
+
+
+def infer_setting(evidence, model):
+    """Enumerate P(S,E) and normalize. Every observed label participates.
+
+    Each label contributes a positive observation likelihood; absent labels
+    remain unobserved. Low-score observations use a weaker, explicit CPT mixture
+    with the prior-predictive mean, not the YOLO score as a probability of truth.
+    """
+    scenes, observations = model["scenes"], class_observations(evidence)
+    means = {label: sum(row["prior"] * label_likelihood(row, label) for row in scenes.values())
+             for label in observations}
     log_joint = {}
     for setting, data in scenes.items():
-        log_joint[setting] = math.log(data["prior"]) + sum(
-            math.log(data["likelihoods"].get(label, data["default_likelihood"]))
-            for label in labels)
+        value = math.log(data["prior"])
+        for label, score in observations.items():
+            weight = 1.0 if score >= LOW_SCORE else model["low_score_weight"]
+            likelihood = weight * label_likelihood(data, label) + (1-weight) * means[label]
+            value += math.log(likelihood)
+        log_joint[setting] = value
     offset = max(log_joint.values())
-    weights = {name: math.exp(value - offset) for name, value in log_joint.items()}
+    weights = {name: math.exp(value-offset) for name, value in log_joint.items()}
     normalizer = sum(weights.values())
-    posterior = {name: value / normalizer for name, value in weights.items()}
+    posterior = {name: value/normalizer for name, value in weights.items()}
     ranked = sorted(posterior, key=lambda name: (-posterior[name], name))
     top, second = ranked[:2]
-    accepted = (len(labels) >= 2 and top != "unclear" and posterior[top] >= .55
-                and posterior[top] - posterior[second] >= .15)
-    return {
-        "setting": top if accepted else "unclear", "posterior": posterior,
-        "observed_labels": labels, "candidates": ranked[:3],
-        "method": "Bayes rule / exact enumeration of scene hypotheses",
-        "calibrated": False, "table_version": model["version"],
-        "assumption": "Distinct observed classes are conditionally independent given the setting; missing classes are unobserved.",
-    }
+    informative = [label for label, score in observations.items() if score >= LOW_SCORE
+                   and len({label_likelihood(row, label) for row in scenes.values()}) > 1]
+    accepted = (len(informative) >= 2 and top != "unclear" and posterior[top] >= .55
+                and posterior[top]-posterior[second] >= .15)
+    return {"setting": top if accepted else "unclear", "posterior": posterior,
+            "observed_labels": sorted(observations), "label_confidences": observations,
+            "custom_labels": sorted(set(observations)-set(model["labels"])),
+            "candidates": ranked[:3], "method": "Inference by Enumeration",
+            "calibrated": False, "table_version": model["version"],
+            "assumption": "Distinct observed labels are conditionally independent given the setting. Missing labels are unobserved. Custom labels have equal neutral likelihoods."}
 
 
-def review_targets(evidence):
-    """Simple implication rules create review goals from current YOLO facts."""
-    targets = []
-    offered = action_choices(evidence)
+def associate_setting(evidence, model):
+    """Search mode's scene estimate uses explicit cue associations, not Bayes."""
+    observations = class_observations(evidence)
+    scores, matches = {}, {}
+    for setting, data in model["scenes"].items():
+        if setting == "unclear":
+            continue
+        matches[setting] = [label for label in observations
+                            if label in model["labels"] and label_likelihood(data, label) >= .45
+                            and len({label_likelihood(row, label) for row in model["scenes"].values()}) > 1]
+        scores[setting] = sum(label_likelihood(data, label) *
+                              (1 if observations[label] >= LOW_SCORE else model["low_score_weight"])
+                              for label in matches[setting])
+    ranked = sorted(scores, key=lambda name: (-scores[name], name))
+    top, second = ranked[:2]
+    strong = sum(observations[label] >= LOW_SCORE for label in matches[top])
+    accepted = strong >= 2 and scores[top] >= 1 and scores[top]-scores[second] >= .2
+    return {"setting": top if accepted else "unclear", "method": "Knowledge-base label associations",
+            "observed_labels": sorted(observations), "scores": scores, "matches": matches,
+            "candidates": [name for name in ranked[:3] if scores[name] > 0],
+            "custom_labels": sorted(set(observations)-set(model["labels"])),
+            "score_meaning": "Cue-match weights, not probabilities or measured accuracy."}
+
+
+def assess_detections(evidence, model):
+    """Every eligible box gets a decision association, even if it needs no action."""
+    assessments = []
     for item in evidence:
-        if "box_xyxy_normalized" not in item:
+        if "box_xyxy_pixels" not in item:
             continue
-        if item["confidence"] < LOW_SCORE:
-            rule, kinds = "low_score", (("verify", 1.0),)
-        elif item["label"].casefold() in {"traffic light", "stop sign"}:
-            rule, kinds = "signal_state_unconfirmed", (("check_signal", 1.0), ("inspect", 1.6))
-        elif item["label"].casefold() in {"knife", "scissors"}:
-            rule, kinds = "care_if_handled", (("handle_carefully", 1.2), ("inspect", 1.6))
-        else:
+        label = item["label"].casefold()
+        kind = "verify" if item["confidence"] < LOW_SCORE else model["label_actions"].get(label, "no_action")
+        rule = {"verify": "low_score", "check_signal": "signal_state_unconfirmed",
+                "handle_carefully": "care_if_handled", "no_action": "presence_only"}[kind]
+        assessments.append({"detection_id": item["id"], "label": item["label"], "kind": kind,
+                            "rule": rule, "confidence": item["confidence"],
+                            "knowledge_base_label": label in model["label_actions"]})
+    return assessments
+
+
+def review_targets(evidence, assessments):
+    offered, by_id = action_choices(evidence), {item["id"]: item for item in evidence}
+    targets = []
+    for assessment in assessments:
+        kind, ident = assessment["kind"], assessment["detection_id"]
+        if kind == "no_action":
             continue
-        options = [(f"{kind}:{item['id']}", cost) for kind, cost in kinds
-                   if f"{kind}:{item['id']}" in offered]
+        item = by_id[ident]
+        kinds = ((kind, 1.2 if kind == "handle_carefully" else 1.0),)
+        if kind != "verify":
+            kinds += (("inspect", 1.6),)
+        options = [(f"{action}:{ident}", cost) for action, cost in kinds if f"{action}:{ident}" in offered]
         if options:
             x1, y1, x2, y2 = item["box_xyxy_normalized"]
-            targets.append({"id": item["id"], "rule": rule, "options": options,
+            targets.append({"id": ident, "rule": assessment["rule"], "options": options,
                             "center": ((x1+x2)/2, (y1+y2)/2)})
-    # Input is already confidence-sorted. Bound search time without claiming
-    # that the omitted objects have been reviewed.
-    return targets[:MAX_REVIEW_TARGETS], max(0, len(targets)-MAX_REVIEW_TARGETS)
+    return targets
 
 
-def search_review_plan(evidence):
-    """UCS over (planned target bitmask, last image location).
+def search_review_plan(evidence, algorithm=DEFAULT_SEARCH, model=None):
+    model = model or load_scene_model()
+    assessments = assess_detections(evidence, model)
+    result = plan_reviews(review_targets(evidence, assessments), algorithm)
+    result["assessments"] = assessments
+    return result
 
-Goal: a conditional review suggestion for every selected target. Edge cost is
-illustrative review effort + normalized Manhattan image-attention shift.
-This plans advice; it never executes an action or plans physical movement.
-"""
-    targets, omitted = review_targets(evidence)
-    goal = (1 << len(targets)) - 1
-    counter = itertools.count()
-    frontier = [(0.0, next(counter), 0, -1, [])]
-    best = {(0, -1): 0.0}
-    expanded = 0
-    while frontier:
-        cost, _, mask, previous, path = heapq.heappop(frontier)
-        if cost > best[(mask, previous)]:
-            continue
-        expanded += 1
-        if mask == goal:
-            return {"algorithm": "Uniform-cost search", "steps": path,
-                    "cost": cost, "expanded_states": expanded,
-                    "targets": [t["id"] for t in targets], "omitted_targets": omitted,
-                    "goal": "Plan a review suggestion for each selected target; no actions executed.",
-                    "cost_basis": "Illustrative effort plus attention shift between normalized image box centers; not distance or risk."}
-        origin = (.5, .5) if previous == -1 else targets[previous]["center"]
-        for index, target in enumerate(targets):
-            if mask & (1 << index):
-                continue
-            shift = sum(abs(a-b) for a, b in zip(origin, target["center"]))
-            for key, effort in target["options"]:
-                next_cost = cost + effort + shift
-                state = (mask | (1 << index), index)
-                if next_cost < best.get(state, math.inf):
-                    best[state] = next_cost
-                    step = {"choice": key, "detection_id": target["id"], "rule": target["rule"],
-                            "cost": effort + shift}
-                    heapq.heappush(frontier, (next_cost, next(counter), *state, path + [step]))
-    raise RuntimeError("No review plan found for the supplied choices.")
+
+def infer_review(assessments, model):
+    """Conditional P(review useful | observed label, score band), then MAP choice.
+
+    These hand-authored probabilities express a review policy, not object
+    correctness or danger. All boxes are evaluated; presence-only stays below
+    the recommendation threshold. No review planning/search is performed.
+    """
+    table = model["review_model"]
+    outcomes = [{**item, "review_probability": table["probabilities"][item["kind"]]}
+                for item in assessments]
+    chosen = max(outcomes, key=lambda item: item["review_probability"], default=None)
+    recommend = chosen is not None and chosen["review_probability"] >= table["threshold"]
+    key = f"{chosen['kind']}:{chosen['detection_id']}" if recommend else "no_action"
+    return {"next_step": key, "assessments": outcomes, "threshold": table["threshold"],
+            "selected_probability": chosen["review_probability"] if chosen else None,
+            "calibrated": False, "method": "Conditional probability / maximum-posterior review choice",
+            "meaning": table["meaning"]}
 
 
 class ClassicalClient:
@@ -138,38 +194,52 @@ class ClassicalClient:
         self.model = load_scene_model()
 
     def describe(self, frame, records):
-        # Import here to avoid a circular import; no server/model call is made.
         from .descriptor import detection_evidence
         height, width = frame.shape[:2]
         classification = self.cfg.task == "Image classification"
-        evidence, total = detection_evidence(records, width, height, self.cfg.describe_max_objects,
+        # Only LLM prompts have an object budget. Classical methods use all
+        # predictions returned by YOLO after its confidence/class/NMS filters.
+        evidence, total = detection_evidence(records, width, height, None,
                                             self.cfg.confidence, require_boxes=not classification)
+        details = method_details(self.cfg)
         if classification or not evidence:
             result = render_description(evidence, total, width, height, self.cfg,
                                         status="classification" if classification else "no_detections")
         else:
-            inference = infer_setting(evidence, self.model)
-            setting = inference["setting"]
-            environment = SETTINGS[setting][1]
-            plan = search_review_plan(evidence)
-            choice = {"environment": environment, "setting": setting,
-                      "next_step": plan["steps"][0]["choice"] if plan["steps"] else "no_action"}
-            context = environment_text(environment, setting, "probability model")
-            if inference["observed_labels"]:
-                ranking = "; ".join(f"{SETTINGS[name][0]} {inference['posterior'][name]*100:.1f}%"
-                                    for name in inference["candidates"] if inference["posterior"][name] >= .01)
-                context += f"\nPossible settings: {ranking}.\nIllustrative model probabilities, not measured accuracy."
+            if self.cfg.describe_backend == "Search Algorithm":
+                scene = associate_setting(evidence, self.model)
+                plan = search_review_plan(evidence, self.cfg.describe_search, self.model)
+                step = plan["steps"][0]["choice"] if plan["steps"] else "no_action"
+                source = "knowledge-base"
+                note = (f"{self.cfg.describe_search} assessed all {len(evidence)} detections and planned "
+                        f"{len(plan['steps'])} review steps in {len(plan['batches'])} batch(es); the first suggestion is shown.")
+                if not plan["steps"]:
+                    note += " No review rule was triggered by the detected labels and scores."
+                extra = {"scene_associations": scene, "decision_search": plan}
             else:
-                context += " No supported scene cues above 50% detector score."
-            note = (f"CIS 579 rules triggered {len(plan['targets'])} review goal(s). Uniform-cost search chose "
-                    f"a {len(plan['steps'])}-step plan with illustrative cost {plan['cost']:.2f}; "
-                    "the first suggestion is shown. This is a review plan, not a physical route.") if plan["steps"] else (
-                    "CIS 579 rules found no low-score detection, signal to check, or handling-related review goal. "
-                    "No Action does not establish that the scene is safe.")
-            if plan["omitted_targets"]:
-                note += f" {plan['omitted_targets']} additional review targets are outside the search limit."
+                scene = infer_setting(evidence, self.model)
+                decision = infer_review(assess_detections(evidence, self.model), self.model)
+                step, source = decision["next_step"], "probability model"
+                note = (f"Conditional review probabilities were evaluated for all {len(evidence)} detections. "
+                        f"Highest review probability: {decision['selected_probability']*100:.0f}%; "
+                        f"recommendation threshold: {decision['threshold']*100:.0f}%. "
+                        "These are illustrative policy probabilities, not measured accuracy or danger.")
+                extra = {"scene_inference": scene, "decision_inference": decision}
+            setting = scene["setting"]
+            environment = SETTINGS[setting][1]
+            context = environment_text(environment, setting, source)
+            if source == "probability model":
+                ranking = "; ".join(f"{SETTINGS[name][0]} {scene['posterior'][name]*100:.1f}%"
+                                    for name in scene["candidates"] if scene["posterior"][name] >= .01)
+                context += f"\nPossible settings: {ranking}.\nIllustrative model probabilities, not measured accuracy."
+            elif scene["candidates"]:
+                context += "\nLabel associations suggest: " + "; ".join(SETTINGS[name][0] for name in scene["candidates"]) + "."
+            if scene["custom_labels"]:
+                context += " Custom labels without scene associations use a neutral fallback."
+            choice = {"environment": environment, "setting": setting, "next_step": step}
             result = render_description(evidence, total, width, height, self.cfg, choice=choice,
                                         context_override=context, reason_note=note)
-            result.update(scene_inference=inference, decision_search=plan)
-        result.update(model="CIS 579 · Probability + UCS", backend="CIS 579")
+            result.update(extra)
+        result.update(model=details["algorithm"], backend=self.cfg.describe_backend, **details,
+                      detections_considered=len(evidence), knowledge_base_labels=len(self.model["labels"]))
         return result
