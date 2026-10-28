@@ -1,5 +1,6 @@
-# Install torch/torchvision for your platform first; setup.sh does this.
+# Install torch/torchvision for your platform first; the graphical launcher does this.
 ultralytics>=8.4.56,<9
 opencv-python>=4.10,<5
 Pillow>=10.4,<13
 numpy>=1.26,<3
+# Vision descriptions use the local Ollama HTTP API (Python standard library).

@@ -29,3 +29,4 @@ snapshot_*.png
 .pytest_cache/
 .ruff_cache/
 *.update
+*.gguf

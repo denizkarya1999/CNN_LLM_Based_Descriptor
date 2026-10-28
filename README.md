@@ -1,14 +1,33 @@
-# Generic YOLO
+# YOLO LLM Visual Descriptor
+
+A desktop visual descriptor combining quantized Moondream 2 (1.8B) with YOLO detections. It describes sampled frames using the image, bounding boxes, spatial positions, and detector confidence scores.
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
 ## Open
 
-Run **Run_Generic_YOLO.sh** with no arguments. On this PC it is in `~/Projects/Generic_YOLO`.
+Run **Run_YOLO_LLM_Visual_Descriptor.sh** with no arguments. On this PC it is in `~/Projects/YOLO_LLM_Visual_Descriptor`.
 
-The launcher checks your installation. Select a device and click **Open Generic YOLO**. **Installation options…** contains GUI setup/repair; it opens automatically when setup is needed. No setup flags are required.
+The launcher checks your installation. Select a device and click **Open YOLO LLM Visual Descriptor**. **Installation options…** contains GUI setup/repair; it opens automatically when setup is needed. No setup flags are required.
 
 Resize or maximize the app normally. It opens at 1600×1000 on larger displays and fits smaller screens. Buttons move onto additional rows when space is limited, status text wraps, and fonts adjust between readable small-window and large-window sizes. The camera preview scales to the available space while preserving its proportions. Settings and launcher windows are also resizable. A 1024×600 or larger desktop display is recommended; the main window can shrink to 760×520.
+
+## Local vision descriptions
+
+1. Install and start [Ollama](https://ollama.com/download) (0.1.33 or newer).
+2. Run `python3 setup_descriptor.py` once from this project. It downloads and verifies **moondream:1.8b-v2-q4_0**, a small **Q4_0 (4-bit)** vision-language model, about **1.7 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The model is cached by Ollama and is not committed to Git.
+3. Open **Run_YOLO_LLM_Visual_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
+4. Read the **Visual description** panel under the preview. Its frame number (and source timestamp for video files) identifies the described frame; captions can lag behind live video. **Details** includes the full description and the exact detection evidence.
+
+The default samples at most once every three seconds, with a 180-second request timeout to allow the first model load. One background request and one latest pending frame keep memory bounded and video preview responsive. The model receives the original frame resized to at most 640 px, plus up to 10 predictions ordered by confidence: labels, scores, pixel and normalized boxes, and spatial positions. Axis-aligned extents represent oriented boxes. Classification predictions have no invented boxes. Extra predictions and objects dropped to fit the small context window are counted as omitted. Empty detections are explicitly distinguished from an empty scene.
+
+Confidence percentages are **YOLO detector scores**, not measured accuracy or confidence in the generated caption. Generated descriptions can still be wrong. The prompt asks the model to state uncertainty and image/detector disagreements. No cloud endpoint is used: the server must be loopback, proxy forwarding and redirects are disabled, and cloud-only models are rejected. Alternative local models must report vision support and quantized weights.
+
+Descriptions are generated only when YOLO inference is on. A missing model, unavailable server, invalid model or timeout disables descriptions for that run and displays recovery instructions; detection and recording continue. Reopen the input after fixing the problem. Still images and normal video EOF wait for pending descriptions. **Stop** cancels pending work without waiting for a model response; an already submitted request can finish inside Ollama, but its caption is discarded. It never stops a shared Ollama service.
+
+When recording or saving an image, sampled descriptions are written to `descriptions.jsonl` beside `predictions.jsonl`, with their original frame number, source time, model name, generation time, frame dimensions and exact evidence. A caption can finish after its recording is stopped, and still belongs to that recording's directory. Manual Stop can discard unfinished captions. Captions are displayed in the panel and saved as metadata; they are not burned into video frames.
+
+Source: [Moondream 2 (1.8B) model and quantization](https://ollama.com/library/moondream:1.8b-v2-q4_0), [Ollama vision API](https://docs.ollama.com/capabilities/vision).
 
 ## Live camera and recording
 
@@ -37,6 +56,7 @@ The main screen contains input, model size, device, inference, and recording con
 
 - **Model:** detection, instance segmentation, pose, classification, or oriented detection; inference resolution, confidence, class filter, custom weights, FP16, and labels.
 - **Camera:** requested resolution/FPS, inference frame stride, CPU threads, and the **Raspberry Pi / SBC preset**.
+- **Descriptions:** local quantized vision model, loopback Ollama server, sampling interval and timeout.
 - **Saving:** optional default save folder and **Record from start / save image result** for automatic export, including short files that might finish before you can click Record. Automatic video recording asks for a filename when opening the source. Cancelling starts preview without recording.
 
 Change these settings before opening the source. A camera may choose a supported capture size or FPS different from the request. Model checkpoints download on first use; Nano, Small, Medium, and Large detection checkpoints are cached on this PC.
@@ -53,7 +73,7 @@ Saved videos use the capture resolution. Preview snapshots are limited to 1280×
 
 ## Raspberry Pi / SBC installation
 
-Copy `Run_Generic_YOLO.sh`, `launcher.py`, `main.py`, `requirements.txt`, and the `generic_yolo/` folder into a `Generic_YOLO` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_Generic_YOLO.sh**. In **Installation options…**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
+Copy `Run_YOLO_LLM_Visual_Descriptor.sh`, `launcher.py`, `main.py`, `setup_descriptor.py`, `requirements.txt`, and the `yolo_llm_visual_descriptor/` folder into a `YOLO_LLM_Visual_Descriptor` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_YOLO_LLM_Visual_Descriptor.sh**. In **Installation options…**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
 
 **Install Linux prerequisites…** installs Tk, venv, pip, and graphics libraries on apt-based Linux systems using the OS authentication dialog. If Tk is missing before the launcher can open, it offers a graphical bootstrap on systems with Zenity and PolicyKit; otherwise install Python Tk through the OS software manager. System package installation must finish before the window closes.
 
@@ -71,11 +91,11 @@ New environments are verified before activation; failed or cancelled installs le
 
 ## Verification
 
-The responsive GUI was checked from 760×520 through 3800×2080, including every input mode, font scaling, Settings tabs, and compact/expanded launcher layouts. Visible controls were checked for clipping and overlap. Syntax checks also passed.
+The descriptor update passes 17 automated tests, Python syntax checks and launcher shell checks. The updated GUI was checked at 760×520 and 1200×850, including the description panel and Settings. The original detector GUI had broader layout checks before this update.
 
-Camera checks on this PC passed live preview, CUDA inference, both MP4 tracks, stopping, and reopening. A simulated USB disconnect verified recovery of the same camera and a playable interrupted recording. Earlier checks covered CPU image/video inference, file-free preview, recording filename selection, cancellation, protection of existing files, and launcher setup. Raspberry Pi/ARM camera hardware remains untested.
+Earlier detector-only camera checks on this PC passed live preview, CUDA inference, both MP4 tracks, stopping, and reopening. A simulated USB disconnect verified recovery of the same camera and a playable interrupted recording. Earlier checks covered CPU image/video inference, file-free preview, recording filename selection, cancellation, protection of existing files, and launcher setup. Raspberry Pi/ARM camera hardware remains untested.
 
-Temporary verification scripts and generated caches were removed after checking. Runtime libraries may recreate caches when the app is used. Git excludes local environments, model weights, settings, logs, and recordings.
+Runtime libraries may recreate caches when the app is used. Git excludes local environments, model weights, settings, logs, and recordings.
 
 ## References
 
@@ -84,3 +104,13 @@ Temporary verification scripts and generated caches were removed after checking.
 [Linux camera capabilities](https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/vidioc-querycap.html) · [OpenCV camera backends](https://docs.opencv.org/4.13.0/d8/dfe/classcv_1_1VideoCapture.html)
 
 Ultralytics code/models have their own AGPL-3.0 / enterprise terms. Dependencies retain their respective licenses.
+
+## Development checks
+
+Run `python3 -m unittest discover -s tests -v` after installing `requirements.txt`. These checks cover evidence conversion, frame/image requests, error isolation, stale-result cancellation, bounded queuing, saving and still-image inference integration; they do not download a model.
+
+The application package is `yolo_llm_visual_descriptor`. The old `Run_Generic_YOLO.sh` name remains as a compatibility shortcut. If you already cloned the old repository, update its origin with:
+
+```bash
+git remote set-url origin https://github.com/denizkarya1999/YOLO_LLM_Visual_Descriptor.git
+```

@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 import re
+import math
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -60,6 +61,34 @@ class RunConfig:
     save_output: bool = False
     output_dir: str = str(ROOT / "outputs")
 
+    describe_enabled: bool = True
+    describe_model: str = "moondream:1.8b-v2-q4_0"
+    describe_url: str = "http://127.0.0.1:11434"
+    describe_interval: float = 3.0
+    describe_timeout: float = 180.0
+    describe_max_objects: int = 10
+    describe_max_tokens: int = 180
+    describe_image_size: int = 640
+
+    def validate_descriptor(self):
+        if not self.describe_enabled:
+            return
+        from .descriptor import validate_endpoint
+        validate_endpoint(self.describe_url)
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}", self.describe_model):
+            raise ValueError("Enter a local Ollama model tag, for example moondream:1.8b-v2-q4_0.")
+        if self.describe_model.endswith("-cloud"):
+            raise ValueError("Choose a locally installed vision model, not a cloud model.")
+        for label, value, low, high in (
+            ("Description interval", self.describe_interval, .5, 300),
+            ("Description timeout", self.describe_timeout, 5, 300),
+            ("Description object limit", self.describe_max_objects, 1, 30),
+            ("Description token limit", self.describe_max_tokens, 32, 512),
+            ("Description image size", self.describe_image_size, 224, 1280),
+        ):
+            if not math.isfinite(value) or not low <= value <= high:
+                raise ValueError(f"{label} must be between {low} and {high}.")
+
     @property
     def weights(self) -> Path:
         return (Path(self.custom_model).expanduser().resolve() if self.custom_model
@@ -70,6 +99,7 @@ class RunConfig:
         return self.source_kind in {"Webcam", "Pi camera (CSI)", "Network stream"}
 
     def validated_source(self) -> str | int:
+        self.validate_descriptor()
         if self.inference_enabled:
             self.validate_inference()
         if not 1 <= self.frame_stride <= 30:

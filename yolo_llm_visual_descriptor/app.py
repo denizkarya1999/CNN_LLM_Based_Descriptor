@@ -45,6 +45,7 @@ class App:
         self.log_lines = deque(maxlen=500)
         self.latest_records = []
         self.last_packet = None
+        self.latest_description = None
         self.system_text = ''
         self.device_map = {'CPU': 'cpu'}
         self.camera_map = {}
@@ -56,6 +57,8 @@ class App:
         self.status = tk.StringVar(value='Checking available devices…')
         self.stats = tk.StringVar(value='Open a camera to begin')
         self.record_status = tk.StringVar(value='Not recording')
+        self.description_title = tk.StringVar(value='Visual description · waiting for a frame')
+        self.description_text = tk.StringVar(value='Enable descriptions in Settings to describe frames with YOLO evidence.')
         self._style()
         self._build()
         root.bind('<Configure>', self._window_resized, add='+')
@@ -79,7 +82,7 @@ class App:
             return RunConfig()
 
     def _style(self):
-        self.root.title('Generic YOLO')
+        self.root.title('YOLO LLM Visual Descriptor')
         self.window_width, _ = resizable_window(self.root, 1600, 1000)
         self.root.configure(bg=BG)
         self.body_font = tkfont.Font(root=self.root,family='DejaVu Sans',size=10)
@@ -107,7 +110,7 @@ class App:
         outer = ttk.Frame(self.root, padding=12); outer.pack(fill='both', expand=True)
         outer.columnconfigure(0, weight=1); outer.rowconfigure(3, weight=1)
         header = FlowRow(outer); header.grid(row=0, column=0, sticky='ew', pady=(0,8))
-        header.add(ttk.Label(header, text='GENERIC YOLO', font=self.title_font),expand=True)
+        header.add(ttk.Label(header, text='YOLO LLM Visual Descriptor', font=self.title_font),expand=True)
         self.settings_button = ttk.Button(header, text='Settings', command=self.show_settings)
         header.add(self.settings_button)
         header.add(ttk.Button(header, text='Details', command=self.show_details))
@@ -153,7 +156,20 @@ class App:
         self.record_label = wrap_label(ttk.Label(info,textvariable=self.record_status,foreground=MUTED,anchor='e',justify='right'))
         self.record_label.grid(row=0,column=1,sticky='ew',padx=(8,0))
 
-        actions = FlowRow(outer); actions.grid(row=5,column=0,sticky='ew',pady=(8,0))
+        description = ttk.LabelFrame(outer, text='Visual description', padding=8)
+        description.grid(row=5,column=0,sticky='ew',pady=(8,0))
+        wrap_label(ttk.Label(description,textvariable=self.description_title,foreground=ACCENT)).pack(fill='x')
+        body = ttk.Frame(description); body.pack(fill='x',pady=(4,0))
+        self.description_body = tk.Text(body,height=3,wrap='word',bg=PANEL,fg=FG,
+            font=self.body_font,relief='flat',borderwidth=0,state='disabled')
+        self.description_body.pack(side='left',fill='both',expand=True)
+        scroll = ttk.Scrollbar(body,command=self.description_body.yview)
+        scroll.pack(side='right',fill='y')
+        self.description_body.configure(yscrollcommand=scroll.set)
+        self.description_text.trace_add('write',lambda *_: self._description_updated())
+        self._description_updated()
+
+        actions = FlowRow(outer); actions.grid(row=6,column=0,sticky='ew',pady=(8,0))
         self.start_button = ttk.Button(actions, text='Open camera', style='Start.TButton', command=self.start, width=12)
         actions.add(self.start_button)
         self.stop_button = ttk.Button(actions, text='Stop', command=self.stop, state='disabled', width=6)
@@ -167,11 +183,17 @@ class App:
         self.mode_combo = ttk.Combobox(mode_group,textvariable=self.vars['record_mode'],values=RECORD_MODES,state='readonly',width=17)
         self.mode_combo.pack(side='left',fill='x',expand=True)
         actions.add(mode_group,expand=True)
-        wrap_label(ttk.Label(outer,textvariable=self.status,anchor='w')).grid(row=6,column=0,sticky='ew',pady=(8,0))
+        wrap_label(ttk.Label(outer,textvariable=self.status,anchor='w')).grid(row=7,column=0,sticky='ew',pady=(8,0))
         self.flow_rows = (header, model, actions)
         for widget in (self.source_combo,self.source_entry,self.camera_combo,self.scale_combo,self.device_combo,self.mode_combo):
             widget.configure(font=self.body_font)
         self._draw_preview()
+
+    def _description_updated(self):
+        self.description_body.configure(state='normal')
+        self.description_body.delete('1.0','end')
+        self.description_body.insert('1.0',self.description_text.get())
+        self.description_body.configure(state='disabled')
 
     def _window_resized(self, event):
         if event.widget is not self.root or self.closing:
@@ -265,9 +287,10 @@ class App:
 
     def _config(self):
         data = {key: value.get() for key,value in self.vars.items()}
-        for key in ('image_size','max_detections','frame_stride','cpu_threads','camera_width','camera_height','camera_fps'):
+        for key in ('image_size','max_detections','frame_stride','cpu_threads','camera_width','camera_height','camera_fps','describe_max_objects','describe_max_tokens','describe_image_size'):
             data[key] = int(data[key])
-        data['confidence'] = float(data['confidence'])
+        for key in ('confidence','describe_interval','describe_timeout'):
+            data[key] = float(data[key])
         device = self.device_map.get(self.selected_device.get())
         if device is None and data['inference_enabled']:
             raise ValueError('Select an available GPU or CPU, or turn inference off.')
@@ -298,6 +321,9 @@ class App:
         if self.worker:
             (self.inference_switch.set if enabled else self.inference_switch.clear)()
             self.status.set('Inference on · applies after the current frame' if enabled else 'Inference off · original preview')
+        if not enabled:
+            self.description_title.set('Visual description · inference off')
+            self.description_text.set('Enable YOLO inference to generate descriptions.')
         if not enabled and not self.recording:
             self.vars['record_mode'].set('Original')
         self._controls()
@@ -330,6 +356,9 @@ class App:
         self.image = None; self._draw_preview()
         self.snapshot_button.configure(state='disabled')
         self.latest_records = []
+        self.latest_description = None
+        self.description_title.set('Visual description · waiting for a frame' if cfg.describe_enabled else 'Visual description · disabled')
+        self.description_text.set('The local model may take a moment to load.' if cfg.describe_enabled else 'Enable descriptions in Settings.')
         self.record_status.set('Not recording')
         self.record_label.configure(foreground=MUTED)
         self.worker = self.ctx.Process(target=self.worker_target, args=(cfg,self.messages,self.previews,self.stop_event,self.pause_event,self.commands,self.inference_switch,recording_path), daemon=True)
@@ -360,7 +389,21 @@ class App:
 
     def _handle(self, packet):
         kind = packet['type']
-        if kind=='reconnecting':
+        if kind=='description':
+            if not self.vars['inference_enabled'].get() or self.stopping_since:
+                return
+            self.latest_description = packet
+            position = f" · source {packet['source_seconds']:.1f}s" if packet.get('source_seconds') is not None else ''
+            self.description_title.set(f"Frame {packet['frame']}{position} · {packet['model']} · generated in {packet['elapsed_seconds']:.1f}s")
+            self.description_text.set(packet['text'])
+            self.log(f"Description for frame {packet['frame']}: {packet['text']}")
+        elif kind in {'description_error','description_save_error'}:
+            self.description_title.set('Visual description · unavailable' if kind=='description_error' else 'Visual description · save failed')
+            self.description_text.set(packet['message'])
+            self.log(packet['message'])
+        elif kind=='reconnecting':
+            self.description_title.set('Visual description · camera reconnecting')
+            self.description_text.set('Waiting for a new frame.')
             self.ready = False
             self.status.set(packet['message']); self.log(packet['message']); self._controls()
         elif kind in {'status','ready','model'}:
@@ -481,8 +524,8 @@ class App:
         window.transient(self.root)
         ttk.Button(window,text='Done',command=window.destroy).pack(side='bottom',pady=(0,12))
         book = ttk.Notebook(window); book.pack(fill='both',expand=True,padx=14,pady=14)
-        model,camera,output = (ttk.Frame(book,padding=14) for _ in range(3))
-        for name,tab in [('Model',model),('Camera',camera),('Saving',output)]: book.add(tab,text=name)
+        model,camera,output,description = (ttk.Frame(book,padding=14) for _ in range(4))
+        for name,tab in [('Model',model),('Camera',camera),('Saving',output),('Descriptions',description)]: book.add(tab,text=name)
         def cell(parent,row,column,span=1):
             parent.columnconfigure(column,weight=1)
             frame=ttk.Frame(parent); frame.grid(row=row,column=column,columnspan=span,sticky='ew',padx=(0,8),pady=(0,4))
@@ -506,6 +549,11 @@ class App:
         ttk.Checkbutton(output,text='Record from start / save image result',variable=self.vars['save_output']).pack(anchor='w',pady=8)
         wrap_label(ttk.Label(output,text='A video filename is requested only when recording starts. Cancel keeps the preview available.\n\nOriginal contains no overlays. Both saves the annotated video at your chosen filename and a second file ending in _original.mp4.\n\nLive clips keep elapsed time by repeating frames when inference is slower than capture. Videos are silent.',foreground=MUTED)).pack(fill='x',pady=8)
 
+        ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
+        for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
+            self._field(description,label,key)
+        wrap_label(ttk.Label(description,text='Default: Moondream 2 (1.8B), 4-bit (about 1.7 GB). Run python3 setup_descriptor.py once. Frames stay on this computer. Captions show their source frame number and may lag behind live video. Detector confidence is a score, not measured accuracy. Changes apply when you reopen the input.',foreground=MUTED)).pack(fill='x',pady=12)
+
     def _field(self,parent,label,key):
         ttk.Label(parent,text=label).pack(anchor='w',pady=(7,2))
         ttk.Entry(parent,textvariable=self.vars[key],font=self.body_font).pack(fill='x')
@@ -518,7 +566,7 @@ class App:
         if self.details_window and self.details_window.winfo_exists(): self.details_window.destroy()
         window = self.details_window = tk.Toplevel(self.root); window.title('Session details'); resizable_window(window,900,600,minimum=(600,400)); window.transient(self.root)
         text = tk.Text(window,bg=PANEL,fg=FG,wrap='word',font=('DejaVu Sans Mono',9)); text.pack(fill='both',expand=True)
-        text.insert('end', self.system_text+'\n\nLatest predictions:\n'+json.dumps(self.latest_records,indent=2)+'\n\nActivity:\n'+'\n'.join(self.log_lines))
+        text.insert('end', self.system_text+'\n\nLatest description:\n'+json.dumps(self.latest_description,indent=2)+'\n\nLatest predictions:\n'+json.dumps(self.latest_records,indent=2)+'\n\nActivity:\n'+'\n'.join(self.log_lines))
         text.configure(state='disabled'); text.see('end')
 
     def log(self,text): self.log_lines.append(f'{datetime.now():%H:%M:%S}  {text}')

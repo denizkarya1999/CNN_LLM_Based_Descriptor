@@ -14,6 +14,7 @@ from dataclasses import replace
 from .config import RunConfig, parse_classes, RECORD_MODES
 from .recording import RunRecorder
 from .cameras import open_webcam
+from .descriptor import FrameDescriber
 
 
 def probe_devices(messages) -> None:
@@ -190,6 +191,8 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
     import cv2
     capture = camera = recorder = model = torch = None
     options = {}
+    describer = None
+    was_enabled = False
     outcome = "completed"
     frame_index = processed = 0
     last_preview = 0.0
@@ -228,6 +231,8 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
 
     def reconnect_webcam():
         nonlocal camera, capture
+        if describer:
+            describer.invalidate()
         messages.put({'type': 'reconnecting', 'message': 'Camera disconnected · trying to reconnect for up to eight seconds…'})
         finish_recording('interrupted by camera disconnect')
         camera.release()
@@ -272,6 +277,8 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
             if cfg.live:
                 camera = LatestCamera(capture, stop)
         messages.put({"type": "ready", "message": "Camera open" if cfg.live else "Input ready", "names": {}})
+        if cfg.describe_enabled:
+            describer = FrameDescriber(cfg, messages, stop, inference_switch)
         automatic_recording_pending = cfg.save_output
         while not stop.is_set():
             if commands is not None:
@@ -286,6 +293,9 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
                     pass
             if recorder and recorder.mode != "Original" and not inference_switch.is_set():
                 finish_recording("stopped because inference was turned off")
+            if describer and was_enabled and not inference_switch.is_set():
+                describer.invalidate()
+                was_enabled = False
             if paused.is_set():
                 if recorder:
                     finish_recording("paused")
@@ -367,9 +377,15 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
                     if recorder and recorder.mode != "Original":
                         finish_recording("failed")
                     messages.put({"type": "inference_error", "message": str(exc) + "\nInference turned off. Camera preview and original recording remain available."})
+            if describer and was_enabled and not enabled:
+                describer.invalidate()
+            was_enabled = enabled
             processed += 1
             now = time.perf_counter()
             source_seconds = (frame_index - 1) / fps if cfg.source_kind == "Video" else None
+            if describer and enabled:
+                describer.submit(frame, records, frame_index, source_seconds, captured_at,
+                                 recorder.directory if recorder else None)
             if recorder:
                 try:
                     recorder.write(frame, annotated, records, frame_index, source_seconds, captured_at, enabled)
@@ -399,6 +415,11 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
             detail, trace = detail.replace(cfg.source, "[stream]"), trace.replace(cfg.source, "[stream]")
         messages.put({"type": "error", "message": detail, "traceback": trace})
     finally:
+        if describer:
+            # Still images and EOF keep the last caption; Stop cancels promptly.
+            describer.close(drain=outcome == "completed" and not stop.is_set())
+        if outcome == "completed" and stop.is_set():
+            outcome = "stopped"
         finish_recording(outcome)
         if camera:
             camera.release()
