@@ -4,6 +4,16 @@ A desktop visual descriptor combining a YOLO CNN detector with quantized Qwen3-V
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
+## Screenshots
+
+The main app shows the live preview and scene description together, including detections, environment, decision, and reason. Descriptions identify their sampled frame and can lag behind the live preview.
+
+![Main app with live YOLO detections and scene description](Screenshots/Main%20App.png)
+
+The launcher provides device selection, installation status, and setup controls.
+
+![Launcher with device selection and setup controls](Screenshots/Launcher.png)
+
 ## Open
 
 Run **Run_CNN_LLM_Based_Descriptor.sh** with no arguments. On this PC it is in `~/Projects/CNN_LLM_Based_Descriptor`.
@@ -17,7 +27,7 @@ The app opens at 1440×900 on larger displays, with the camera preview and scene
 1. Install [Ollama](https://ollama.com/download) (0.12.7 or newer). The app starts its own local model service when needed.
 2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; structured descriptions took about 6–7 seconds in a warmed sample-image test (first loading can take longer), so it is not a per-frame real-time captioner. LLM weights are stored in the project’s `Models/ollama/` folder; YOLO weights are stored directly in `Models/`. Weights are excluded from Git.
 3. Open **Run_CNN_LLM_Based_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
-4. Read the **Scene understanding** panel under the preview. It shows **Detections** (YOLO objects, counts, scores and positions), **Environment** (a broad model estimate), **Decision** (either **Take Action** or **No Action**), and **Reason** (the evidence behind that recommendation). Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
+4. Read the **Scene understanding** panel beside or below the preview. It shows **Detections** (YOLO objects, counts, scores and positions), **Environment** (a broad model estimate), **Decision** (either **Take Action** or **No Action**), and **Reason** (the evidence behind that recommendation). Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
 
 The model receives the frame for context, but **cannot write free-form object descriptions**. It returns structured choices: `indoor`, `outdoor` or `unclear`, and either `no_action` or one suggestion from a list tied to the supplied detection IDs. Object presence alone does not force an action. The application checks the complete answer and builds all displayed text from YOLO facts and fixed suggestion/reason wording. Reasons for an action identify its detected object, position and exact confidence score, then explain the selected suggestion. Extra fields, unknown IDs, unsupported actions, prose and malformed answers are discarded; a YOLO-only summary is shown instead and the next frame can try again. Unchecked model text is never displayed or saved in description records.
 
