@@ -6,6 +6,7 @@ can estimate a broad setting and select a suggestion tied to a current box.
 
 from collections import Counter
 import json
+from .scenes import SETTINGS, environment_text
 
 ENVIRONMENTS = ("indoor", "outdoor", "unclear")
 LOW_SCORE = 0.5
@@ -41,9 +42,10 @@ def response_schema(choices):
         "type": "object",
         "properties": {
             "environment": {"type": "string", "enum": list(ENVIRONMENTS)},
+            "setting": {"type": "string", "enum": list(SETTINGS)},
             "next_step": {"type": "string", "enum": list(choices)},
         },
-        "required": ["environment", "next_step"],
+        "required": ["environment", "setting", "next_step"],
         "additionalProperties": False,
     }
 
@@ -61,19 +63,26 @@ def parse_choice(content, choices):
     if not isinstance(content, str) or len(content) > 2000:
         raise ValueError("Invalid model choice")
     answer = json.loads(content, object_pairs_hook=unique_keys)
-    if not isinstance(answer, dict) or set(answer) != {"environment", "next_step"}:
+    if not isinstance(answer, dict) or set(answer) != {"environment", "setting", "next_step"}:
         raise ValueError("Unexpected model fields")
     if not isinstance(answer["environment"], str) or answer["environment"] not in ENVIRONMENTS:
         raise ValueError("Unsupported environment")
+    if not isinstance(answer["setting"], str) or answer["setting"] not in SETTINGS:
+        raise ValueError("Unsupported setting")
+    expected = SETTINGS[answer["setting"]][1]
+    if expected != "unclear" and answer["environment"] != expected:
+        raise ValueError("Setting contradicts indoor/outdoor estimate")
     if not isinstance(answer["next_step"], str) or answer["next_step"] not in choices:
         raise ValueError("Unsupported suggestion or detection ID")
     return answer
 
 
-def render_description(evidence, total, width, height, cfg, choice=None, status="validated"):
+def render_description(evidence, total, width, height, cfg, choice=None, status="validated",
+                       context_override=None, reason_note=""):
     """All object words, counts, scores and locations originate in YOLO evidence."""
     choices = action_choices(evidence)
     environment = choice["environment"] if choice else "unclear"
+    setting = choice["setting"] if choice else "unclear"
     step = choices[choice["next_step"]] if choice else choices["no_action"]
     decision = "No Action" if step["kind"] == "no_action" else "Take Action"
     classification = cfg.task == "Image classification"
@@ -92,9 +101,7 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
     else:
         counts = Counter(item["label"] for item in evidence)
         facts = "; ".join(f"{count} × {label}" for label, count in counts.items()) + "."
-        context = {"indoor": "appears indoors (model estimate).",
-                   "outdoor": "appears outdoors (model estimate).",
-                   "unclear": "Unclear."}[environment]
+        context = context_override or environment_text(environment, setting)
         target = next((item for item in evidence if item["id"] == step["detection_id"]), None)
         if target is None:
             advice = "No specific action is suggested for the listed detections."
@@ -124,6 +131,8 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         context = "Unconfirmed."
         advice = "No action recommendation is available."
         reason = "The model answer failed validation, so only YOLO facts are shown."
+    if reason_note:
+        reason += " " + reason_note
     scores = "; ".join(
         f"{item['label']} ({item.get('position', 'classification')}, {item['confidence_percent']:g}%)"
         for item in evidence)
@@ -134,7 +143,8 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         "grounding_summary": summary,
         "model": cfg.describe_model,
         "evidence": evidence, "total_predictions": total, "frame_size": [width, height],
-        "grounding_status": status, "environment": environment,
+        "grounding_status": status, "environment": environment, "setting": setting,
+        "backend": getattr(cfg, "describe_backend", "LLM"),
         "action_decision": decision,
         "reason": reason,
         "suggested_action": {**step, "text": advice},

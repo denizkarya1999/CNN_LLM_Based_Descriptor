@@ -55,7 +55,7 @@ jobs:
               for size in ('1440x900','760x520'):
                   root.geometry(size)
                   for step in ('give_space:d1','no_action'):
-                      choice=parse_choice(json.dumps({'environment':'indoor','next_step':step}), action_choices(evidence))
+                      choice=parse_choice(json.dumps({'environment':'indoor','setting':'home','next_step':step}), action_choices(evidence))
                       packet=render_description(evidence,total,100,80,RunConfig(),choice=choice)
                       packet.update(type='description',frame=1,source_seconds=None,elapsed_seconds=1)
                       app._handle(packet); settle(root)
@@ -68,10 +68,61 @@ jobs:
                       assert 'Reason:' in packet['text'] and '91%' in packet['text']
               app._destroy()
           try:
-              parse_choice('{"environment":"indoor","next_step":"inspect:d99"}',action_choices(evidence))
+              parse_choice('{"environment":"indoor","setting":"home","next_step":"inspect:d99"}',action_choices(evidence))
               raise AssertionError('Unknown object was accepted')
           except ValueError:
               pass
+          from dataclasses import replace
+          import itertools, math, numpy as np
+          from cnn_llm_based_descriptor.classical import ClassicalClient, infer_setting, load_scene_model, review_targets, search_review_plan
+          from cnn_llm_based_descriptor.descriptor import OllamaVisionClient, FrameDescriber
+          def record(label, score=.9, x=0, y=0):
+              return {'name':label,'confidence':score,'box':{'x1':x,'y1':y,'x2':x+10,'y2':y+10}}
+          def facts(records):
+              return detection_evidence(records,100,100,30,require_boxes=True)[0]
+          cfg=RunConfig(describe_backend='CIS 579',describe_url='unavailable')
+          cfg.validate_descriptor()
+          table=load_scene_model()
+          posterior=infer_setting(facts([record('laptop')]),table)['posterior']
+          weights={name:row['prior']*row['likelihoods'].get('laptop',row['default_likelihood']) for name,row in table['scenes'].items()}
+          assert math.isclose(sum(posterior.values()),1)
+          assert all(math.isclose(posterior[name],weight/sum(weights.values())) for name,weight in weights.items())
+          assert infer_setting(facts([record('laptop'),record('laptop',.8)]),table)['posterior']==posterior
+          assert infer_setting(facts([record('laptop',.49)]),table)['setting']=='unclear'
+          frame=np.zeros((100,100,3),dtype=np.uint8)
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Unexpected LLM request')):
+              client=ClassicalClient(cfg)
+              for labels,setting in [(('laptop','keyboard','mouse'),'office'),(('couch','tv','remote'),'home'),(('person',),'unclear')]:
+                  result=client.describe(frame,[record(label) for label in labels])
+                  assert result['setting']==setting and result['action_decision']=='No Action'
+              assert client.describe(frame,[])['grounding_status']=='no_detections'
+              assert ClassicalClient(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
+              assert client.describe(frame,[record('person',.4)])['suggested_action']['kind']=='verify'
+              assert client.describe(frame,[record('traffic light')])['suggested_action']['kind']=='check_signal'
+          evidence=facts([record('knife',x=5,y=70),record('traffic light',x=80,y=20),record('person',.4,x=45,y=45)])
+          plan=search_review_plan(evidence); targets,_=review_targets(evidence)
+          optimum=math.inf
+          for order in itertools.permutations(targets):
+              for choices in itertools.product(*(target['options'] for target in order)):
+                  center=(.5,.5);cost=0
+                  for target,(_,effort) in zip(order,choices):
+                      cost+=effort+sum(abs(a-b) for a,b in zip(center,target['center']));center=target['center']
+                  optimum=min(optimum,cost)
+          assert math.isclose(plan['cost'],optimum)
+          assert all(step['choice'] in action_choices(evidence) for step in plan['steps'])
+          bounded=search_review_plan(facts([record('person',.4,x=i*3) for i in range(12)]))
+          assert len(bounded['steps'])==8 and bounded['omitted_targets']==4
+          for raw in ['{"environment":"outdoor","setting":"ballroom","next_step":"no_action"}',
+                      '{"environment":"indoor","setting":"invented place","next_step":"no_action"}',
+                      '{"environment":"indoor","setting":"home","next_step":"no_action","objects":["invented"]}']:
+              try:
+                  parse_choice(raw, action_choices(evidence))
+                  raise AssertionError('Invalid setting accepted')
+              except ValueError:
+                  pass
+          llm=OllamaVisionClient(RunConfig());llm.checked=True
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',return_value={'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}):
+              assert 'ballroom or event hall' in llm.describe(frame,[record('person')])['text']
           assert RunConfig().weights.parent.name == 'Models'
           print('Desktop and grounding checks passed.')
           PY

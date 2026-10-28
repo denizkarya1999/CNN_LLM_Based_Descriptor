@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="CNN LLM Descriptor: detection frame, eye and speech bubble">
+  <rect x="12" y="12" width="488" height="488" rx="112" fill="#0d1420"/>
+  <rect x="28" y="28" width="456" height="456" rx="98" fill="none" stroke="#25384e" stroke-width="4"/>
+  <g fill="none" stroke="#69dfc0" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M88 174V100h74 M350 100h74v74 M88 322v74h74"/>
+  </g>
+  <path d="M112 246Q256 82 400 246Q256 410 112 246Z" fill="#edf3fa"/>
+  <circle cx="256" cy="246" r="67" fill="#69dfc0"/>
+  <circle cx="256" cy="246" r="35" fill="#0d1420"/>
+  <circle cx="273" cy="227" r="10" fill="#edf3fa"/>
+  <path d="M318 326h110a24 24 0 0 1 24 24v49a24 24 0 0 1-24 24h-52l-38 29v-29h-20a24 24 0 0 1-24-24v-49a24 24 0 0 1 24-24Z" fill="#ffd084" stroke="#0d1420" stroke-width="12" stroke-linejoin="round"/>
+  <g fill="#0d1420"><circle cx="332" cy="376" r="8"/><circle cx="373" cy="376" r="8"/><circle cx="414" cy="376" r="8"/></g>
+</svg>

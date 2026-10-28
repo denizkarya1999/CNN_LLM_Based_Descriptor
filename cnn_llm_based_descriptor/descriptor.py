@@ -107,7 +107,12 @@ def build_prompt(evidence, total, width, height, threshold, task):
                    if "box_xyxy_normalized" in item else {})} for item in evidence]
     return (
         "Return only JSON matching response_schema. YOLO is the only source of object facts. "
-        "Use the frame only to estimate environment (indoor/outdoor/unclear) and choose one next_step. "
+        "Use the frame to estimate environment (indoor/outdoor/unclear), the setting, and one next_step. "
+        "Setting means the kind of place: home, ballroom/event hall, kitchen, bedroom, bathroom, office, "
+        "classroom, restaurant, shop, street, park, sports_area, station, vehicle_interior, or unclear. "
+        "Use the setting enum value ballroom for a ballroom/event hall. Setting is an unconfirmed visual "
+        "estimate, not an object detection. A room type must agree with indoor/outdoor. "
+        "Use unclear when the place is ambiguous; people/chairs alone do not establish a ballroom. "
         "Select no_action (displayed as No Action) when no specific response is warranted by the listed detections. "
         "Otherwise select an offered suggestion for a listed detection ID (displayed as Take Action), "
         "considering its box, score and surroundings. Object presence alone does not require action. "
@@ -125,7 +130,7 @@ def build_prompt(evidence, total, width, height, threshold, task):
                       "predictions": compact,
                       "response_schema": response_schema(action_choices(evidence))},
                      ensure_ascii=True, allow_nan=False)
-        + '\nAnswer with exactly two keys: "environment" and "next_step". '
+        + '\nAnswer with exactly three keys: "environment", "setting", and "next_step". '
         'Select one enum value for each. Choose no_action or an offered suggestion with its exact detection ID. '
         'Do not force an action just because an object is present. '
         'Return the JSON answer only. Do not copy the input data or schema. No explanation or Markdown.'
@@ -228,7 +233,13 @@ class FrameDescriber:
     """One request in flight and one latest pending frame; never block YOLO."""
     def __init__(self, cfg, messages, stop, inference_switch, client=None):
         self.cfg, self.messages, self.stop, self.inference_switch = cfg, messages, stop, inference_switch
-        self.client = client or OllamaVisionClient(cfg)
+        if client is not None:
+            self.client = client
+        elif cfg.describe_backend == "CIS 579":
+            from .classical import ClassicalClient
+            self.client = ClassicalClient(cfg)
+        else:
+            self.client = OllamaVisionClient(cfg)
         self.pending = queue.Queue(maxsize=1)
         self.closed = threading.Event()
         self.busy = threading.Event()

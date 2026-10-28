@@ -1,0 +1,168 @@
+{
+  "version": "teaching-v1",
+  "calibrated": false,
+  "description": "Illustrative hand-authored probabilities for CIS 579 conditional inference. Not learned from observations; not measured scene accuracy.",
+  "formula": "P(S|E) = normalize(P(S) * product(P(observed_class|S))). Distinct positive observed classes only; missing classes marginalized, not assumed absent.",
+  "scenes": {
+    "home": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "couch": 0.85,
+        "tv": 0.8,
+        "remote": 0.8,
+        "potted plant": 0.4,
+        "chair": 0.5,
+        "book": 0.3
+      }
+    },
+    "kitchen": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "refrigerator": 0.9,
+        "oven": 0.85,
+        "microwave": 0.75,
+        "sink": 0.75,
+        "toaster": 0.7,
+        "knife": 0.45,
+        "bowl": 0.45,
+        "cup": 0.5
+      }
+    },
+    "bedroom": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "bed": 0.95,
+        "teddy bear": 0.4,
+        "book": 0.4,
+        "chair": 0.3
+      }
+    },
+    "bathroom": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "toilet": 0.95,
+        "sink": 0.8,
+        "toothbrush": 0.7
+      }
+    },
+    "office": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "laptop": 0.8,
+        "keyboard": 0.85,
+        "mouse": 0.85,
+        "chair": 0.8,
+        "book": 0.45
+      }
+    },
+    "classroom": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "chair": 0.85,
+        "book": 0.8,
+        "laptop": 0.5,
+        "dining table": 0.6
+      }
+    },
+    "restaurant": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "dining table": 0.85,
+        "chair": 0.9,
+        "wine glass": 0.75,
+        "cup": 0.65,
+        "fork": 0.7,
+        "knife": 0.6,
+        "spoon": 0.6,
+        "bowl": 0.65
+      }
+    },
+    "ballroom": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "chair": 0.7,
+        "dining table": 0.7,
+        "wine glass": 0.7
+      }
+    },
+    "shop": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "handbag": 0.6,
+        "bottle": 0.5,
+        "apple": 0.5,
+        "banana": 0.5,
+        "orange": 0.5
+      }
+    },
+    "street": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "car": 0.9,
+        "bus": 0.7,
+        "traffic light": 0.75,
+        "stop sign": 0.65,
+        "motorcycle": 0.7,
+        "bicycle": 0.5,
+        "truck": 0.7
+      }
+    },
+    "park": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "bench": 0.8,
+        "bird": 0.65,
+        "dog": 0.5,
+        "bicycle": 0.4,
+        "potted plant": 0.3
+      }
+    },
+    "sports_area": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "sports ball": 0.9,
+        "baseball bat": 0.9,
+        "baseball glove": 0.9,
+        "tennis racket": 0.85,
+        "skateboard": 0.75,
+        "surfboard": 0.75
+      }
+    },
+    "station": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "train": 0.9,
+        "bench": 0.65,
+        "suitcase": 0.7,
+        "backpack": 0.5
+      }
+    },
+    "vehicle_interior": {
+      "prior": 0.05,
+      "default_likelihood": 0.06,
+      "likelihoods": {
+        "chair": 0.5,
+        "backpack": 0.4,
+        "suitcase": 0.4
+      }
+    },
+    "unclear": {
+      "prior": 0.3,
+      "default_likelihood": 0.18,
+      "likelihoods": {}
+    }
+  }
+}

@@ -18,6 +18,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import uuid
 from cnn_llm_based_descriptor.window import resizable_window, FlowRow, ScrollFrame, wrap_label
+from cnn_llm_based_descriptor.branding import apply_icon
 from cnn_llm_based_descriptor.theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT
 
 ROOT = Path(__file__).resolve().parent
@@ -240,9 +241,10 @@ class SetupWindow:
         root.title("CNN + LLM Based Descriptor · Launch & Setup")
         resizable_window(root, 800, 740, minimum=(640, 480))
         apply_theme(root)
+        self.brand_icon = apply_icon(root)
         header = ttk.Frame(root, padding=(20, 18, 20, 12))
         header.pack(fill='x')
-        ttk.Label(header, text='CNN + LLM Based Descriptor', font=('DejaVu Sans', 19, 'bold')).pack(anchor='w')
+        wrap_label(ttk.Label(header, text='CNN + LLM Based Descriptor', image=self.brand_icon, compound='left', font=('DejaVu Sans', 17, 'bold'))).pack(fill='x')
         ttk.Label(header, text='Launch your workspace', foreground=MUTED).pack(anchor='w', pady=(4, 0))
 
         # Reserve the action area before packing scrollable content. Checks and

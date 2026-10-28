@@ -17,6 +17,7 @@ TASKS = {
 }
 SCALES = {"N · Nano": "n", "S · Small": "s", "M · Medium": "m",
           "L · Large": "l", "X · Extra large": "x"}
+DESCRIBE_BACKENDS = ("LLM", "CIS 579")
 RECORD_MODES = ("Original", "With inference", "Both")
 
 
@@ -63,6 +64,7 @@ class RunConfig:
     output_dir: str = str(ROOT / "outputs")
 
     describe_enabled: bool = True
+    describe_backend: str = "LLM"
     describe_model: str = "qwen3-vl:2b"
     describe_url: str = PROJECT_ENDPOINT
     describe_interval: float = 3.0
@@ -74,6 +76,16 @@ class RunConfig:
     def validate_descriptor(self):
         if not self.describe_enabled:
             return
+        if self.describe_backend not in DESCRIBE_BACKENDS:
+            raise ValueError("Choose LLM or CIS 579 for scene understanding.")
+        for label, value, low, high in (
+            ("Description interval", self.describe_interval, .5, 300),
+            ("Description object limit", self.describe_max_objects, 1, 30),
+        ):
+            if not math.isfinite(value) or not low <= value <= high:
+                raise ValueError(f"{label} must be between {low} and {high}.")
+        if self.describe_backend == "CIS 579":
+            return
         from .descriptor import validate_endpoint
         validate_endpoint(self.describe_url)
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}", self.describe_model):
@@ -81,9 +93,7 @@ class RunConfig:
         if self.describe_model.endswith("-cloud"):
             raise ValueError("Choose a locally installed vision model, not a cloud model.")
         for label, value, low, high in (
-            ("Description interval", self.describe_interval, .5, 300),
             ("Description timeout", self.describe_timeout, 5, 300),
-            ("Description object limit", self.describe_max_objects, 1, 30),
             ("Description token limit", self.describe_max_tokens, 32, 512),
             ("Description image size", self.describe_image_size, 224, 1280),
         ):

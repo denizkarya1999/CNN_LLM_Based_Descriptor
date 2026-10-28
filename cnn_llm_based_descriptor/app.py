@@ -24,6 +24,8 @@ from .cameras import discover_cameras, linux_camera_path
 from .window import resizable_window, FlowRow, ScrollFrame, wrap_label
 from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT, AMBER
 from .model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
+from .branding import apply_icon
+from .config import DESCRIBE_BACKENDS
 
 
 
@@ -93,6 +95,7 @@ class App:
 
     def _style(self):
         self.root.title('CNN + LLM Based Descriptor')
+        self.brand_icon = apply_icon(self.root)
         self.window_width, _ = resizable_window(self.root, 1440, 900)
         self.body_font = tkfont.Font(root=self.root, family='DejaVu Sans', size=10)
         self.bold_font = tkfont.Font(root=self.root, family='DejaVu Sans', size=10, weight='bold')
@@ -121,7 +124,7 @@ class App:
 
         header = ttk.Frame(outer); header.pack(fill='x', pady=(0, 14))
         header.columnconfigure(0, weight=1)
-        self.heading_label = wrap_label(ttk.Label(header, text='CNN + LLM Based Descriptor', font=self.title_font))
+        self.heading_label = wrap_label(ttk.Label(header, text='CNN + LLM Based Descriptor', image=self.brand_icon, compound='left', font=self.title_font))
         self.heading_label.grid(row=0, column=0, sticky='ew', padx=(0, 20))
         ttk.Label(header, text='LOCAL VISION  /  DETECT · DESCRIBE · DECIDE', foreground=MUTED, font=('DejaVu Sans', 9)).grid(row=1, column=0, sticky='w', pady=(4, 0))
         self.tools_row = tools = FlowRow(header, width=345); tools.grid(row=0, column=1, rowspan=2, sticky='ew')
@@ -388,7 +391,7 @@ class App:
         self.latest_records = []
         self.latest_description = None
         self.description_title.set('Visual description · waiting for a frame' if cfg.describe_enabled else 'Visual description · disabled')
-        self.description_text.set('The local model may take a moment to load.' if cfg.describe_enabled else 'Enable descriptions in Settings.')
+        self.description_text.set(('CIS 579 probability and search are ready; waiting for YOLO detections.' if cfg.describe_backend == 'CIS 579' else 'The local model may take a moment to load.') if cfg.describe_enabled else 'Enable descriptions in Settings.')
         self.record_status.set('Not recording')
         self.record_label.configure(foreground=MUTED)
         self.worker = self.ctx.Process(target=self.worker_target, args=(cfg,self.messages,self.previews,self.stop_event,self.pause_event,self.commands,self.inference_switch,recording_path), daemon=True)
@@ -587,12 +590,16 @@ class App:
         ttk.Checkbutton(output,text='Record from start / save image result',variable=self.vars['save_output']).pack(anchor='w',pady=8)
         wrap_label(ttk.Label(output,text='A video filename is requested only when recording starts. Cancel keeps the preview available.\n\nOriginal contains no overlays. Both saves the annotated video at your chosen filename and a second file ending in _original.mp4.\n\nLive clips keep elapsed time by repeating frames when inference is slower than capture. Videos are silent.',foreground=MUTED)).pack(fill='x',pady=8)
 
-        ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
-        for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
+        ttk.Checkbutton(description,text='Enable scene descriptions',variable=self.vars['describe_enabled']).pack(anchor='w')
+        self._combo(description,'Description method','describe_backend',DESCRIBE_BACKENDS)
+        self._field(description,'Minimum seconds between frames','describe_interval')
+        wrap_label(ttk.Label(description,text='LLM uses the image to estimate the setting: home, ballroom, office, street, and more. CIS 579 uses only detected objects, conditional probability, rules, and uniform-cost search; no LLM or Ollama is needed.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Both methods keep object facts tied to YOLO. Settings are estimates. CIS 579 probabilities come from an illustrative table, not measured accuracy. Details shows the probabilities and review plan.',foreground=MUTED)).pack(fill='x',pady=8)
+        ttk.Separator(description).pack(fill='x',pady=8)
+        ttk.Label(description,text='LLM settings (used only in LLM mode)',font=self.bold_font).pack(anchor='w')
+        for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Request timeout (seconds)','describe_timeout')]:
             self._field(description,label,key)
-        wrap_label(ttk.Label(description,text='Detections come only from YOLO. Decision and Reason explain the recommendation. Models are stored in Models/ollama and the local service starts automatically. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
-        wrap_label(ttk.Label(description,text=f'Model folder: {MODEL_DIRECTORY}',foreground=MUTED)).pack(fill='x',pady=(0,8))
-
+        wrap_label(ttk.Label(description,text=f'Model folder: {MODEL_DIRECTORY}',foreground=MUTED)).pack(fill='x',pady=8)
         buttons = FlowRow(description); buttons.pack(fill='x')
         buttons.add(ttk.Button(buttons, text='Download model', command=self.download_description_model))
         buttons.add(ttk.Button(buttons, text='Cancel download', command=self.model_cancel.set))
@@ -603,7 +610,7 @@ class App:
         if self.model_job and self.model_job.is_alive():
             return
         try:
-            cfg = replace(self._config(), describe_enabled=True)
+            cfg = replace(self._config(), describe_enabled=True, describe_backend="LLM")
             cfg.validate_descriptor()
         except (ValueError, tk.TclError) as exc:
             messagebox.showerror('Check description settings', str(exc)); return
