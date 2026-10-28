@@ -116,10 +116,10 @@ class App:
         footer.pack(side='bottom', fill='x', pady=(12, 0))
         ttk.Separator(footer).pack(fill='x', pady=(0, 10))
         actions = FlowRow(footer); actions.pack(fill='x')
-        self.start_button = actions.add(ttk.Button(actions, text='Open camera', style='Start.TButton', command=self.start, width=10))
-        self.stop_button = actions.add(ttk.Button(actions, text='Stop', command=self.stop, state='disabled', width=5))
-        self.record_button = actions.add(ttk.Button(actions, text='● Record', style='Record.TButton', command=self.toggle_record, state='disabled', width=13))
-        self.snapshot_button = actions.add(ttk.Button(actions, text='Snapshot', command=self.snapshot, state='disabled', width=9))
+        self.start_button = actions.add(ttk.Button(actions, text='Open Camera', style='Start.TButton', command=self.start, width=-10))
+        self.stop_button = actions.add(ttk.Button(actions, text='Stop', command=self.stop, state='disabled', width=-5))
+        self.record_button = actions.add(ttk.Button(actions, text='● Record', style='Record.TButton', command=self.toggle_record, state='disabled', width=-13))
+        self.snapshot_button = actions.add(ttk.Button(actions, text='Snapshot', command=self.snapshot, state='disabled', width=-9))
         mode_group = ttk.Frame(actions)
         ttk.Label(mode_group, text='Save').pack(side='left', padx=(4, 6))
         self.mode_combo = ttk.Combobox(mode_group, textvariable=self.vars['record_mode'], values=RECORD_MODES, state='readonly', width=13)
@@ -133,9 +133,9 @@ class App:
         self.heading_label.grid(row=0, column=0, sticky='ew', padx=(0, 20))
         ttk.Label(header, text='LOCAL VISION  /  DETECT · DESCRIBE · DECIDE', foreground=MUTED, font=('DejaVu Sans', 9)).grid(row=1, column=0, sticky='w', pady=(4, 0))
         self.tools_row = tools = FlowRow(header, width=345); tools.grid(row=0, column=1, rowspan=2, sticky='ew')
-        self.settings_button = tools.add(ttk.Button(tools, text='Settings', command=self.show_settings, width=7))
-        self.details_button = tools.add(ttk.Button(tools, text='Details', command=self.show_details, width=7))
-        self.outputs_button = tools.add(ttk.Button(tools, text='Outputs', command=self.open_outputs, width=7))
+        self.settings_button = tools.add(ttk.Button(tools, text='Settings', command=self.show_settings, width=-7))
+        self.details_button = tools.add(ttk.Button(tools, text='Details', command=self.show_details, width=-7))
+        self.outputs_button = tools.add(ttk.Button(tools, text='Outputs', command=self.open_outputs, width=-7))
 
         source_card = ttk.Frame(outer, padding=12, style='Card.TFrame')
         source_card.pack(fill='x', pady=(0, 12))
@@ -286,7 +286,8 @@ class App:
             self.vars['source'].set('0' if camera else '')
         if named:
             self.refresh_cameras()
-        self.start_button.configure(text='Open camera' if camera else 'Open stream' if kind=='Network stream' else 'Start')
+        self.start_button.configure(text='Open Camera' if camera else 'Open Stream' if kind=='Network stream' else 'Start')
+        self.start_button.master.reflow()
 
     def refresh_cameras(self):
         if self.worker or not self.named_cameras:
