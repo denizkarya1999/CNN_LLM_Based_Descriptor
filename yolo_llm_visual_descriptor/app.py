@@ -11,11 +11,14 @@ import queue
 import subprocess
 import sys
 import time
+import threading
+import webbrowser
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk, font as tkfont
 from PIL import Image, ImageTk
 from .config import ROOT, RunConfig, SCALES, TASKS, RECORD_MODES
 from .engine import infer, probe_devices
+from .descriptor import download_model
 from .recording import recording_destinations
 from .cameras import discover_cameras, linux_camera_path
 from .window import resizable_window, FlowRow, wrap_label
@@ -57,6 +60,10 @@ class App:
         self.status = tk.StringVar(value='Checking available devices…')
         self.stats = tk.StringVar(value='Open a camera to begin')
         self.record_status = tk.StringVar(value='Not recording')
+        self.model_messages = queue.Queue(maxsize=8)
+        self.model_cancel = threading.Event()
+        self.model_job = None
+        self.model_status = tk.StringVar(value='Qwen3-VL 2B · 4-bit · about 1.9 GB · local Ollama')
         self.description_title = tk.StringVar(value='Visual description · waiting for a frame')
         self.description_text = tk.StringVar(value='Enable descriptions in Settings to describe frames with YOLO evidence.')
         self._style()
@@ -395,7 +402,7 @@ class App:
             self.latest_description = packet
             position = f" · source {packet['source_seconds']:.1f}s" if packet.get('source_seconds') is not None else ''
             self.description_title.set(f"Frame {packet['frame']}{position} · {packet['model']} · generated in {packet['elapsed_seconds']:.1f}s")
-            self.description_text.set(packet['text'])
+            self.description_text.set(packet['text'] + ('\n\n' + packet['grounding_summary'] if packet.get('grounding_summary') else ''))
             self.log(f"Description for frame {packet['frame']}: {packet['text']}")
         elif kind in {'description_error','description_save_error'}:
             self.description_title.set('Visual description · unavailable' if kind=='description_error' else 'Visual description · save failed')
@@ -471,6 +478,11 @@ class App:
             self.canvas.create_image(w//2,h//2,image=self.photo)
 
     def _pump(self):
+        try:
+            while True:
+                self.model_status.set(self.model_messages.get_nowait())
+        except queue.Empty:
+            pass
         if self.probe:
             alive = self.probe.is_alive()
             try:
@@ -552,7 +564,37 @@ class App:
         ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
         for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
             self._field(description,label,key)
-        wrap_label(ttk.Label(description,text='Default: Moondream 2 (1.8B), 4-bit (about 1.7 GB). Run python3 setup_descriptor.py once. Frames stay on this computer. Captions show their source frame number and may lag behind live video. Detector confidence is a score, not measured accuracy. Changes apply when you reopen the input.',foreground=MUTED)).pack(fill='x',pady=12)
+        wrap_label(ttk.Label(description,text='Install/start Ollama, then download the model once. Descriptions stay on this computer and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
+
+        buttons = FlowRow(description); buttons.pack(fill='x')
+        buttons.add(ttk.Button(buttons, text='Download model', command=self.download_description_model))
+        buttons.add(ttk.Button(buttons, text='Cancel download', command=self.model_cancel.set))
+        buttons.add(ttk.Button(buttons, text='Get Ollama', command=lambda: webbrowser.open('https://ollama.com/download')))
+        wrap_label(ttk.Label(description, textvariable=self.model_status, foreground=ACCENT)).pack(fill='x', pady=6)
+
+    def download_description_model(self):
+        if self.model_job and self.model_job.is_alive():
+            return
+        try:
+            cfg = replace(self._config(), describe_enabled=True)
+            cfg.validate_descriptor()
+        except (ValueError, tk.TclError) as exc:
+            messagebox.showerror('Check description settings', str(exc)); return
+        self.model_cancel.clear()
+        self.model_status.set('Downloading vision model…')
+        def progress(message):
+            if self.model_messages.full():
+                try: self.model_messages.get_nowait()
+                except queue.Empty: pass
+            self.model_messages.put_nowait(message)
+        def work():
+            try:
+                download_model(cfg.describe_url, cfg.describe_model, progress, self.model_cancel)
+                progress('Model ready · ' + cfg.describe_model)
+            except Exception as exc:
+                progress('Download needs attention · ' + str(exc))
+        self.model_job = threading.Thread(target=work, name='model-download', daemon=True)
+        self.model_job.start()
 
     def _field(self,parent,label,key):
         ttk.Label(parent,text=label).pack(anchor='w',pady=(7,2))
@@ -627,6 +669,7 @@ class App:
 
     def close(self):
         self.closing = True
+        self.model_cancel.set()
         try: self._save_settings(self._config())
         except (ValueError,tk.TclError): pass
         if self.worker: self.stop()

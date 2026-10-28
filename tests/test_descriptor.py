@@ -78,6 +78,36 @@ class ClientTests(unittest.TestCase):
         self.assertFalse(payload["stream"])
         self.assertNotIn("think", payload)  # Non-thinking vision models reject unsupported controls.
         self.assertEqual(result["evidence"][0]["position"], "top-left")
+        self.assertIn("top-left, 91%", result["grounding_summary"])
+
+    @patch("yolo_llm_visual_descriptor.descriptor.request_json")
+    def test_qwen_prefill_skips_forced_thinking(self, request):
+        request.side_effect = [
+            {"capabilities": ["vision", "thinking"], "details": {"quantization_level": "Q4_K_M"}},
+            {"message": {"content": "One person at 91%."}},
+        ]
+        OllamaVisionClient(RunConfig()).describe(FRAME, RECORDS)
+        payload = request.call_args.args[2]
+        self.assertFalse(payload["think"])
+        self.assertEqual(payload["messages"][-1], {"role": "assistant", "content": "<think>\n\n</think>\n\n"})
+        self.assertIn('"listed_counts_by_label"', payload["messages"][0]["content"])
+        self.assertEqual(payload["options"]["num_ctx"], 4096)
+
+    @patch("yolo_llm_visual_descriptor.descriptor.build_opener")
+    def test_model_download_progress_and_errors(self, opener):
+        from yolo_llm_visual_descriptor.descriptor import download_model
+        for failure in (False, True):
+            packets = [{"status": "pulling model", "completed": 50, "total": 100},
+                       {"error": "registry unavailable"} if failure else {"status": "success"}]
+            opener.return_value.open.return_value = io.BytesIO(b''.join(json.dumps(p).encode() + b'\n' for p in packets))
+            progress = []
+            if failure:
+                with self.assertRaisesRegex(RuntimeError, 'registry unavailable'):
+                    download_model('http://localhost:11434', 'qwen3-vl:2b', progress.append, threading.Event())
+            else:
+                download_model('http://localhost:11434', 'qwen3-vl:2b', progress.append, threading.Event())
+                self.assertEqual(progress[-1], 'success')
+            self.assertIn('50%', progress[0])
 
     @patch("yolo_llm_visual_descriptor.descriptor.request_json")
     def test_no_detections_and_empty_response(self, request):

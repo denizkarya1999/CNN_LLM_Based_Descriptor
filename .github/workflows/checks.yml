@@ -1,0 +1,20 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install 'numpy>=1.26,<3' 'opencv-python-headless>=4.10,<5'
+      - name: Test frame descriptions and recording integration
+        run: python -m unittest discover -s tests -v
+      - name: Check Python and launcher syntax
+        run: |
+          python -m compileall -q yolo_llm_visual_descriptor main.py launcher.py
+          bash -n Run_YOLO_LLM_Visual_Descriptor.sh

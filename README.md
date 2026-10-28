@@ -1,6 +1,6 @@
 # YOLO LLM Visual Descriptor
 
-A desktop visual descriptor combining quantized Moondream 2 (1.8B) with YOLO detections. It describes sampled frames using the image, bounding boxes, spatial positions, and detector confidence scores.
+A desktop visual descriptor combining quantized Qwen3-VL 2B with YOLO detections. It describes sampled frames using the image, bounding boxes, spatial positions, and detector confidence scores.
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
@@ -14,12 +14,14 @@ Resize or maximize the app normally. It opens at 1600×1000 on larger displays a
 
 ## Local vision descriptions
 
-1. Install and start [Ollama](https://ollama.com/download) (0.1.33 or newer).
-2. Run `python3 setup_descriptor.py` once from this project. It downloads and verifies **moondream:1.8b-v2-q4_0**, a small **Q4_0 (4-bit)** vision-language model, about **1.7 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The model is cached by Ollama and is not committed to Git.
+1. Install and start [Ollama](https://ollama.com/download) (0.12.7 or newer).
+2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; a sampled description took about 19 seconds after loading (first loading can take longer), so it is not a per-frame real-time captioner. The model is cached by Ollama and is not committed to Git.
 3. Open **Run_YOLO_LLM_Visual_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
-4. Read the **Visual description** panel under the preview. Its frame number (and source timestamp for video files) identifies the described frame; captions can lag behind live video. **Details** includes the full description and the exact detection evidence.
+4. Read the **Visual description** panel under the preview. An exact YOLO score/position line is shown beneath the generated text, even when the model omits confidence values. Its frame number (and source timestamp for video files) identifies the described frame; captions can lag behind live video. **Details** includes the full description and the exact detection evidence.
 
-The default samples at most once every three seconds, with a 180-second request timeout to allow the first model load. One background request and one latest pending frame keep memory bounded and video preview responsive. The model receives the original frame resized to at most 640 px, plus up to 10 predictions ordered by confidence: labels, scores, pixel and normalized boxes, and spatial positions. Axis-aligned extents represent oriented boxes. Classification predictions have no invented boxes. Extra predictions and objects dropped to fit the small context window are counted as omitted. Empty detections are explicitly distinguished from an empty scene.
+The Qwen3-VL compatibility prefill avoids the forced reasoning in older Ollama builds so the bounded output budget is used for the caption. Counts for listed classes are supplied explicitly.
+
+The default samples at most once every three seconds, with a 220-token output limit and a 180-second request timeout to allow the first model load. One background request and one latest pending frame keep memory bounded and video preview responsive. Cancel download stops after the current network read; downloading again resumes cached progress. Ollama chooses its GPU/CPU placement independently of YOLO. The model receives the original frame resized to at most 640 px, plus up to 10 predictions ordered by confidence: labels, scores, pixel and normalized boxes, and spatial positions. Axis-aligned extents represent oriented boxes. Classification predictions have no invented boxes. Extra predictions and objects dropped to fit the small context window are counted as omitted. Empty detections are explicitly distinguished from an empty scene.
 
 Confidence percentages are **YOLO detector scores**, not measured accuracy or confidence in the generated caption. Generated descriptions can still be wrong. The prompt asks the model to state uncertainty and image/detector disagreements. No cloud endpoint is used: the server must be loopback, proxy forwarding and redirects are disabled, and cloud-only models are rejected. Alternative local models must report vision support and quantized weights.
 
@@ -27,7 +29,7 @@ Descriptions are generated only when YOLO inference is on. A missing model, unav
 
 When recording or saving an image, sampled descriptions are written to `descriptions.jsonl` beside `predictions.jsonl`, with their original frame number, source time, model name, generation time, frame dimensions and exact evidence. A caption can finish after its recording is stopped, and still belongs to that recording's directory. Manual Stop can discard unfinished captions. Captions are displayed in the panel and saved as metadata; they are not burned into video frames.
 
-Source: [Moondream 2 (1.8B) model and quantization](https://ollama.com/library/moondream:1.8b-v2-q4_0), [Ollama vision API](https://docs.ollama.com/capabilities/vision).
+Source: [Qwen3-VL 2B model and quantization](https://ollama.com/library/qwen3-vl:2b), [Ollama vision API](https://docs.ollama.com/capabilities/vision).
 
 ## Live camera and recording
 
@@ -90,6 +92,8 @@ GUI setup offers existing-package reuse, CPU-only PyTorch, or NVIDIA CUDA packag
 New environments are verified before activation; failed or cancelled installs leave the working environment available. The active environment is recorded in `launcher_settings.json`, with the original `.venv/` also supported. Repairs retain prior working environments and can require additional disk space.
 
 ## Verification
+
+The final combined version passes 19 automated tests, compact-window GUI checks, and a real CUDA YOLO → quantized Qwen → saved-description test on the bundled bus image. GitHub Actions runs the automated checks on pushes and pull requests.
 
 The descriptor update passes 17 automated tests, Python syntax checks and launcher shell checks. The updated GUI was checked at 760×520 and 1200×850, including the description panel and Settings. The original detector GUI had broader layout checks before this update.
 

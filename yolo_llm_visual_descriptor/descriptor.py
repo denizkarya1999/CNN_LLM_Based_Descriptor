@@ -1,6 +1,7 @@
 """Local quantized vision-language captions with bounded, asynchronous work."""
 
 import base64
+from collections import Counter
 from datetime import datetime, timezone
 import ipaddress
 import json
@@ -13,7 +14,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
-DEFAULT_MODEL = "moondream:1.8b-v2-q4_0"
+DEFAULT_MODEL = "qwen3-vl:2b"
 
 
 def validate_endpoint(url):
@@ -53,10 +54,10 @@ def request_json(endpoint, route, payload, timeout):
         return result
     except HTTPError as exc:
         if exc.code == 404:
-            raise RuntimeError("Vision model missing. Run python3 setup_descriptor.py, then reopen the input.") from exc
+            raise RuntimeError("Vision model missing. Use Settings → Descriptions → Download model, then reopen the input.") from exc
         raise RuntimeError(f"Ollama returned HTTP {exc.code}. Check the local model service.") from exc
     except (URLError, TimeoutError, OSError) as exc:
-        raise RuntimeError("Could not reach Ollama or the description timed out. Start Ollama and run python3 setup_descriptor.py.") from exc
+        raise RuntimeError("Could not reach Ollama or the description timed out. Start Ollama and check Settings → Descriptions.") from exc
 
 
 def detection_evidence(records, width, height, limit):
@@ -99,6 +100,7 @@ def build_prompt(evidence, total, width, height, threshold, task):
     return (
         "Describe this frame in 2 concise sentences using the image and YOLO data. "
         "Mention main objects, positions and supplied confidence percentages (detector scores, not accuracy). "
+        "Use listed_counts_by_label for counts of supplied objects; omitted objects are not counted there. "
         "Low scores are uncertain. Do not invent objects, scores, identities or actions. "
         "Report image/detector disagreements. With no predictions, say YOLO detected nothing at the threshold, "
         "not that the scene is empty. Boxes are normalized xyxy; classification has no boxes. "
@@ -106,8 +108,34 @@ def build_prompt(evidence, total, width, height, threshold, task):
         + json.dumps({"task": task, "frame_width": width, "frame_height": height,
                       "detector_threshold": threshold, "valid_predictions": total,
                       "shown_predictions": len(evidence), "omitted_predictions": total-len(evidence),
+                      "listed_counts_by_label": dict(Counter(item["label"] for item in evidence)),
                       "predictions": compact}, ensure_ascii=True, allow_nan=False)
     )
+
+
+def download_model(endpoint, model, progress, cancelled):
+    """Stream local Ollama download progress without blocking Tk."""
+    request = Request(validate_endpoint(endpoint) + "/api/pull",
+                      data=json.dumps({"model": model, "stream": True}).encode(),
+                      headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with build_opener(ProxyHandler({}), NoRedirects()).open(request, timeout=120) as response:
+            while not cancelled.is_set():
+                line = response.readline(65536)
+                if not line:
+                    break
+                data = json.loads(line)
+                if data.get("error"):
+                    raise RuntimeError(str(data["error"])[:500])
+                status = data.get("status", "Downloading…")
+                if data.get("total"):
+                    status += f" · {100 * data.get('completed', 0) / data['total']:.0f}%"
+                progress(status)
+                if data.get("status") == "success":
+                    return
+        raise RuntimeError("Download cancelled or incomplete. Download again to resume.")
+    except (URLError, TimeoutError, OSError) as exc:
+        raise RuntimeError("Could not download the model. Start local Ollama and check your connection.") from exc
 
 
 class OllamaVisionClient:
@@ -122,12 +150,12 @@ class OllamaVisionClient:
         if not self.checked:
             model = request_json(cfg.describe_url, "/api/show", {"model": cfg.describe_model}, min(10, cfg.describe_timeout))
             if "vision" not in model.get("capabilities", []):
-                raise ValueError("Select an Ollama model with vision support, such as moondream:1.8b-v2-q4_0.")
+                raise ValueError("Select an Ollama model with vision support, such as qwen3-vl:2b.")
             if model.get("remote_host") or model.get("remote_model"):
                 raise ValueError("Select a locally installed model; cloud models are not used for camera frames.")
             quantization = model.get("details", {}).get("quantization_level", "")
             if not quantization.startswith(("Q", "IQ")):
-                raise ValueError("Select quantized vision weights, such as moondream:1.8b-v2-q4_0 (Q4_0).")
+                raise ValueError("Select quantized vision weights, such as qwen3-vl:2b (Q4_K_M).")
             self.supports_thinking = "thinking" in model.get("capabilities", [])
             self.checked = True
         height, width = frame.shape[:2]
@@ -143,18 +171,27 @@ class OllamaVisionClient:
         ok, jpeg = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, 85])
         if not ok:
             raise ValueError("Could not encode the frame for description.")
+        messages = [{"role": "user", "content": prompt,
+                     "images": [base64.b64encode(jpeg).decode("ascii")]}]
+        qwen = cfg.describe_model.lower().startswith("qwen3-vl:")
+        if qwen and "instruct" not in cfg.describe_model.lower():
+            # Older Qwen3-VL renderers ignore think=False. A completed empty
+            # thinking prefill makes Ollama resume directly into the answer.
+            messages.append({"role": "assistant", "content": "<think>\n\n</think>\n\n"})
         response = request_json(cfg.describe_url, "/api/chat", {
             "model": cfg.describe_model, "stream": False,
             **({"think": False} if self.supports_thinking else {}),
-            "keep_alive": "5m", "messages": [{"role": "user",
-                "content": prompt,
-                "images": [base64.b64encode(jpeg).decode("ascii")]}],
-            "options": {"temperature": 0, "num_predict": cfg.describe_max_tokens, "num_ctx": 2048},
+            "keep_alive": "5m", "messages": messages,
+            "options": {"temperature": 0, "num_predict": cfg.describe_max_tokens, "num_ctx": 4096 if qwen else 2048},
         }, cfg.describe_timeout)
         content = response.get("message", {}).get("content")
         if not isinstance(content, str) or not content.strip():
             raise ValueError("The vision model returned an empty description.")
-        return {"text": content.strip()[:4000], "model": cfg.describe_model,
+        scores = "; ".join(f"{item['label']} ({item.get('position', 'classification')}, {item['confidence_percent']:g}%)" for item in evidence)
+        summary = "YOLO scores: " + (scores or "No predictions above the selected threshold.")
+        if total > len(evidence):
+            summary += f" · {total - len(evidence)} additional predictions omitted."
+        return {"text": content.strip()[:4000], "grounding_summary": summary, "model": cfg.describe_model,
                 "evidence": evidence, "total_predictions": total,
                 "frame_size": [width, height]}
 

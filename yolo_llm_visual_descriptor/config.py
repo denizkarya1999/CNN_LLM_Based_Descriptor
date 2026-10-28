@@ -62,12 +62,12 @@ class RunConfig:
     output_dir: str = str(ROOT / "outputs")
 
     describe_enabled: bool = True
-    describe_model: str = "moondream:1.8b-v2-q4_0"
+    describe_model: str = "qwen3-vl:2b"
     describe_url: str = "http://127.0.0.1:11434"
     describe_interval: float = 3.0
     describe_timeout: float = 180.0
     describe_max_objects: int = 10
-    describe_max_tokens: int = 180
+    describe_max_tokens: int = 220
     describe_image_size: int = 640
 
     def validate_descriptor(self):
@@ -76,7 +76,7 @@ class RunConfig:
         from .descriptor import validate_endpoint
         validate_endpoint(self.describe_url)
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}", self.describe_model):
-            raise ValueError("Enter a local Ollama model tag, for example moondream:1.8b-v2-q4_0.")
+            raise ValueError("Enter a local Ollama model tag, for example qwen3-vl:2b.")
         if self.describe_model.endswith("-cloud"):
             raise ValueError("Choose a locally installed vision model, not a cloud model.")
         for label, value, low, high in (
