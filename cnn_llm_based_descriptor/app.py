@@ -65,7 +65,7 @@ class App:
         self.model_job = None
         self.model_status = tk.StringVar(value='Qwen3-VL 2B · 4-bit · about 1.9 GB · local Ollama')
         self.description_title = tk.StringVar(value='Visual description · waiting for a frame')
-        self.description_text = tk.StringVar(value='Enable descriptions in Settings to describe frames with YOLO evidence.')
+        self.description_text = tk.StringVar(value='Enable descriptions in Settings for detected objects and a suggested next step.')
         self._style()
         self._build()
         root.bind('<Configure>', self._window_resized, add='+')
@@ -163,11 +163,11 @@ class App:
         self.record_label = wrap_label(ttk.Label(info,textvariable=self.record_status,foreground=MUTED,anchor='e',justify='right'))
         self.record_label.grid(row=0,column=1,sticky='ew',padx=(8,0))
 
-        description = ttk.LabelFrame(outer, text='Visual description', padding=8)
+        description = ttk.LabelFrame(outer, text='Detected objects and guidance', padding=8)
         description.grid(row=5,column=0,sticky='ew',pady=(8,0))
         wrap_label(ttk.Label(description,textvariable=self.description_title,foreground=ACCENT)).pack(fill='x')
         body = ttk.Frame(description); body.pack(fill='x',pady=(4,0))
-        self.description_body = tk.Text(body,height=3,wrap='word',bg=PANEL,fg=FG,
+        self.description_body = tk.Text(body,height=4,wrap='word',bg=PANEL,fg=FG,
             font=self.body_font,relief='flat',borderwidth=0,state='disabled')
         self.description_body.pack(side='left',fill='both',expand=True)
         scroll = ttk.Scrollbar(body,command=self.description_body.yview)
@@ -401,7 +401,8 @@ class App:
                 return
             self.latest_description = packet
             position = f" · source {packet['source_seconds']:.1f}s" if packet.get('source_seconds') is not None else ''
-            self.description_title.set(f"Frame {packet['frame']}{position} · {packet['model']} · generated in {packet['elapsed_seconds']:.1f}s")
+            method = packet['model'] if packet.get('grounding_status', 'validated') == 'validated' else 'YOLO facts only'
+            self.description_title.set(f"Frame {packet['frame']}{position} · {method} · {packet['elapsed_seconds']:.1f}s")
             self.description_text.set(packet['text'] + ('\n\n' + packet['grounding_summary'] if packet.get('grounding_summary') else ''))
             self.log(f"Description for frame {packet['frame']}: {packet['text']}")
         elif kind in {'description_error','description_save_error'}:
@@ -564,7 +565,7 @@ class App:
         ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
         for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
             self._field(description,label,key)
-        wrap_label(ttk.Label(description,text='Install/start Ollama, then download the model once. Descriptions stay on this computer and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Install/start Ollama, then download the model once. Only YOLO detections are described. The model estimates indoor/outdoor context and selects a suggestion for a detected object. Descriptions stay on this computer and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
 
         buttons = FlowRow(description); buttons.pack(fill='x')
         buttons.add(ttk.Button(buttons, text='Download model', command=self.download_description_model))

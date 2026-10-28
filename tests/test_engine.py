@@ -17,7 +17,8 @@ from cnn_llm_based_descriptor.engine import infer
 
 
 class EngineIntegrationTests(unittest.TestCase):
-    def run_source(self, source_kind="Image", describe_enabled=True, failure=False, cancel=False, inference_enabled=True):
+    def run_source(self, source_kind="Image", describe_enabled=True, failure=False, cancel=False, inference_enabled=True,
+                   model_answer=None):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -49,11 +50,16 @@ class EngineIntegrationTests(unittest.TestCase):
         def cancel_description(*args):
             stop.set()
             return caption
-        with patch.dict("sys.modules", modules), patch(
+        client_patch = patch(
             "cnn_llm_based_descriptor.descriptor.OllamaVisionClient.describe",
             side_effect=RuntimeError("Model unavailable") if failure else cancel_description if cancel else None,
             return_value=caption,
-        ) as describe:
+        ) if model_answer is None else patch(
+            "cnn_llm_based_descriptor.descriptor.request_json",
+            side_effect=[{"capabilities": ["vision"], "details": {"quantization_level": "Q4_K_M"}},
+                         {"message": {"content": model_answer}}],
+        )
+        with patch.dict("sys.modules", modules), client_patch as describe:
             infer(cfg, messages, previews, stop, threading.Event())
             self.assertEqual(describe.called, describe_enabled and inference_enabled)
         packets = []
@@ -103,6 +109,25 @@ class EngineIntegrationTests(unittest.TestCase):
         prediction = json.loads((directory/"predictions.jsonl").read_text())
         self.assertFalse(prediction["inference"])
         self.assertEqual(prediction["predictions"], [])
+
+    def test_validated_suggestion_is_saved_with_its_detection_id(self):
+        packets, directory = self.run_source(model_answer=json.dumps(
+            {"environment": "indoor", "next_step": "give_space:d1"}))
+        saved = json.loads((directory/"descriptions.jsonl").read_text())
+        self.assertEqual(saved["grounding_status"], "validated")
+        self.assertEqual(saved["suggested_action"]["detection_id"], saved["evidence"][0]["id"])
+        self.assertIn("1 × person", saved["text"])
+        self.assertEqual(saved["text"], next(p for p in packets if p["type"] == "description")["text"])
+
+    def test_hallucinated_prose_is_not_displayed_or_recorded(self):
+        packets, directory = self.run_source(model_answer='A bus is approaching. Cross now.')
+        saved_text = (directory/"descriptions.jsonl").read_text()
+        saved = json.loads(saved_text)
+        self.assertEqual(saved["grounding_status"], "fallback")
+        self.assertNotIn("bus", saved_text)
+        self.assertNotIn("Cross now", saved_text)
+        self.assertIn("1 × person", saved["text"])
+        self.assertFalse(any(p["type"] == "description_error" for p in packets))
 
 
 if __name__ == "__main__":
