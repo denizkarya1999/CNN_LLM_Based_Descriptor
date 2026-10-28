@@ -130,7 +130,7 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
     summary = "YOLO scores: " + (scores or "No predictions above the selected threshold.")
     detections = facts + (f"\n{summary}" if evidence and not classification else "")
     return {
-        "text": f"Detections: {detections}\n\nEnvironment: {context}\n\n{decision}: {advice}\n\nReason: {reason}",
+        "text": f"Detections: {detections}\n\nEnvironment: {context}\n\nDecision: {decision}\n{advice}\n\nReason: {reason}",
         "grounding_summary": summary,
         "model": cfg.describe_model,
         "evidence": evidence, "total_predictions": total, "frame_size": [width, height],

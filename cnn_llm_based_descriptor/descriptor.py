@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 from .grounding import action_choices, parse_choice, render_description, response_schema
+from .model_store import ensure_project_server
 
 DEFAULT_MODEL = "qwen3-vl:2b"
 
@@ -39,6 +40,7 @@ class NoRedirects(HTTPRedirectHandler):
 
 
 def request_json(endpoint, route, payload, timeout):
+    ensure_project_server(validate_endpoint(endpoint))
     request = Request(validate_endpoint(endpoint) + route,
                       data=json.dumps(payload, allow_nan=False).encode("utf-8"),
                       headers={"Content-Type": "application/json"}, method="POST")
@@ -132,6 +134,7 @@ def build_prompt(evidence, total, width, height, threshold, task):
 
 def download_model(endpoint, model, progress, cancelled):
     """Stream local Ollama download progress without blocking Tk."""
+    ensure_project_server(validate_endpoint(endpoint))
     request = Request(validate_endpoint(endpoint) + "/api/pull",
                       data=json.dumps({"model": model, "stream": True}).encode(),
                       headers={"Content-Type": "application/json"}, method="POST")

@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import math
 from urllib.parse import urlsplit
+from .model_store import PROJECT_ENDPOINT
 
 ROOT = Path(__file__).resolve().parent.parent
 TASKS = {
@@ -63,7 +64,7 @@ class RunConfig:
 
     describe_enabled: bool = True
     describe_model: str = "qwen3-vl:2b"
-    describe_url: str = "http://127.0.0.1:11434"
+    describe_url: str = PROJECT_ENDPOINT
     describe_interval: float = 3.0
     describe_timeout: float = 180.0
     describe_max_objects: int = 10
@@ -92,7 +93,7 @@ class RunConfig:
     @property
     def weights(self) -> Path:
         return (Path(self.custom_model).expanduser().resolve() if self.custom_model
-                else ROOT / "models" / model_name(self.task, self.scale))
+                else ROOT / "Models" / model_name(self.task, self.scale))
 
     @property
     def live(self) -> bool:

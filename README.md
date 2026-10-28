@@ -8,16 +8,16 @@ A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU 
 
 Run **Run_CNN_LLM_Based_Descriptor.sh** with no arguments. On this PC it is in `~/Projects/CNN_LLM_Based_Descriptor`.
 
-The launcher checks your installation. Select a device and click **Open CNN + LLM Based Descriptor**. **Installation options…** contains GUI setup/repair; it opens automatically when setup is needed. No setup flags are required.
+The launcher checks your installation. Select a device and click **Open app**. Launch, check, cancel, repair and Linux prerequisite buttons remain visible in a fixed bottom bar. Installation options and the activity log scroll independently. No setup flags are required.
 
-Resize or maximize the app normally. It opens at 1600×1000 on larger displays and fits smaller screens. Buttons move onto additional rows when space is limited, status text wraps, and fonts adjust between readable small-window and large-window sizes. The camera preview scales to the available space while preserving its proportions. Settings and launcher windows are also resizable. A 1024×600 or larger desktop display is recommended; the main window can shrink to 760×520.
+The app opens at 1440×900 on larger displays, with the camera preview and scene description side by side. Preview and Description remain visible together at every supported size: side by side on wide or short windows, and stacked on narrow, taller windows. The description scrolls independently. Open, Stop, Record and Snapshot stay in a fixed bottom bar. **Decision:** is prominent, with amber **Take Action** and teal **No Action** highlights. Settings pages scroll, including every model-download button. The app supports windows down to 760×520; the launcher supports 640×480 and does not shrink itself after checking dependencies.
 
 ## Local vision descriptions
 
-1. Install and start [Ollama](https://ollama.com/download) (0.12.7 or newer).
-2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; structured descriptions took about 6–7 seconds in a warmed sample-image test (first loading can take longer), so it is not a per-frame real-time captioner. The model is cached by Ollama and is not committed to Git.
+1. Install [Ollama](https://ollama.com/download) (0.12.7 or newer). The app starts its own local model service when needed.
+2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; structured descriptions took about 6–7 seconds in a warmed sample-image test (first loading can take longer), so it is not a per-frame real-time captioner. LLM weights are stored in the project’s `Models/ollama/` folder; YOLO weights are stored directly in `Models/`. Weights are excluded from Git.
 3. Open **Run_CNN_LLM_Based_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
-4. Read the **Detected objects and guidance** panel under the preview. It shows **Detections** (YOLO objects, counts, scores and positions), **Environment** (a broad model estimate), either **Take Action** or **No Action**, and **Reason** (the evidence behind that recommendation). Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
+4. Read the **Scene understanding** panel under the preview. It shows **Detections** (YOLO objects, counts, scores and positions), **Environment** (a broad model estimate), **Decision** (either **Take Action** or **No Action**), and **Reason** (the evidence behind that recommendation). Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
 
 The model receives the frame for context, but **cannot write free-form object descriptions**. It returns structured choices: `indoor`, `outdoor` or `unclear`, and either `no_action` or one suggestion from a list tied to the supplied detection IDs. Object presence alone does not force an action. The application checks the complete answer and builds all displayed text from YOLO facts and fixed suggestion/reason wording. Reasons for an action identify its detected object, position and exact confidence score, then explain the selected suggestion. Extra fields, unknown IDs, unsupported actions, prose and malformed answers are discarded; a YOLO-only summary is shown instead and the next frame can try again. Unchecked model text is never displayed or saved in description records.
 
@@ -31,7 +31,7 @@ The default samples at most once every three seconds, with a 220-token output li
 
 Confidence percentages are **YOLO detector scores**, not measured accuracy or confidence in the environment estimate. Detections below 50% are marked tentative and can only receive a verification suggestion. YOLO can still miss or misclassify objects; the descriptor preserves its predictions rather than substituting the vision model's guesses. Suggestions are conditional guidance for reviewing the scene, not movement commands. No cloud endpoint is used: the server must be loopback, proxy forwarding and redirects are disabled, and cloud-only models are rejected. Alternative local models must report vision support and quantized weights and support structured JSON output.
 
-Descriptions are generated only when YOLO inference is on. A missing model, unavailable server, invalid model or timeout disables descriptions for that run and displays recovery instructions; detection and recording continue. Reopen the input after fixing the problem. Still images and normal video EOF wait for pending descriptions. **Stop** cancels pending work without waiting for a model response; an already submitted request can finish inside Ollama, but its caption is discarded. It never stops a shared Ollama service.
+Descriptions are generated only when YOLO inference is on. A missing model, failed server startup, invalid model or timeout disables descriptions for that run and displays recovery instructions; detection and recording continue. Reopen the input after fixing the problem. Still images and normal video EOF wait for pending descriptions. **Stop** cancels pending work without waiting for a model response; an already submitted request can finish inside Ollama, but its caption is discarded. The dedicated project service uses `127.0.0.1:11435` and `OLLAMA_MODELS=Models/ollama`. It starts on demand and remains available in the background, unloading idle model memory after five minutes. A custom loopback server can still be selected in Settings. The shared Ollama service on port 11434 is unaffected.
 
 When recording or saving an image, sampled descriptions are written to `descriptions.jsonl` beside `predictions.jsonl`, with their original frame number, source time, model name, generation time, frame dimensions, exact evidence, `action_decision` and `reason`. A caption can finish after its recording is stopped, and still belongs to that recording's directory. Manual Stop can discard unfinished captions. Captions are displayed in the panel and saved as metadata; they are not burned into video frames.
 
@@ -81,7 +81,7 @@ Saved videos use the capture resolution. Preview snapshots are limited to 1280×
 
 ## Raspberry Pi / SBC installation
 
-Copy `Run_CNN_LLM_Based_Descriptor.sh`, `launcher.py`, `main.py`, `setup_descriptor.py`, `requirements.txt`, and the `cnn_llm_based_descriptor/` folder into a `CNN_LLM_Based_Descriptor` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_CNN_LLM_Based_Descriptor.sh**. In **Installation options…**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
+Copy `Run_CNN_LLM_Based_Descriptor.sh`, `launcher.py`, `main.py`, `setup_descriptor.py`, `requirements.txt`, and the `cnn_llm_based_descriptor/` folder into a `CNN_LLM_Based_Descriptor` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_CNN_LLM_Based_Descriptor.sh**. Under **Installation & repair**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
 
 **Install Linux prerequisites…** installs Tk, venv, pip, and graphics libraries on apt-based Linux systems using the OS authentication dialog. If Tk is missing before the launcher can open, it offers a graphical bootstrap on systems with Zenity and PolicyKit; otherwise install Python Tk through the OS software manager. System package installation must finish before the window closes.
 
@@ -89,7 +89,7 @@ For a Raspberry Pi CSI camera, enable the CSI-support checkbox before installing
 
 Use **Settings → Camera → Raspberry Pi / SBC preset** to select Nano, CPU, 320-pixel inference, two CPU threads, and frame stride 2. Larger models need more memory and may be too slow on small boards. No board-specific NPU acceleration is included.
 
-Copy the `models/` folder separately for offline use. Do not copy `.venv/`, `.environments/`, or `launcher_settings.json` between computers.
+Copy the `Models/` folder separately for offline use. Do not copy `.venv/`, `.environments/`, or `launcher_settings.json` between computers.
 
 ## Installation management
 
@@ -99,11 +99,9 @@ New environments are verified before activation; failed or cancelled installs le
 
 ## Verification
 
-The final combined version passes 19 automated tests, compact-window GUI checks, and a real CUDA YOLO → quantized Qwen → saved-description test on the bundled bus image. GitHub Actions runs the automated checks on pushes and pull requests.
+The descriptor’s 31 regression checks passed before the requested test-file cleanup. The refreshed launcher was checked at 800×740, 700×520 and 640×480 in ready, error and busy states. The main app was checked at 1440×900, 1100×700, 1024×600 and 760×520, including both decision highlights and scrolling settings. GitHub Actions runs syntax, launcher-layout and descriptor smoke checks without downloading models.
 
-The descriptor update passes 17 automated tests, Python syntax checks and launcher shell checks. The updated GUI was checked at 760×520 and 1200×850, including the description panel and Settings. The original detector GUI had broader layout checks before this update.
-
-Earlier detector-only camera checks on this PC passed live preview, CUDA inference, both MP4 tracks, stopping, and reopening. A simulated USB disconnect verified recovery of the same camera and a playable interrupted recording. Earlier checks covered CPU image/video inference, file-free preview, recording filename selection, cancellation, protection of existing files, and launcher setup. Raspberry Pi/ARM camera hardware remains untested.
+A real CUDA YOLO → quantized Qwen frame check verifies the local model pipeline. Raspberry Pi/ARM camera hardware remains untested.
 
 Runtime libraries may recreate caches when the app is used. Git excludes local environments, model weights, settings, logs, and recordings.
 
@@ -115,12 +113,8 @@ Runtime libraries may recreate caches when the app is used. Git excludes local e
 
 Ultralytics code/models have their own AGPL-3.0 / enterprise terms. Dependencies retain their respective licenses.
 
-## Development checks
+## Automated checks
 
-Run `python3 -m unittest discover -s tests -v` after installing `requirements.txt`. These checks cover evidence conversion, frame/image requests, error isolation, stale-result cancellation, bounded queuing, saving and still-image inference integration; they do not download a model.
+GitHub Actions contains the smoke checks directly in its workflow; a separate test folder is not shipped. Local verification can use `python3 -m compileall -q cnn_llm_based_descriptor main.py launcher.py setup_descriptor.py` and `bash -n Run_CNN_LLM_Based_Descriptor.sh`.
 
-The application package is `cnn_llm_based_descriptor`. The GitHub repository remains available at the following origin:
-
-```bash
-git remote set-url origin https://github.com/denizkarya1999/CNN_LLM_Based_Descriptor.git
-```
+Repository: [CNN_LLM_Based_Descriptor](https://github.com/denizkarya1999/CNN_LLM_Based_Descriptor).

@@ -8,8 +8,9 @@ __pycache__/
 .ultralytics/
 settings.json
 settings.tmp
-models/*
-!models/.gitkeep
+Models/*
+!Models/.gitkeep
+.runtime/
 outputs/*
 !outputs/.gitkeep
 *.log

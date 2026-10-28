@@ -17,7 +17,8 @@ import time
 import tkinter as tk
 from tkinter import messagebox, ttk
 import uuid
-from cnn_llm_based_descriptor.window import resizable_window, FlowRow, wrap_label
+from cnn_llm_based_descriptor.window import resizable_window, FlowRow, ScrollFrame, wrap_label
+from cnn_llm_based_descriptor.theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT
 
 ROOT = Path(__file__).resolve().parent
 REUSE = "Use installed Python packages"
@@ -237,77 +238,70 @@ class SetupWindow:
         self.cuda = tk.StringVar(value="CUDA 13.0")
         self.csi = tk.BooleanVar(value=False)
         root.title("CNN + LLM Based Descriptor · Launch & Setup")
-        resizable_window(root,780,710,minimum=(700,520))
-        root.configure(bg="#101725")
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure(".", font=("DejaVu Sans", 10), background="#101725", foreground="#e6edf7")
-        style.configure("TButton", padding=(10, 8), background="#293a52")
-        style.configure("Open.TButton", background="#67e8c2", foreground="#0a3027", font=("DejaVu Sans", 11, "bold"))
-        style.map("TButton", foreground=[("disabled", "#76859a")])
-        style.configure("TCombobox", padding=5, fieldbackground="#192335", foreground="#e6edf7")
-        style.map("TCombobox", fieldbackground=[("readonly", "#192335")], foreground=[("readonly", "#e6edf7")])
-        content = ttk.Frame(root, padding=20)
-        content.pack(fill="both", expand=True)
-        ttk.Label(content, text="CNN + LLM Based Descriptor", font=("DejaVu Sans", 20, "bold")).pack(anchor="w")
-        wrap_label(ttk.Label(content, text="Launch and setup · All choices stay in this window", foreground="#99abc4")).pack(fill='x', pady=(3, 6))
-        wrap_label(ttk.Label(content, textvariable=self.status)).pack(fill='x', pady=(0, 6))
-        row = FlowRow(content)
-        row.pack(fill="x")
-        self.devices = ttk.Combobox(row, textvariable=self.device, state="readonly")
-        row.add(self.devices,expand=True)
-        self.open_button = ttk.Button(row, text="Open CNN + LLM Based Descriptor", style="Open.TButton", state="disabled", command=self.launch)
-        row.add(self.open_button)
-        self.setup_visible = True
-        self.setup_toggle = ttk.Button(content, text="Hide installation options", command=self.toggle_setup)
-        self.setup_toggle.pack(anchor="w", pady=(6,0))
+        resizable_window(root, 800, 740, minimum=(640, 480))
+        apply_theme(root)
+        header = ttk.Frame(root, padding=(20, 18, 20, 12))
+        header.pack(fill='x')
+        ttk.Label(header, text='CNN + LLM Based Descriptor', font=('DejaVu Sans', 19, 'bold')).pack(anchor='w')
+        ttk.Label(header, text='Launch your workspace', foreground=MUTED).pack(anchor='w', pady=(4, 0))
+
+        # Reserve the action area before packing scrollable content. Checks and
+        # long logs can never consume the space needed to launch or cancel.
+        footer = ttk.Frame(root, padding=(20, 10, 20, 16))
+        footer.pack(side='bottom', fill='x')
+        ttk.Separator(footer).pack(fill='x', pady=(0, 10))
+        primary = FlowRow(footer); primary.pack(fill='x')
+        self.open_button = primary.add(ttk.Button(primary, text='Open app', style='Open.TButton', state='disabled', command=self.launch), expand=True)
+        self.check_button = primary.add(ttk.Button(primary, text='Check again', command=self.check))
+        self.cancel_button = primary.add(ttk.Button(primary, text='Cancel operation', command=self.cancelled.set, state='disabled'))
+        secondary = FlowRow(footer); secondary.pack(fill='x', pady=(8, 0))
+        self.install_button = secondary.add(ttk.Button(secondary, text='Set up / repair', command=self.install), expand=True)
+        self.system_button = secondary.add(ttk.Button(secondary, text='Linux prerequisites…', command=self.system_packages), expand=True)
+        self.progress = ttk.Progressbar(footer, mode='indeterminate')
+        self.progress.pack(fill='x', pady=(10, 0))
+
+        self.form = ScrollFrame(root, padding=(20, 0, 16, 8))
+        self.form.pack(fill='both', expand=True)
+        content = self.form.body
+        status_card = ttk.Frame(content, style='Card.TFrame', padding=14)
+        status_card.pack(fill='x', pady=(0, 14))
+        ttk.Label(status_card, text='INSTALLATION STATUS', style='Card.TLabel', foreground=ACCENT, font=('DejaVu Sans', 9, 'bold')).pack(anchor='w')
+        wrap_label(ttk.Label(status_card, textvariable=self.status, style='Card.TLabel')).pack(fill='x', pady=(5, 0))
+        ttk.Label(content, text='Processing device', font=('DejaVu Sans', 11, 'bold')).pack(anchor='w')
+        self.devices = ttk.Combobox(content, textvariable=self.device, state='readonly')
+        self.devices.pack(fill='x', pady=(6, 16))
+        ttk.Separator(content).pack(fill='x', pady=(0, 14))
         self.setup_frame = setup = ttk.Frame(content)
-        setup.pack(fill="both", expand=True)
-        ttk.Separator(setup).pack(fill="x", pady=8)
-        ttk.Label(setup, text="First-time setup or repair", font=("DejaVu Sans", 13, "bold")).pack(anchor="w")
-        wrap_label(ttk.Label(setup, text="Choose how to prepare Python packages. Your existing environment remains available until the new one passes its checks.", foreground="#99abc4")).pack(fill='x', pady=(2, 6))
-        self.profiles = ttk.Combobox(setup, textvariable=self.mode, values=[REUSE, CPU, CUDA], state="readonly")
-        self.profiles.pack(fill="x")
-        self.profiles.bind("<<ComboboxSelected>>", self._mode_changed)
-        cuda_row = ttk.Frame(setup)
-        cuda_row.pack(fill="x", pady=(8, 0))
-        ttk.Label(cuda_row, text="CUDA package build").pack(side="left", padx=(0, 12))
-        self.cuda_box = ttk.Combobox(cuda_row, textvariable=self.cuda, values=list(CUDA_INDEXES), state="disabled", width=18)
-        self.cuda_box.pack(side="left")
-        self.csi_check = ttk.Checkbutton(setup, text="Include Raspberry Pi CSI camera support", variable=self.csi)
-        self.csi_check.pack(anchor="w", pady=(8, 0))
-        buttons = FlowRow(setup)
-        buttons.pack(fill="x", pady=(6, 0))
-        self.install_button = ttk.Button(buttons, text="Set up / repair", command=self.install)
-        buttons.add(self.install_button)
-        self.check_button = ttk.Button(buttons, text="Check again", command=self.check)
-        buttons.add(self.check_button)
-        self.system_button = ttk.Button(buttons, text="Install Linux prerequisites…", command=self.system_packages)
-        buttons.add(self.system_button)
-        self.cancel_button = ttk.Button(buttons, text="Cancel", command=self.cancelled.set, state="disabled")
-        buttons.add(self.cancel_button)
-        self.progress = ttk.Progressbar(setup, mode="indeterminate")
-        self.progress.pack(fill="x", pady=(6, 4))
-        self.log_widget = tk.Text(setup, height=9, bg="#192335", fg="#e6edf7", relief="flat", wrap="word", font=("DejaVu Sans Mono", 9), state="disabled")
-        wrap_label(ttk.Label(setup, text="Fresh installs require internet. System package installation may request administrator authentication.", foreground="#99abc4")).pack(side="bottom", fill='x', pady=(4, 0))
-        self.log_widget.pack(fill="both", expand=True)
-        root.protocol("WM_DELETE_WINDOW", self.close)
-        self.show_setup(not env_python(self.environment).is_file())
+        setup.pack(fill='x')
+        self.setup_visible = True
+        ttk.Label(setup, text='Installation & repair', font=('DejaVu Sans', 13, 'bold')).pack(anchor='w')
+        wrap_label(ttk.Label(setup, text='Choose a package profile, then use Set up / repair below.', foreground=MUTED)).pack(fill='x', pady=(4, 8))
+        self.profiles = ttk.Combobox(setup, textvariable=self.mode, values=[REUSE, CPU, CUDA], state='readonly')
+        self.profiles.pack(fill='x')
+        self.profiles.bind('<<ComboboxSelected>>', self._mode_changed)
+        cuda_row = ttk.Frame(setup); cuda_row.pack(fill='x', pady=(10, 0))
+        ttk.Label(cuda_row, text='CUDA package build').pack(side='left', padx=(0, 12))
+        self.cuda_box = ttk.Combobox(cuda_row, textvariable=self.cuda, values=list(CUDA_INDEXES), state='disabled', width=18)
+        self.cuda_box.pack(side='left')
+        self.csi_check = ttk.Checkbutton(setup, text='Include Raspberry Pi CSI camera support', variable=self.csi)
+        self.csi_check.pack(anchor='w', pady=(6, 8))
+        ttk.Label(content, text='Activity', font=('DejaVu Sans', 11, 'bold')).pack(anchor='w', pady=(8, 6))
+        log_frame = ttk.Frame(content); log_frame.pack(fill='x')
+        self.log_widget = tk.Text(log_frame, height=5, bg=PANEL, fg=FG, relief='flat', wrap='word', font=('DejaVu Sans Mono', 9), state='disabled', padx=10, pady=8)
+        self.log_widget.pack(side='left', fill='both', expand=True)
+        log_scroll = ttk.Scrollbar(log_frame, command=self.log_widget.yview)
+        log_scroll.pack(side='right', fill='y')
+        self.log_widget.configure(yscrollcommand=log_scroll.set)
+        wrap_label(ttk.Label(content, text='Fresh installs need internet. Linux prerequisites may request administrator authentication.', foreground=MUTED)).pack(fill='x', pady=(8, 0))
+        root.protocol('WM_DELETE_WINDOW', self.close)
         self.timer = root.after(50, self._pump)
         self.check()
 
     def show_setup(self, visible):
-        self.setup_visible = visible
+        # Setup and its buttons remain available in every state. In particular,
+        # a successful dependency check must not shrink a user-resized window.
         if visible:
-            self.setup_frame.pack(fill="both", expand=True)
-            resizable_window(self.root,780,710,minimum=(700,520))
-        else:
-            self.setup_frame.pack_forget()
-            resizable_window(self.root,780,280,minimum=(700,260))
-        self.setup_toggle.configure(text="Hide installation options" if visible else "Installation options…")
-
-    def toggle_setup(self):
-        self.show_setup(not self.setup_visible)
+            self.form.canvas.yview_moveto(0)
 
     def emit(self, kind, value):
         self.events.put((kind, value))

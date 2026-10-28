@@ -1,5 +1,54 @@
 """Resizable windows and rows that wrap controls without clipping."""
+import tkinter as tk
 from tkinter import ttk
+
+
+class ScrollFrame(ttk.Frame):
+    """Scrollable form with a visible scrollbar and keyboard focus tracking."""
+    def __init__(self, parent, padding=0, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.canvas = tk.Canvas(self, highlightthickness=0, borderwidth=0, background='#0d1420', width=1, height=1)
+        self.bar = ttk.Scrollbar(self, orient='vertical', command=self.canvas.yview)
+        self.bar.pack(side='right', fill='y')
+        self.canvas.pack(side='left', fill='both', expand=True)
+        self.body = ttk.Frame(self.canvas, padding=padding)
+        self.window = self.canvas.create_window((0, 0), window=self.body, anchor='nw')
+        self.canvas.configure(yscrollcommand=self.bar.set)
+        self.canvas.bind('<Configure>', self._resize)
+        self.body.bind('<Configure>', lambda _e: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
+        self.top = self.winfo_toplevel()
+        self.bindings = [(event, self.top.bind(event, callback, add='+')) for event, callback in
+                         [('<MouseWheel>', self._wheel), ('<Button-4>', self._wheel),
+                          ('<Button-5>', self._wheel), ('<FocusIn>', self._focus)]]
+        self.bind('<Destroy>', self._destroy)
+
+    def _contains(self, widget):
+        return str(widget).startswith(str(self.body) + '.') or widget in (self.body, self.canvas)
+
+    def _resize(self, event):
+        self.canvas.itemconfigure(self.window, width=event.width)
+
+    def _wheel(self, event):
+        if not self._contains(event.widget) or isinstance(event.widget, (tk.Text, ttk.Combobox)):
+            return
+        if self.body.winfo_height() > self.canvas.winfo_height():
+            direction = -1 if getattr(event, 'num', 0) == 4 or getattr(event, 'delta', 0) > 0 else 1
+            self.canvas.yview_scroll(direction * 3, 'units')
+            return 'break'
+
+    def _focus(self, event):
+        if not self._contains(event.widget):
+            return
+        top = event.widget.winfo_rooty() - self.canvas.winfo_rooty()
+        bottom = top + event.widget.winfo_height()
+        offset = top if top < 0 else bottom - self.canvas.winfo_height() if bottom > self.canvas.winfo_height() else 0
+        if offset:
+            self.canvas.yview_moveto(self.canvas.yview()[0] + offset / max(1, self.body.winfo_height()))
+
+    def _destroy(self, event):
+        if event.widget is self:
+            for sequence, identifier in self.bindings:
+                self.top.unbind(sequence, identifier)
 
 
 def resizable_window(window, width, height, minimum=(760, 520)):

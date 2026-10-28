@@ -21,9 +21,10 @@ from .engine import infer, probe_devices
 from .descriptor import download_model
 from .recording import recording_destinations
 from .cameras import discover_cameras, linux_camera_path
-from .window import resizable_window, FlowRow, wrap_label
+from .window import resizable_window, FlowRow, ScrollFrame, wrap_label
+from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT, AMBER
+from .model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
 
-BG, PANEL, FG, MUTED, ACCENT = '#101725', '#192335', '#e6edf7', '#99abc4', '#67e8c2'
 
 
 class App:
@@ -79,6 +80,8 @@ class App:
     def _load_settings(self):
         try:
             data = json.loads(self.settings_path.read_text())
+            if data.get('describe_url') in ('http://127.0.0.1:11434', 'http://localhost:11434'):
+                data['describe_url'] = PROJECT_ENDPOINT
             cfg = RunConfig(**{f.name: data[f.name] for f in fields(RunConfig) if f.name in data})
             if cfg.source_kind in {'Video', 'Image'} and not Path(cfg.source).expanduser().is_file():
                 cfg = replace(cfg, source_kind='Webcam', source='0')
@@ -90,121 +93,133 @@ class App:
 
     def _style(self):
         self.root.title('CNN + LLM Based Descriptor')
-        self.window_width, _ = resizable_window(self.root, 1600, 1000)
-        self.root.configure(bg=BG)
-        self.body_font = tkfont.Font(root=self.root,family='DejaVu Sans',size=10)
-        self.bold_font = tkfont.Font(root=self.root,family='DejaVu Sans',size=10,weight='bold')
-        self.title_font = tkfont.Font(root=self.root,family='DejaVu Sans',size=20,weight='bold')
-        s = ttk.Style(); s.theme_use('clam')
-        s.configure('.', background=BG, foreground=FG, font=self.body_font)
-        s.configure('TButton', background='#293a52', padding=(10,8))
-        s.map('TButton', foreground=[('disabled','#718097')], background=[('active','#38506c')])
-        s.configure('Start.TButton', background=ACCENT, foreground='#0a3027', font=self.bold_font)
-        s.map('Start.TButton', background=[('disabled','#293a52')], foreground=[('disabled','#718097')])
-        s.configure('Record.TButton', background='#a83348', foreground='#ffffff')
-        s.configure('TEntry', fieldbackground=PANEL, insertcolor=FG, padding=5)
-        s.configure('TSpinbox', fieldbackground=PANEL, insertcolor=FG, padding=5)
-        s.configure('TCombobox', fieldbackground=PANEL, padding=5)
-        s.map('TCombobox', fieldbackground=[('readonly',PANEL)], foreground=[('readonly',FG),('disabled','#718097')])
-        s.configure('TCheckbutton', padding=(0,8))
-        s.configure('TNotebook.Tab', padding=(12,6), background=PANEL)
-        s.map('TNotebook.Tab', foreground=[('selected',ACCENT)])
-        self.root.option_add('*TCombobox*Listbox.background', PANEL)
-        self.root.option_add('*TCombobox*Listbox.foreground', FG)
-        self.root.option_add('*TCombobox*Listbox.font', self.body_font)
+        self.window_width, _ = resizable_window(self.root, 1440, 900)
+        self.body_font = tkfont.Font(root=self.root, family='DejaVu Sans', size=10)
+        self.bold_font = tkfont.Font(root=self.root, family='DejaVu Sans', size=10, weight='bold')
+        self.title_font = tkfont.Font(root=self.root, family='DejaVu Sans', size=20, weight='bold')
+        apply_theme(self.root, self.body_font, self.bold_font)
 
     def _build(self):
-        outer = ttk.Frame(self.root, padding=12); outer.pack(fill='both', expand=True)
-        outer.columnconfigure(0, weight=1); outer.rowconfigure(3, weight=1)
-        header = FlowRow(outer); header.grid(row=0, column=0, sticky='ew', pady=(0,8))
-        header.add(ttk.Label(header, text='CNN + LLM Based Descriptor', font=self.title_font),expand=True)
-        self.settings_button = ttk.Button(header, text='Settings', command=self.show_settings)
-        header.add(self.settings_button)
-        header.add(ttk.Button(header, text='Details', command=self.show_details))
-        header.add(ttk.Button(header, text='Outputs', command=self.open_outputs))
-
-        inputs = ttk.Frame(outer); inputs.grid(row=1,column=0,sticky='ew',pady=(0,8))
-        inputs.columnconfigure(1,weight=1)
-        ttk.Label(inputs,text='Input').grid(row=0,column=0,sticky='w',pady=(0,3))
-        self.source_combo = ttk.Combobox(inputs,textvariable=self.vars['source_kind'],values=['Webcam','Pi camera (CSI)','Network stream','Video','Image'],state='readonly',width=19)
-        self.source_combo.grid(row=1,column=0,sticky='ew',padx=(0,10))
-        self.source_combo.bind('<<ComboboxSelected>>',lambda _e:self._source_changed())
-        self.source_label = ttk.Label(inputs,text='Camera'); self.source_label.grid(row=0,column=1,sticky='w',pady=(0,3))
-        self.source_entry = ttk.Entry(inputs,textvariable=self.vars['source'])
-        self.source_entry.grid(row=1,column=1,sticky='ew')
-        self.camera_combo = ttk.Combobox(inputs,textvariable=self.selected_camera,state='readonly')
-        self.camera_combo.grid(row=1,column=1,sticky='ew')
-        self.camera_combo.bind('<<ComboboxSelected>>',lambda _e:self._camera_selected())
-        self.refresh_button = ttk.Button(inputs,text='Refresh',command=self.refresh_cameras,width=16)
-        self.refresh_button.grid(row=1,column=2,padx=(8,0))
-        self.browse_button = ttk.Button(inputs,text='Choose input file…',command=self.browse_source,width=16)
-        self.browse_button.grid(row=1,column=2,padx=(8,0))
-
-        model = FlowRow(outer); model.grid(row=2,column=0,sticky='ew',pady=(0,8))
-        self.inference_button = ttk.Checkbutton(model,text='Enable inference',variable=self.vars['inference_enabled'],command=self.inference_changed)
-        model.add(self.inference_button)
-        size_group = ttk.Frame(model)
-        ttk.Label(size_group,text='Model').pack(side='left',padx=(0,6))
-        self.scale_combo = ttk.Combobox(size_group,textvariable=self.vars['scale'],values=list(SCALES),state='readonly',width=18)
-        self.scale_combo.pack(side='left')
-        model.add(size_group)
-        device_group = ttk.Frame(model)
-        ttk.Label(device_group,text='Device').pack(side='left',padx=(8,6))
-        self.device_combo = ttk.Combobox(device_group,textvariable=self.selected_device,values=list(self.device_map),state='readonly',width=24)
-        self.device_combo.pack(side='left',fill='x',expand=True)
-        model.add(device_group,expand=True)
-
-        self.canvas = tk.Canvas(outer,background='#080d16',highlightthickness=1,highlightbackground='#2d3c52',height=150)
-        self.canvas.grid(row=3,column=0,sticky='nsew')
-        self.canvas.bind('<Configure>',self._resize)
-        info = ttk.Frame(outer); info.grid(row=4,column=0,sticky='ew',pady=(6,0))
-        info.columnconfigure(0,weight=3); info.columnconfigure(1,weight=2)
-        wrap_label(ttk.Label(info,textvariable=self.stats,foreground=MUTED)).grid(row=0,column=0,sticky='ew')
-        self.record_label = wrap_label(ttk.Label(info,textvariable=self.record_status,foreground=MUTED,anchor='e',justify='right'))
-        self.record_label.grid(row=0,column=1,sticky='ew',padx=(8,0))
-
-        description = ttk.LabelFrame(outer, text='Detected objects and guidance', padding=8)
-        description.grid(row=5,column=0,sticky='ew',pady=(8,0))
-        wrap_label(ttk.Label(description,textvariable=self.description_title,foreground=ACCENT)).pack(fill='x')
-        body = ttk.Frame(description); body.pack(fill='x',pady=(4,0))
-        self.description_body = tk.Text(body,height=4,wrap='word',bg=PANEL,fg=FG,
-            font=self.body_font,relief='flat',borderwidth=0,state='disabled')
-        self.description_body.pack(side='left',fill='both',expand=True)
-        scroll = ttk.Scrollbar(body,command=self.description_body.yview)
-        scroll.pack(side='right',fill='y')
-        self.description_body.configure(yscrollcommand=scroll.set)
-        self.description_text.trace_add('write',lambda *_: self._description_updated())
-        self._description_updated()
-
-        actions = FlowRow(outer); actions.grid(row=6,column=0,sticky='ew',pady=(8,0))
-        self.start_button = ttk.Button(actions, text='Open camera', style='Start.TButton', command=self.start, width=12)
-        actions.add(self.start_button)
-        self.stop_button = ttk.Button(actions, text='Stop', command=self.stop, state='disabled', width=6)
-        actions.add(self.stop_button)
-        self.record_button = ttk.Button(actions, text='● Record', style='Record.TButton', command=self.toggle_record, state='disabled', width=18)
-        actions.add(self.record_button)
-        self.snapshot_button = ttk.Button(actions, text='Snapshot', command=self.snapshot, state='disabled')
-        actions.add(self.snapshot_button)
+        outer = ttk.Frame(self.root, padding=16)
+        outer.pack(fill='both', expand=True)
+        # Pack the footer first: even a long description or a small display
+        # cannot push the session controls below the window.
+        footer = ttk.Frame(outer)
+        footer.pack(side='bottom', fill='x', pady=(12, 0))
+        ttk.Separator(footer).pack(fill='x', pady=(0, 10))
+        actions = FlowRow(footer); actions.pack(fill='x')
+        self.start_button = actions.add(ttk.Button(actions, text='Open camera', style='Start.TButton', command=self.start, width=10))
+        self.stop_button = actions.add(ttk.Button(actions, text='Stop', command=self.stop, state='disabled', width=5))
+        self.record_button = actions.add(ttk.Button(actions, text='● Record', style='Record.TButton', command=self.toggle_record, state='disabled', width=13))
+        self.snapshot_button = actions.add(ttk.Button(actions, text='Snapshot', command=self.snapshot, state='disabled', width=9))
         mode_group = ttk.Frame(actions)
-        ttk.Label(mode_group,text='Record').pack(side='left',padx=(4,6))
-        self.mode_combo = ttk.Combobox(mode_group,textvariable=self.vars['record_mode'],values=RECORD_MODES,state='readonly',width=17)
-        self.mode_combo.pack(side='left',fill='x',expand=True)
-        actions.add(mode_group,expand=True)
-        wrap_label(ttk.Label(outer,textvariable=self.status,anchor='w')).grid(row=7,column=0,sticky='ew',pady=(8,0))
-        self.flow_rows = (header, model, actions)
+        ttk.Label(mode_group, text='Save').pack(side='left', padx=(4, 6))
+        self.mode_combo = ttk.Combobox(mode_group, textvariable=self.vars['record_mode'], values=RECORD_MODES, state='readonly', width=13)
+        self.mode_combo.pack(side='left', fill='x', expand=True)
+        actions.add(mode_group, expand=True)
+        ttk.Label(footer, textvariable=self.status, foreground=MUTED, width=1, anchor='w').pack(fill='x', pady=(8, 0))
+
+        header = ttk.Frame(outer); header.pack(fill='x', pady=(0, 14))
+        header.columnconfigure(0, weight=1)
+        self.heading_label = wrap_label(ttk.Label(header, text='CNN + LLM Based Descriptor', font=self.title_font))
+        self.heading_label.grid(row=0, column=0, sticky='ew', padx=(0, 20))
+        ttk.Label(header, text='LOCAL VISION  /  DETECT · DESCRIBE · DECIDE', foreground=MUTED, font=('DejaVu Sans', 9)).grid(row=1, column=0, sticky='w', pady=(4, 0))
+        self.tools_row = tools = FlowRow(header, width=345); tools.grid(row=0, column=1, rowspan=2, sticky='ew')
+        self.settings_button = tools.add(ttk.Button(tools, text='Settings', command=self.show_settings, width=7))
+        self.details_button = tools.add(ttk.Button(tools, text='Details', command=self.show_details, width=7))
+        self.outputs_button = tools.add(ttk.Button(tools, text='Outputs', command=self.open_outputs, width=7))
+
+        source_card = ttk.Frame(outer, padding=12, style='Card.TFrame')
+        source_card.pack(fill='x', pady=(0, 12))
+        inputs = ttk.Frame(source_card, style='Card.TFrame'); inputs.pack(fill='x')
+        inputs.columnconfigure(1, weight=1)
+        ttk.Label(inputs, text='SOURCE', style='Card.TLabel', foreground=MUTED, font=('DejaVu Sans', 9, 'bold')).grid(row=0, column=0, sticky='w', pady=(0, 5))
+        self.source_combo = ttk.Combobox(inputs, textvariable=self.vars['source_kind'], values=['Webcam','Pi camera (CSI)','Network stream','Video','Image'], state='readonly', width=16)
+        self.source_combo.grid(row=1, column=0, sticky='ew', padx=(0, 10))
+        self.source_combo.bind('<<ComboboxSelected>>', lambda _e: self._source_changed())
+        self.source_label = ttk.Label(inputs, text='Camera', style='Card.TLabel', foreground=MUTED)
+        self.source_label.grid(row=0, column=1, sticky='w', pady=(0, 5))
+        self.source_entry = ttk.Entry(inputs, textvariable=self.vars['source'])
+        self.source_entry.grid(row=1, column=1, sticky='ew')
+        self.camera_combo = ttk.Combobox(inputs, textvariable=self.selected_camera, state='readonly')
+        self.camera_combo.grid(row=1, column=1, sticky='ew')
+        self.camera_combo.bind('<<ComboboxSelected>>', lambda _e: self._camera_selected())
+        self.refresh_button = ttk.Button(inputs, text='Refresh', command=self.refresh_cameras)
+        self.refresh_button.grid(row=1, column=2, padx=(8, 0))
+        self.browse_button = ttk.Button(inputs, text='Choose file…', command=self.browse_source)
+        self.browse_button.grid(row=1, column=2, padx=(8, 0))
+
+        model = FlowRow(outer); model.pack(fill='x', pady=(0, 12))
+        self.inference_button = model.add(ttk.Checkbutton(model, text='YOLO inference', variable=self.vars['inference_enabled'], command=self.inference_changed))
+        size_group = ttk.Frame(model)
+        ttk.Label(size_group, text='Model').pack(side='left', padx=(0, 6))
+        self.scale_combo = ttk.Combobox(size_group, textvariable=self.vars['scale'], values=list(SCALES), state='readonly', width=14)
+        self.scale_combo.pack(side='left'); model.add(size_group)
+        device_group = ttk.Frame(model)
+        ttk.Label(device_group, text='Device').pack(side='left', padx=(8, 6))
+        self.device_combo = ttk.Combobox(device_group, textvariable=self.selected_device, values=list(self.device_map), state='readonly', width=22)
+        self.device_combo.pack(side='left', fill='x', expand=True)
+        model.add(device_group, expand=True)
+
+        self.workspace = ttk.Frame(outer); self.workspace.pack(fill='both', expand=True)
+        self.workspace_mode = None
+        self.preview_card = ttk.Frame(self.workspace, style='Card.TFrame', padding=10)
+        self.preview_card.rowconfigure(1, weight=1); self.preview_card.columnconfigure(0, weight=1)
+        preview_header = ttk.Frame(self.preview_card, style='Card.TFrame')
+        preview_header.grid(row=0, column=0, sticky='ew', pady=(0, 8))
+        ttk.Label(preview_header, text='Live preview', style='Card.TLabel', font=self.bold_font).pack(side='left')
+        self.record_label = ttk.Label(preview_header, textvariable=self.record_status, style='Card.TLabel', foreground=MUTED)
+        self.record_label.pack(side='right')
+        self.canvas = tk.Canvas(self.preview_card, background='#080e17', highlightthickness=0, width=1, height=1)
+        self.canvas.grid(row=1, column=0, sticky='nsew')
+        self.canvas.bind('<Configure>', self._resize)
+        ttk.Label(self.preview_card, textvariable=self.stats, style='Card.TLabel', foreground=MUTED, width=1).grid(row=2, column=0, sticky='ew', pady=(8, 0))
+
+        self.description_card = ttk.Frame(self.workspace, style='Card.TFrame', padding=12)
+        ttk.Label(self.description_card, text='Scene understanding', style='Card.TLabel', font=self.bold_font).pack(anchor='w')
+        wrap_label(ttk.Label(self.description_card, textvariable=self.description_title, style='Card.TLabel', foreground=MUTED)).pack(fill='x', pady=(4, 10))
+        body = ttk.Frame(self.description_card, style='Card.TFrame'); body.pack(fill='both', expand=True)
+        self.description_body = tk.Text(body, height=1, width=1, wrap='word', bg=PANEL, fg=FG,
+                                       font=self.body_font, relief='flat', borderwidth=0, state='disabled', padx=2, pady=4, spacing1=2, spacing3=5)
+        self.description_body.pack(side='left', fill='both', expand=True)
+        scroll = ttk.Scrollbar(body, command=self.description_body.yview); scroll.pack(side='right', fill='y')
+        self.description_body.configure(yscrollcommand=scroll.set)
+        self.description_text.trace_add('write', lambda *_: self._description_updated())
+        self._description_updated()
+        self.flow_rows = (tools, model, actions)
         for widget in (self.source_combo,self.source_entry,self.camera_combo,self.scale_combo,self.device_combo,self.mode_combo):
             widget.configure(font=self.body_font)
+        self._arrange_workspace(1440, 900)
         self._draw_preview()
+
+    def _arrange_workspace(self, width, height):
+        mode = 'wide' if width >= 1100 or height < 700 else 'stacked'
+        if mode == self.workspace_mode:
+            return
+        self.workspace_mode = mode
+        self.preview_card.grid_forget(); self.description_card.grid_forget()
+        self.workspace.columnconfigure(0, weight=3 if mode == 'wide' else 1, uniform='workspace' if mode == 'wide' else '')
+        self.workspace.columnconfigure(1, weight=2 if mode == 'wide' else 0, uniform='workspace' if mode == 'wide' else '')
+        self.workspace.rowconfigure(0, weight=1 if mode == 'wide' else 3)
+        self.workspace.rowconfigure(1, weight=0 if mode == 'wide' else 2)
+        self.preview_card.grid(row=0, column=0, sticky='nsew', padx=(0, 12) if mode == 'wide' else 0)
+        self.description_card.grid(row=0 if mode == 'wide' else 1, column=1 if mode == 'wide' else 0,
+                                   sticky='nsew', pady=0 if mode == 'wide' else (10, 0))
 
     def _description_updated(self):
         self.description_body.configure(state='normal')
         self.description_body.delete('1.0','end')
         self.description_body.insert('1.0',self.description_text.get())
         self.description_body.tag_configure('section',font=self.bold_font,foreground=ACCENT)
+        self.description_body.tag_configure('take_action',font=self.bold_font,foreground=AMBER,background='#3b3021')
+        self.description_body.tag_configure('no_action',font=self.bold_font,foreground=ACCENT,background='#173b34')
         for index, line in enumerate(self.description_text.get().splitlines(), 1):
-            for heading in ('Detections:', 'Environment:', 'Take Action:', 'No Action:', 'Reason:'):
+            for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:'):
                 if line.startswith(heading):
                     self.description_body.tag_add('section', f'{index}.0', f'{index}.{len(heading)}')
+            if line in ('Decision: Take Action', 'Decision: No Action'):
+                self.description_body.tag_add('take_action' if line.endswith('Take Action') else 'no_action',
+                                               f'{index}.10', f'{index}.end')
         self.description_body.configure(state='disabled')
 
     def _window_resized(self, event):
@@ -221,14 +236,16 @@ class App:
     def _adapt_layout(self):
         self.layout_job = None
         width, height = self.layout_size
-        self.description_body.configure(height=10 if height >= 800 else 6 if height >= 640 else 4)
-        size = max(9, min(14, round(10 * min(width/1200, height/720))))
+        compact = height < 700 or width < 1000
+        self.heading_label.configure(text='CNN + LLM Descriptor' if compact else 'CNN + LLM Based Descriptor')
+        self.title_font.configure(size=16 if compact else 22)
+        self._arrange_workspace(width, height)
+        size = 11 if width >= 1100 and height >= 700 else 10
         if size != self.font_size:
             self.font_size = size
             self.body_font.configure(size=size)
             self.bold_font.configure(size=size)
-            self.title_font.configure(size=size*2)
-            ttk.Style().configure('TButton',padding=(size,max(5,size//2)))
+            ttk.Style().configure('TButton',padding=(12, 8))
             self._draw_preview()
         for row in self.flow_rows:
             row.reflow()
@@ -476,7 +493,8 @@ class App:
         w,h = self.canvas.winfo_width(),self.canvas.winfo_height()
         self.canvas.delete('all')
         if self.image is None:
-            self.canvas.create_text(w//2,h//2-16,text='Your camera, live.',fill=FG,font=self.title_font,width=max(100,w-30))
+            self.canvas.create_text(w//2,h//2 if h < 100 else h//2-16,text='Your camera, live.',fill=FG,font=self.bold_font if h < 150 else self.title_font,width=max(100,w-30))
+            if h < 100: return
             self.canvas.create_text(w//2,h//2+22,text='Open a camera · Turn inference on or off · Record',fill=MUTED,font=self.body_font,width=max(100,w-30))
         else:
             ratio = min(max(1,w-8)/self.image.width,max(1,h-8)/self.image.height)
@@ -539,12 +557,13 @@ class App:
         if self.settings_window and self.settings_window.winfo_exists():
             self.settings_window.lift(); return
         window = self.settings_window = tk.Toplevel(self.root)
-        window.title('Settings'); resizable_window(window,820,640,minimum=(640,520)); window.configure(bg=BG)
+        window.title('Settings'); resizable_window(window,880,700,minimum=(640,480)); window.configure(bg=BG)
         window.transient(self.root)
         ttk.Button(window,text='Done',command=window.destroy).pack(side='bottom',pady=(0,12))
         book = ttk.Notebook(window); book.pack(fill='both',expand=True,padx=14,pady=14)
-        model,camera,output,description = (ttk.Frame(book,padding=14) for _ in range(4))
-        for name,tab in [('Model',model),('Camera',camera),('Saving',output),('Descriptions',description)]: book.add(tab,text=name)
+        pages = [ScrollFrame(book, padding=14) for _ in range(4)]
+        for name, page in zip(('Model', 'Camera', 'Saving', 'Descriptions'), pages): book.add(page, text=name)
+        model,camera,output,description = (page.body for page in pages)
         def cell(parent,row,column,span=1):
             parent.columnconfigure(column,weight=1)
             frame=ttk.Frame(parent); frame.grid(row=row,column=column,columnspan=span,sticky='ew',padx=(0,8),pady=(0,4))
@@ -571,7 +590,8 @@ class App:
         ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
         for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
             self._field(description,label,key)
-        wrap_label(ttk.Label(description,text='Detections come only from YOLO. Environment is a model estimate. Take Action or No Action gives a recommendation; Reason explains it using the detections. Install/start Ollama and download the model once. Descriptions stay local and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Detections come only from YOLO. Decision and Reason explain the recommendation. Models are stored in Models/ollama and the local service starts automatically. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text=f'Model folder: {MODEL_DIRECTORY}',foreground=MUTED)).pack(fill='x',pady=(0,8))
 
         buttons = FlowRow(description); buttons.pack(fill='x')
         buttons.add(ttk.Button(buttons, text='Download model', command=self.download_description_model))

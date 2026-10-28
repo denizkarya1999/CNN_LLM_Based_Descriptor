@@ -3,18 +3,75 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  test:
+  smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install test dependencies
-        run: python -m pip install 'numpy>=1.26,<3' 'opencv-python-headless>=4.10,<5'
-      - name: Test frame descriptions and recording integration
-        run: python -m unittest discover -s tests -v
+      - name: Install desktop check dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-tk xvfb xauth
+          python -m pip install 'Pillow>=10.4,<13' 'numpy>=1.26,<3' 'opencv-python-headless>=4.10,<5'
       - name: Check Python and launcher syntax
         run: |
-          python -m compileall -q cnn_llm_based_descriptor main.py launcher.py
+          python -m compileall -q cnn_llm_based_descriptor main.py launcher.py setup_descriptor.py
           bash -n Run_CNN_LLM_Based_Descriptor.sh
+      - name: Check launcher layout and grounded decisions
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          xvfb-run -a -s '-screen 0 1600x1000x24' python - <<'PY'
+          import json, tempfile, time, tkinter as tk
+          from unittest.mock import patch
+          from launcher import SetupWindow
+          from cnn_llm_based_descriptor.app import App
+          from cnn_llm_based_descriptor.config import RunConfig
+          from cnn_llm_based_descriptor.descriptor import detection_evidence
+          from cnn_llm_based_descriptor.grounding import action_choices, parse_choice, render_description
+          def settle(root):
+              for _ in range(10):
+                  root.update()
+                  time.sleep(.03)
+          def visible(widget, root):
+              assert widget.winfo_ismapped()
+              assert widget.winfo_rooty() >= root.winfo_rooty()
+              assert widget.winfo_rootx() >= root.winfo_rootx()
+              assert widget.winfo_rootx()+widget.winfo_width() <= root.winfo_rootx()+root.winfo_width()+1
+              assert widget.winfo_rooty()+widget.winfo_height() <= root.winfo_rooty()+root.winfo_height()+1
+          with tempfile.TemporaryDirectory() as project, patch.object(SetupWindow, 'check'):
+              root=tk.Tk(); launcher=SetupWindow(root, project=project)
+              for size in ('800x740', '640x480'):
+                  root.geometry(size); settle(root)
+                  for widget in (launcher.open_button,launcher.check_button,launcher.install_button,launcher.system_button,launcher.cancel_button):
+                      visible(widget, root)
+              launcher._destroy()
+          records=[{'name':'person','confidence':.91,'box':{'x1':0,'y1':0,'x2':30,'y2':70}}]
+          evidence,total=detection_evidence(records,100,80,10)
+          with patch.object(App,'refresh_devices'), patch.object(App,'refresh_cameras'):
+              root=tk.Tk(); app=App(root)
+              for size in ('1440x900','760x520'):
+                  root.geometry(size)
+                  for step in ('give_space:d1','no_action'):
+                      choice=parse_choice(json.dumps({'environment':'indoor','next_step':step}), action_choices(evidence))
+                      packet=render_description(evidence,total,100,80,RunConfig(),choice=choice)
+                      packet.update(type='description',frame=1,source_seconds=None,elapsed_seconds=1)
+                      app._handle(packet); settle(root)
+                      for widget in (app.start_button,app.stop_button,app.record_button,app.snapshot_button,app.settings_button,app.details_button,app.outputs_button,app.canvas,app.description_body):
+                          visible(widget,root)
+                      assert app.canvas.winfo_height() >= 60
+                      assert app.description_body.winfo_height() >= 50
+                      assert bool(app.description_body.tag_ranges('take_action')) == (step!='no_action')
+                      assert bool(app.description_body.tag_ranges('no_action')) == (step=='no_action')
+                      assert 'Reason:' in packet['text'] and '91%' in packet['text']
+              app._destroy()
+          try:
+              parse_choice('{"environment":"indoor","next_step":"inspect:d99"}',action_choices(evidence))
+              raise AssertionError('Unknown object was accepted')
+          except ValueError:
+              pass
+          assert RunConfig().weights.parent.name == 'Models'
+          print('Desktop and grounding checks passed.')
+          PY
