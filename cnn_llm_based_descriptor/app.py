@@ -65,7 +65,7 @@ class App:
         self.model_job = None
         self.model_status = tk.StringVar(value='Qwen3-VL 2B · 4-bit · about 1.9 GB · local Ollama')
         self.description_title = tk.StringVar(value='Visual description · waiting for a frame')
-        self.description_text = tk.StringVar(value='Enable descriptions in Settings for detected objects and a suggested next step.')
+        self.description_text = tk.StringVar(value='Enable descriptions in Settings for Detections, Environment, Take Action or No Action, and Reason.')
         self._style()
         self._build()
         root.bind('<Configure>', self._window_resized, add='+')
@@ -200,6 +200,11 @@ class App:
         self.description_body.configure(state='normal')
         self.description_body.delete('1.0','end')
         self.description_body.insert('1.0',self.description_text.get())
+        self.description_body.tag_configure('section',font=self.bold_font,foreground=ACCENT)
+        for index, line in enumerate(self.description_text.get().splitlines(), 1):
+            for heading in ('Detections:', 'Environment:', 'Take Action:', 'No Action:', 'Reason:'):
+                if line.startswith(heading):
+                    self.description_body.tag_add('section', f'{index}.0', f'{index}.{len(heading)}')
         self.description_body.configure(state='disabled')
 
     def _window_resized(self, event):
@@ -216,6 +221,7 @@ class App:
     def _adapt_layout(self):
         self.layout_job = None
         width, height = self.layout_size
+        self.description_body.configure(height=10 if height >= 800 else 6 if height >= 640 else 4)
         size = max(9, min(14, round(10 * min(width/1200, height/720))))
         if size != self.font_size:
             self.font_size = size
@@ -403,7 +409,7 @@ class App:
             position = f" · source {packet['source_seconds']:.1f}s" if packet.get('source_seconds') is not None else ''
             method = packet['model'] if packet.get('grounding_status', 'validated') == 'validated' else 'YOLO facts only'
             self.description_title.set(f"Frame {packet['frame']}{position} · {method} · {packet['elapsed_seconds']:.1f}s")
-            self.description_text.set(packet['text'] + ('\n\n' + packet['grounding_summary'] if packet.get('grounding_summary') else ''))
+            self.description_text.set(packet['text'])
             self.log(f"Description for frame {packet['frame']}: {packet['text']}")
         elif kind in {'description_error','description_save_error'}:
             self.description_title.set('Visual description · unavailable' if kind=='description_error' else 'Visual description · save failed')
@@ -565,7 +571,7 @@ class App:
         ttk.Checkbutton(description,text='Describe frames with the local vision model',variable=self.vars['describe_enabled']).pack(anchor='w')
         for label,key in [('Quantized vision model','describe_model'),('Local Ollama server','describe_url'),('Minimum seconds between frames','describe_interval'),('Request timeout (seconds)','describe_timeout')]:
             self._field(description,label,key)
-        wrap_label(ttk.Label(description,text='Install/start Ollama, then download the model once. Only YOLO detections are described. The model estimates indoor/outdoor context and selects a suggestion for a detected object. Descriptions stay on this computer and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Detections come only from YOLO. Environment is a model estimate. Take Action or No Action gives a recommendation; Reason explains it using the detections. Install/start Ollama and download the model once. Descriptions stay local and may lag the preview. Confidence is a detector score, not measured accuracy.',foreground=MUTED)).pack(fill='x',pady=8)
 
         buttons = FlowRow(description); buttons.pack(fill='x')
         buttons.add(ttk.Button(buttons, text='Download model', command=self.download_description_model))

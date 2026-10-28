@@ -115,6 +115,9 @@ class EngineIntegrationTests(unittest.TestCase):
             {"environment": "indoor", "next_step": "give_space:d1"}))
         saved = json.loads((directory/"descriptions.jsonl").read_text())
         self.assertEqual(saved["grounding_status"], "validated")
+        self.assertEqual(saved["action_decision"], "Take Action")
+        self.assertIn("90% detector confidence", saved["reason"])
+        self.assertIn("\n\nReason: " + saved["reason"], saved["text"])
         self.assertEqual(saved["suggested_action"]["detection_id"], saved["evidence"][0]["id"])
         self.assertIn("1 × person", saved["text"])
         self.assertEqual(saved["text"], next(p for p in packets if p["type"] == "description")["text"])
@@ -128,6 +131,20 @@ class EngineIntegrationTests(unittest.TestCase):
         self.assertNotIn("Cross now", saved_text)
         self.assertIn("1 × person", saved["text"])
         self.assertFalse(any(p["type"] == "description_error" for p in packets))
+
+    def test_no_action_decision_is_saved_with_the_visible_sections(self):
+        packets, directory = self.run_source(model_answer=json.dumps(
+            {"environment": "indoor", "next_step": "no_action"}))
+        saved = json.loads((directory/"descriptions.jsonl").read_text())
+        self.assertEqual(saved["action_decision"], "No Action")
+        self.assertEqual(saved["grounding_status"], "validated")
+        self.assertIsNone(saved["suggested_action"]["detection_id"])
+        self.assertTrue(saved["text"].startswith("Detections:"))
+        self.assertIn("\n\nEnvironment:", saved["text"])
+        self.assertIn("\n\nNo Action:", saved["text"])
+        self.assertNotIn("Take Action:", saved["text"])
+        self.assertIn("\n\nReason: " + saved["reason"], saved["text"])
+        self.assertEqual(saved["text"], next(p for p in packets if p["type"] == "description")["text"])
 
 
 if __name__ == "__main__":

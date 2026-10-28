@@ -18,7 +18,7 @@ SPACE_LABELS = frozenset({
 
 def action_choices(evidence):
     """Offer suggestions only for supplied boxes, with no inferred object state."""
-    choices = {}
+    choices = {"no_action": {"kind": "no_action", "detection_id": None}}
     for item in evidence:
         if "box_xyxy_pixels" not in item:
             continue
@@ -74,27 +74,31 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
     """All object words, counts, scores and locations originate in YOLO evidence."""
     choices = action_choices(evidence)
     environment = choice["environment"] if choice else "unclear"
-    step = choices[choice["next_step"]] if choice else {"kind": "observe", "detection_id": None}
+    step = choices[choice["next_step"]] if choice else choices["no_action"]
+    decision = "No Action" if step["kind"] == "no_action" else "Take Action"
     classification = cfg.task == "Image classification"
     if classification:
-        facts = "YOLO classification candidates: " + (
+        facts = "Classification candidates: " + (
             "; ".join(f"{item['label']} ({item['confidence_percent']:g}%)" for item in evidence)
             or "none above the selected threshold.")
-        context = "Classification does not locate or count objects."
-        advice = "Switch to object detection for suggestions tied to detected objects."
+        context = "Unconfirmed. Classification does not locate or count objects."
+        advice = "Object-specific actions are unavailable in classification mode."
+        reason = "Classification provides candidate labels without bounding boxes, so it cannot support object-specific actions."
     elif not evidence:
-        facts = "YOLO detected no objects above the selected threshold."
-        context = "The environment is unconfirmed; no detections does not mean the scene is empty."
-        advice = "Check the view and capture another frame before deciding what to do."
+        facts = "No objects detected by YOLO above the selected threshold."
+        context = "Unconfirmed; no detections does not mean the scene is empty."
+        advice = "No object-based action can be recommended from this frame."
+        reason = f"YOLO supplied no valid object boxes at or above {cfg.confidence * 100:g}% detector confidence."
     else:
         counts = Counter(item["label"] for item in evidence)
-        facts = "YOLO detected: " + "; ".join(f"{count} × {label}" for label, count in counts.items()) + "."
-        context = {"indoor": "Environment: appears indoors (model estimate).",
-                   "outdoor": "Environment: appears outdoors (model estimate).",
-                   "unclear": "Environment: unclear."}[environment]
+        facts = "; ".join(f"{count} × {label}" for label, count in counts.items()) + "."
+        context = {"indoor": "appears indoors (model estimate).",
+                   "outdoor": "appears outdoors (model estimate).",
+                   "unclear": "Unclear."}[environment]
         target = next((item for item in evidence if item["id"] == step["detection_id"]), None)
         if target is None:
-            advice = "Review the listed detections and confirm the current view before deciding what to do."
+            advice = "No specific action is suggested for the listed detections."
+            reason = "The listed detections establish object presence only; object presence alone does not require intervention."
         else:
             name = f"{target['label']} at {target['position']} in the image"
             advice = {
@@ -104,20 +108,34 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
                 "handle_carefully": f"If handling the detected {name}, inspect it first and handle it carefully.",
                 "check_signal": f"Check the actual state of the detected {name} before deciding what to do.",
             }[step["kind"]]
+            basis = {
+                "verify": "This is below the 50% review threshold, so the label needs confirmation.",
+                "inspect": "Detection alone does not establish its condition or how to interact with it.",
+                "give_space": "Leaving space is a precaution if moving nearby; distance and movement are not established by the detection.",
+                "handle_carefully": "This detected class calls for care if handled; its current condition is unconfirmed.",
+                "check_signal": "The box and class label do not establish its current state.",
+            }[step["kind"]]
+            reason = f"YOLO reports {name} with {target['confidence_percent']:g}% detector confidence. {basis}"
         if any(item["confidence"] < LOW_SCORE for item in evidence):
             facts += " Detections below 50% are tentative."
     if total > len(evidence):
         facts += f" {total - len(evidence)} additional predictions omitted; counts cover listed predictions only."
     if status == "fallback":
-        context = "Environment: unconfirmed. The model answer failed validation; showing YOLO facts only."
+        context = "Unconfirmed."
+        advice = "No action recommendation is available."
+        reason = "The model answer failed validation, so only YOLO facts are shown."
     scores = "; ".join(
         f"{item['label']} ({item.get('position', 'classification')}, {item['confidence_percent']:g}%)"
         for item in evidence)
+    summary = "YOLO scores: " + (scores or "No predictions above the selected threshold.")
+    detections = facts + (f"\n{summary}" if evidence and not classification else "")
     return {
-        "text": f"{facts}\n{context}\nSuggested next step: {advice}",
-        "grounding_summary": "YOLO scores: " + (scores or "No predictions above the selected threshold."),
+        "text": f"Detections: {detections}\n\nEnvironment: {context}\n\n{decision}: {advice}\n\nReason: {reason}",
+        "grounding_summary": summary,
         "model": cfg.describe_model,
         "evidence": evidence, "total_predictions": total, "frame_size": [width, height],
         "grounding_status": status, "environment": environment,
+        "action_decision": decision,
+        "reason": reason,
         "suggested_action": {**step, "text": advice},
     }

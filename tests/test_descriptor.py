@@ -86,10 +86,37 @@ class ClientTests(unittest.TestCase):
         self.assertIn("1 × person", result["text"])
         self.assertIn("appears outdoors (model estimate)", result["text"])
         self.assertIn("leave space", result["text"])
+        self.assertEqual(result["action_decision"], "Take Action")
+        self.assertTrue(result["text"].startswith("Detections:"))
+        self.assertIn("\n\nEnvironment:", result["text"])
+        self.assertIn("\n\nTake Action:", result["text"])
+        self.assertNotIn("No Action:", result["text"])
+        self.assertEqual(result["text"].count("YOLO scores:"), 1)
+        self.assertIn("\n\nReason:", result["text"])
+        self.assertIn("person at top-left", result["reason"])
+        self.assertIn("91% detector confidence", result["reason"])
         self.assertEqual(result["suggested_action"]["detection_id"], "d1")
         self.assertFalse(payload["format"]["additionalProperties"])
         self.assertEqual(payload["format"]["properties"]["next_step"]["enum"],
-                         ["inspect:d1", "give_space:d1"])
+                         ["no_action", "inspect:d1", "give_space:d1"])
+
+    @patch("cnn_llm_based_descriptor.descriptor.request_json")
+    def test_model_can_choose_no_action_with_detections_present(self, request):
+        request.side_effect = [MODEL, {"message": {"content": json.dumps(
+            {"environment": "indoor", "next_step": "no_action"})}}]
+        result = OllamaVisionClient(RunConfig()).describe(FRAME, RECORDS)
+        self.assertEqual(result["grounding_status"], "validated")
+        self.assertEqual(result["action_decision"], "No Action")
+        self.assertEqual(result["suggested_action"]["kind"], "no_action")
+        self.assertIsNone(result["suggested_action"]["detection_id"])
+        self.assertIn("Detections: 1 × person", result["text"])
+        self.assertIn("91%", result["text"])
+        self.assertIn("Environment: appears indoors", result["text"])
+        self.assertIn("No Action: No specific action is suggested for the listed detections.", result["text"])
+        self.assertNotIn("Take Action:", result["text"])
+        self.assertNotIn("safe", result["text"])
+        self.assertIn("Reason: The listed detections", result["text"])
+        self.assertIn("object presence alone does not require intervention", result["reason"])
 
     @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_qwen_prefill_skips_forced_thinking(self, request):
@@ -129,6 +156,12 @@ class ClientTests(unittest.TestCase):
                 self.assertEqual(result["grounding_status"], "no_detections")
                 self.assertIn("does not mean the scene is empty", result["text"])
                 self.assertNotIn("car", result["text"])
+                self.assertEqual(result["action_decision"], "No Action")
+                self.assertIn("Detections:", result["text"])
+                self.assertIn("Environment:", result["text"])
+                self.assertIn("No Action:", result["text"])
+                self.assertNotIn("Take Action:", result["text"])
+                self.assertIn("25% detector confidence", result["reason"])
         request.assert_not_called()
 
     @patch("cnn_llm_based_descriptor.descriptor.request_json")
@@ -141,6 +174,8 @@ class ClientTests(unittest.TestCase):
         self.assertNotIn("×", result["text"])
         self.assertIn("does not locate or count objects", result["text"])
         self.assertIsNone(result["suggested_action"]["detection_id"])
+        self.assertEqual(result["action_decision"], "No Action")
+        self.assertIn("No Action:", result["text"])
         request.assert_not_called()
 
     @patch("cnn_llm_based_descriptor.descriptor.request_json")
@@ -152,6 +187,8 @@ class ClientTests(unittest.TestCase):
             '{"environment":"outdoor","next_step":"inspect:d2"}',
             '{"environment":"outdoor","next_step":"cross_road:d1"}',
             '{"environment":"outdoor","next_step":"handle_carefully:d1"}',
+            '{"environment":"outdoor","next_step":"no_action:d1"}',
+            '{"environment":"outdoor","next_step":"no_action","action_decision":"Take Action"}',
             '{"environment":"outdoor","next_step":[]}',
             '{"environment":{},"next_step":"observe"}',
             '{"environment":"outdoor","environment":"indoor","next_step":"observe"}',
@@ -169,6 +206,10 @@ class ClientTests(unittest.TestCase):
                 self.assertIn("91%", result["grounding_summary"])
                 self.assertNotIn("dog", json.dumps(result))
                 self.assertNotIn("Walk left", json.dumps(result))
+                self.assertEqual(result["action_decision"], "No Action")
+                self.assertIn("No Action: No action recommendation is available", result["text"])
+                self.assertNotIn("Take Action:", result["text"])
+                self.assertIn("failed validation", result["reason"])
         # A rejected answer must not poison later frames.
         request.return_value = {"message": {"content": VALID_CHOICE}}
         self.assertEqual(client.describe(FRAME, RECORDS)["grounding_status"], "validated")
@@ -193,8 +234,10 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(result["grounding_status"], "validated")
         self.assertIn("tentative", result["text"])
         self.assertIn("Confirm the possible person", result["text"])
+        self.assertIn("30% detector confidence", result["reason"])
+        self.assertIn("below the 50% review threshold", result["reason"])
         self.assertEqual(request.call_args.args[2]["format"]["properties"]["next_step"]["enum"],
-                         ["verify:d1"])
+                         ["no_action", "verify:d1"])
 
     @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_repeated_classes_keep_exact_counts_and_locations(self, request):
@@ -238,7 +281,7 @@ class ClientTests(unittest.TestCase):
         payload = request.call_args.args[2]
         self.assertLessEqual(len(payload["messages"][0]["content"]), 4000)
         self.assertEqual(payload["format"]["properties"]["next_step"]["enum"],
-                         [f"inspect:{item['id']}" for item in result["evidence"]])
+                         ["no_action"] + [f"inspect:{item['id']}" for item in result["evidence"]])
 
     @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_rejects_text_only_unquantized_and_remote_models(self, request):

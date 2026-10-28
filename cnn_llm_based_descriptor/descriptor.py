@@ -105,10 +105,12 @@ def build_prompt(evidence, total, width, height, threshold, task):
                    if "box_xyxy_normalized" in item else {})} for item in evidence]
     return (
         "Return only JSON matching response_schema. YOLO is the only source of object facts. "
-        "Use the frame only to estimate environment (indoor/outdoor/unclear) and choose one next_step "
-        "for a listed detection ID, considering its box, score and surroundings. "
+        "Use the frame only to estimate environment (indoor/outdoor/unclear) and choose one next_step. "
+        "Select no_action (displayed as No Action) when no specific response is warranted by the listed detections. "
+        "Otherwise select an offered suggestion for a listed detection ID (displayed as Take Action), "
+        "considering its box, score and surroundings. Object presence alone does not require action. "
         "Never add objects, attributes, motion, distances, hazards, clear routes or safe-to-proceed claims. "
-        "Choose unclear if the setting is uncertain. If unsure what to do, select inspect or verify for a listed ID. "
+        "Choose unclear if the setting is uncertain. No Action means no recommendation, not proof of a safe scene. "
         "Allowed suggestion meanings: inspect=check the detected object directly; "
         "verify=confirm a low-score prediction; give_space=allow space if moving nearby; "
         "handle_carefully=inspect before handling; check_signal=check actual state before acting. "
@@ -122,8 +124,8 @@ def build_prompt(evidence, total, width, height, threshold, task):
                       "response_schema": response_schema(action_choices(evidence))},
                      ensure_ascii=True, allow_nan=False)
         + '\nAnswer with exactly two keys: "environment" and "next_step". '
-        'Select one enum value for each. Prefer the most useful offered suggestion for a listed object, '
-        'including its exact ID. Every suggestion must refer to a listed detection. '
+        'Select one enum value for each. Choose no_action or an offered suggestion with its exact detection ID. '
+        'Do not force an action just because an object is present. '
         'Return the JSON answer only. Do not copy the input data or schema. No explanation or Markdown.'
     )
 
