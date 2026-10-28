@@ -12,8 +12,8 @@ from unittest.mock import patch
 import cv2
 import numpy as np
 
-from yolo_llm_visual_descriptor.config import RunConfig
-from yolo_llm_visual_descriptor.engine import infer
+from cnn_llm_based_descriptor.config import RunConfig
+from cnn_llm_based_descriptor.engine import infer
 
 
 class EngineIntegrationTests(unittest.TestCase):
@@ -50,7 +50,7 @@ class EngineIntegrationTests(unittest.TestCase):
             stop.set()
             return caption
         with patch.dict("sys.modules", modules), patch(
-            "yolo_llm_visual_descriptor.descriptor.OllamaVisionClient.describe",
+            "cnn_llm_based_descriptor.descriptor.OllamaVisionClient.describe",
             side_effect=RuntimeError("Model unavailable") if failure else cancel_description if cancel else None,
             return_value=caption,
         ) as describe:

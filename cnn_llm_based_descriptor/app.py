@@ -89,7 +89,7 @@ class App:
             return RunConfig()
 
     def _style(self):
-        self.root.title('YOLO LLM Visual Descriptor')
+        self.root.title('CNN + LLM Based Descriptor')
         self.window_width, _ = resizable_window(self.root, 1600, 1000)
         self.root.configure(bg=BG)
         self.body_font = tkfont.Font(root=self.root,family='DejaVu Sans',size=10)
@@ -117,7 +117,7 @@ class App:
         outer = ttk.Frame(self.root, padding=12); outer.pack(fill='both', expand=True)
         outer.columnconfigure(0, weight=1); outer.rowconfigure(3, weight=1)
         header = FlowRow(outer); header.grid(row=0, column=0, sticky='ew', pady=(0,8))
-        header.add(ttk.Label(header, text='YOLO LLM Visual Descriptor', font=self.title_font),expand=True)
+        header.add(ttk.Label(header, text='CNN + LLM Based Descriptor', font=self.title_font),expand=True)
         self.settings_button = ttk.Button(header, text='Settings', command=self.show_settings)
         header.add(self.settings_button)
         header.add(ttk.Button(header, text='Details', command=self.show_details))

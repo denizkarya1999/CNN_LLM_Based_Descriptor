@@ -17,7 +17,7 @@ import time
 import tkinter as tk
 from tkinter import messagebox, ttk
 import uuid
-from yolo_llm_visual_descriptor.window import resizable_window, FlowRow, wrap_label
+from cnn_llm_based_descriptor.window import resizable_window, FlowRow, wrap_label
 
 ROOT = Path(__file__).resolve().parent
 REUSE = "Use installed Python packages"
@@ -47,7 +47,7 @@ try:
               "cuda_build": torch.version.cuda, "devices": devices, "gpu_warning": gpu_warning}
 except Exception as exc:
     report = {"ok": False, "error": str(exc)}
-print("YOLO_LLM_VISUAL_DESCRIPTOR_PROBE=" + json.dumps(report), flush=True)
+print("CNN_LLM_BASED_DESCRIPTOR_PROBE=" + json.dumps(report), flush=True)
 sys.exit(0 if report["ok"] else 1)
 '''
 
@@ -165,7 +165,7 @@ def probe_python(python, runner):
         return {"ok": False, "error": "No configured Python environment yet. Choose a setup option below."}
     _, output = runner.run([python, "-c", PROBE], timeout=60, check=False, visible=False)
     for line in reversed(output.splitlines()):
-        if line.startswith("YOLO_LLM_VISUAL_DESCRIPTOR_PROBE="):
+        if line.startswith("CNN_LLM_BASED_DESCRIPTOR_PROBE="):
             return json.loads(line.split("=", 1)[1])
     return {"ok": False, "error": "Python could not complete its dependency check. " + output[-1200:]}
 
@@ -236,7 +236,7 @@ class SetupWindow:
         self.mode = tk.StringVar(value=REUSE if env_python(self.environment).is_file() else CPU)
         self.cuda = tk.StringVar(value="CUDA 13.0")
         self.csi = tk.BooleanVar(value=False)
-        root.title("YOLO LLM Visual Descriptor · Launch & Setup")
+        root.title("CNN + LLM Based Descriptor · Launch & Setup")
         resizable_window(root,780,710,minimum=(700,520))
         root.configure(bg="#101725")
         style = ttk.Style()
@@ -249,14 +249,14 @@ class SetupWindow:
         style.map("TCombobox", fieldbackground=[("readonly", "#192335")], foreground=[("readonly", "#e6edf7")])
         content = ttk.Frame(root, padding=20)
         content.pack(fill="both", expand=True)
-        ttk.Label(content, text="YOLO LLM Visual Descriptor", font=("DejaVu Sans", 20, "bold")).pack(anchor="w")
+        ttk.Label(content, text="CNN + LLM Based Descriptor", font=("DejaVu Sans", 20, "bold")).pack(anchor="w")
         wrap_label(ttk.Label(content, text="Launch and setup · All choices stay in this window", foreground="#99abc4")).pack(fill='x', pady=(3, 6))
         wrap_label(ttk.Label(content, textvariable=self.status)).pack(fill='x', pady=(0, 6))
         row = FlowRow(content)
         row.pack(fill="x")
         self.devices = ttk.Combobox(row, textvariable=self.device, state="readonly")
         row.add(self.devices,expand=True)
-        self.open_button = ttk.Button(row, text="Open YOLO LLM Visual Descriptor", style="Open.TButton", state="disabled", command=self.launch)
+        self.open_button = ttk.Button(row, text="Open CNN + LLM Based Descriptor", style="Open.TButton", state="disabled", command=self.launch)
         row.add(self.open_button)
         self.setup_visible = True
         self.setup_toggle = ttk.Button(content, text="Hide installation options", command=self.toggle_setup)
@@ -399,7 +399,7 @@ class SetupWindow:
         self.log(f"PyTorch {report['torch']} · Ultralytics {report['ultralytics']}")
         if report.get("gpu_warning"):
             self.log("GPU check: " + report["gpu_warning"])
-        self.log("Installation verified. Select GPU or CPU above, then Open YOLO LLM Visual Descriptor.")
+        self.log("Installation verified. Select GPU or CPU above, then Open CNN + LLM Based Descriptor.")
 
     def launch(self):
         if self.busy or not self.ready:
@@ -476,7 +476,7 @@ def main():
     try:
         root = tk.Tk()
     except tk.TclError as exc:
-        print(f"YOLO LLM Visual Descriptor needs a graphical desktop: {exc}", file=sys.stderr)
+        print(f"CNN + LLM Based Descriptor needs a graphical desktop: {exc}", file=sys.stderr)
         return 1
     SetupWindow(root)
     root.mainloop()

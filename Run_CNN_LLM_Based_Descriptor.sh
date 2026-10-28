@@ -5,7 +5,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
 show_error() {
   if command -v zenity >/dev/null; then
-    zenity --error --title='YOLO LLM Visual Descriptor' --text="$1" --width=460
+    zenity --error --title='CNN + LLM Based Descriptor' --text="$1" --width=460
   elif command -v xmessage >/dev/null; then
     xmessage -center "$1"
   else
@@ -14,12 +14,12 @@ show_error() {
 }
 
 if ! command -v python3 >/dev/null || ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
-  show_error 'YOLO LLM Visual Descriptor needs Python 3.10 or later. Install Python through your operating system software manager, then open this launcher again.'
+  show_error 'CNN + LLM Based Descriptor needs Python 3.10 or later. Install Python through your operating system software manager, then open this launcher again.'
   exit 1
 fi
 if ! python3 -c 'import tkinter' 2>/dev/null; then
   if command -v zenity >/dev/null && command -v pkexec >/dev/null && command -v apt-get >/dev/null; then
-    if zenity --question --title='YOLO LLM Visual Descriptor setup' --width=460 \
+    if zenity --question --title='CNN + LLM Based Descriptor setup' --width=460 \
       --text='Python GUI support is missing. Install it now? Your system will ask for administrator authentication.'; then
       if ! pkexec "$(command -v apt-get)" install -y python3-tk python3-venv python3-pip; then
         show_error 'GUI support could not be installed. Check your system package manager and try this launcher again.'

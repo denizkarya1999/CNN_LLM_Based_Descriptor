@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 
-from yolo_llm_visual_descriptor.descriptor import DEFAULT_MODEL, request_json
+from cnn_llm_based_descriptor.descriptor import DEFAULT_MODEL, request_json
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     quantization = model.get("details", {}).get("quantization_level", "")
     if "vision" not in model.get("capabilities", []) or quantization != "Q4_K_M":
         raise RuntimeError("The installed model does not report vision support with Q4_K_M quantization. Update Ollama and retry.")
-    print(f"Ready: {DEFAULT_MODEL}, {quantization}. Open Run_YOLO_LLM_Visual_Descriptor.sh.")
+    print(f"Ready: {DEFAULT_MODEL}, {quantization}. Open Run_CNN_LLM_Based_Descriptor.sh.")
 
 
 if __name__ == "__main__":

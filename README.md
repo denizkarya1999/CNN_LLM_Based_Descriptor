@@ -1,14 +1,14 @@
-# YOLO LLM Visual Descriptor
+# CNN + LLM Based Descriptor
 
-A desktop visual descriptor combining quantized Qwen3-VL 2B with YOLO detections. It describes sampled frames using the image, bounding boxes, spatial positions, and detector confidence scores.
+A desktop visual descriptor combining a YOLO CNN detector with quantized Qwen3-VL 2B descriptions. It describes sampled frames using the image, bounding boxes, spatial positions, and detector confidence scores.
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
 ## Open
 
-Run **Run_YOLO_LLM_Visual_Descriptor.sh** with no arguments. On this PC it is in `~/Projects/YOLO_LLM_Visual_Descriptor`.
+Run **Run_CNN_LLM_Based_Descriptor.sh** with no arguments. On this PC it is in `~/Projects/CNN_LLM_Based_Descriptor`.
 
-The launcher checks your installation. Select a device and click **Open YOLO LLM Visual Descriptor**. **Installation options…** contains GUI setup/repair; it opens automatically when setup is needed. No setup flags are required.
+The launcher checks your installation. Select a device and click **Open CNN + LLM Based Descriptor**. **Installation options…** contains GUI setup/repair; it opens automatically when setup is needed. No setup flags are required.
 
 Resize or maximize the app normally. It opens at 1600×1000 on larger displays and fits smaller screens. Buttons move onto additional rows when space is limited, status text wraps, and fonts adjust between readable small-window and large-window sizes. The camera preview scales to the available space while preserving its proportions. Settings and launcher windows are also resizable. A 1024×600 or larger desktop display is recommended; the main window can shrink to 760×520.
 
@@ -16,7 +16,7 @@ Resize or maximize the app normally. It opens at 1600×1000 on larger displays a
 
 1. Install and start [Ollama](https://ollama.com/download) (0.12.7 or newer).
 2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; a sampled description took about 19 seconds after loading (first loading can take longer), so it is not a per-frame real-time captioner. The model is cached by Ollama and is not committed to Git.
-3. Open **Run_YOLO_LLM_Visual_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
+3. Open **Run_CNN_LLM_Based_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
 4. Read the **Visual description** panel under the preview. An exact YOLO score/position line is shown beneath the generated text, even when the model omits confidence values. Its frame number (and source timestamp for video files) identifies the described frame; captions can lag behind live video. **Details** includes the full description and the exact detection evidence.
 
 The Qwen3-VL compatibility prefill avoids the forced reasoning in older Ollama builds so the bounded output budget is used for the caption. Counts for listed classes are supplied explicitly.
@@ -75,7 +75,7 @@ Saved videos use the capture resolution. Preview snapshots are limited to 1280×
 
 ## Raspberry Pi / SBC installation
 
-Copy `Run_YOLO_LLM_Visual_Descriptor.sh`, `launcher.py`, `main.py`, `setup_descriptor.py`, `requirements.txt`, and the `yolo_llm_visual_descriptor/` folder into a `YOLO_LLM_Visual_Descriptor` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_YOLO_LLM_Visual_Descriptor.sh**. In **Installation options…**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
+Copy `Run_CNN_LLM_Based_Descriptor.sh`, `launcher.py`, `main.py`, `setup_descriptor.py`, `requirements.txt`, and the `cnn_llm_based_descriptor/` folder into a `CNN_LLM_Based_Descriptor` folder on a **64-bit Linux desktop with Python 3.10+**, then open **Run_CNN_LLM_Based_Descriptor.sh**. In **Installation options…**, select **CPU · Raspberry Pi / SBC / PC** and click **Set up / repair**.
 
 **Install Linux prerequisites…** installs Tk, venv, pip, and graphics libraries on apt-based Linux systems using the OS authentication dialog. If Tk is missing before the launcher can open, it offers a graphical bootstrap on systems with Zenity and PolicyKit; otherwise install Python Tk through the OS software manager. System package installation must finish before the window closes.
 
@@ -113,7 +113,7 @@ Ultralytics code/models have their own AGPL-3.0 / enterprise terms. Dependencies
 
 Run `python3 -m unittest discover -s tests -v` after installing `requirements.txt`. These checks cover evidence conversion, frame/image requests, error isolation, stale-result cancellation, bounded queuing, saving and still-image inference integration; they do not download a model.
 
-The application package is `yolo_llm_visual_descriptor`. The old `Run_Generic_YOLO.sh` name remains as a compatibility shortcut. If you already cloned the old repository, update its origin with:
+The application package is `cnn_llm_based_descriptor`. The GitHub repository remains available at the following origin:
 
 ```bash
 git remote set-url origin https://github.com/denizkarya1999/YOLO_LLM_Visual_Descriptor.git

@@ -16,5 +16,5 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Check Python and launcher syntax
         run: |
-          python -m compileall -q yolo_llm_visual_descriptor main.py launcher.py
-          bash -n Run_YOLO_LLM_Visual_Descriptor.sh
+          python -m compileall -q cnn_llm_based_descriptor main.py launcher.py
+          bash -n Run_CNN_LLM_Based_Descriptor.sh

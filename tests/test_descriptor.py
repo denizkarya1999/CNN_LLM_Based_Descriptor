@@ -14,8 +14,8 @@ from urllib.error import HTTPError, URLError
 import cv2
 import numpy as np
 
-from yolo_llm_visual_descriptor.config import RunConfig
-from yolo_llm_visual_descriptor.descriptor import (
+from cnn_llm_based_descriptor.config import RunConfig
+from cnn_llm_based_descriptor.descriptor import (
     FrameDescriber, OllamaVisionClient, build_prompt, detection_evidence,
     request_json, validate_endpoint,
 )
@@ -62,7 +62,7 @@ class EvidenceTests(unittest.TestCase):
 
 
 class ClientTests(unittest.TestCase):
-    @patch("yolo_llm_visual_descriptor.descriptor.request_json")
+    @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_sends_real_frame_and_exact_evidence(self, request):
         request.side_effect = [
             {"capabilities": ["vision"], "details": {"quantization_level": "Q4_K_M"}},
@@ -80,7 +80,7 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(result["evidence"][0]["position"], "top-left")
         self.assertIn("top-left, 91%", result["grounding_summary"])
 
-    @patch("yolo_llm_visual_descriptor.descriptor.request_json")
+    @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_qwen_prefill_skips_forced_thinking(self, request):
         request.side_effect = [
             {"capabilities": ["vision", "thinking"], "details": {"quantization_level": "Q4_K_M"}},
@@ -93,9 +93,9 @@ class ClientTests(unittest.TestCase):
         self.assertIn('"listed_counts_by_label"', payload["messages"][0]["content"])
         self.assertEqual(payload["options"]["num_ctx"], 4096)
 
-    @patch("yolo_llm_visual_descriptor.descriptor.build_opener")
+    @patch("cnn_llm_based_descriptor.descriptor.build_opener")
     def test_model_download_progress_and_errors(self, opener):
-        from yolo_llm_visual_descriptor.descriptor import download_model
+        from cnn_llm_based_descriptor.descriptor import download_model
         for failure in (False, True):
             packets = [{"status": "pulling model", "completed": 50, "total": 100},
                        {"error": "registry unavailable"} if failure else {"status": "success"}]
@@ -109,7 +109,7 @@ class ClientTests(unittest.TestCase):
                 self.assertEqual(progress[-1], 'success')
             self.assertIn('50%', progress[0])
 
-    @patch("yolo_llm_visual_descriptor.descriptor.request_json")
+    @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_no_detections_and_empty_response(self, request):
         request.side_effect = [
             {"capabilities": ["vision"], "details": {"quantization_level": "Q4_K_M"}},
@@ -119,7 +119,7 @@ class ClientTests(unittest.TestCase):
             OllamaVisionClient(RunConfig()).describe(FRAME, [])
         self.assertIn('"predictions": []', request.call_args.args[2]["messages"][0]["content"])
 
-    @patch("yolo_llm_visual_descriptor.descriptor.request_json")
+    @patch("cnn_llm_based_descriptor.descriptor.request_json")
     def test_rejects_text_only_unquantized_and_remote_models(self, request):
         for metadata in ({"capabilities": ["completion"]},
                          {"capabilities": ["vision"], "details": {"quantization_level": "F16"}},
@@ -128,7 +128,7 @@ class ClientTests(unittest.TestCase):
             with self.subTest(metadata=metadata), self.assertRaises(ValueError):
                 OllamaVisionClient(RunConfig()).describe(FRAME, RECORDS)
 
-    @patch("yolo_llm_visual_descriptor.descriptor.build_opener")
+    @patch("cnn_llm_based_descriptor.descriptor.build_opener")
     def test_missing_model_and_connection_errors(self, opener):
         for error, message in ((HTTPError("http://localhost", 404, "missing", {}, io.BytesIO()), "missing"),
                                (URLError("offline"), "reach Ollama"), (TimeoutError(), "timed out")):
