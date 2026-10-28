@@ -116,5 +116,5 @@ Run `python3 -m unittest discover -s tests -v` after installing `requirements.tx
 The application package is `cnn_llm_based_descriptor`. The GitHub repository remains available at the following origin:
 
 ```bash
-git remote set-url origin https://github.com/denizkarya1999/YOLO_LLM_Visual_Descriptor.git
+git remote set-url origin https://github.com/denizkarya1999/CNN_LLM_Based_Descriptor.git
 ```
