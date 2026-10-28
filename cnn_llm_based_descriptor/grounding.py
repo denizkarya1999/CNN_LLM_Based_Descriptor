@@ -1,11 +1,14 @@
-"""Render only detector facts and validated, bounded model choices.
+"""Detector-owned facts/actions, with evidence-referenced LLM explanations.
 
-Free-form model text never reaches the caption or recording. The vision model
-can estimate a broad setting and select a suggestion tied to a current box.
+Explanation checks constrain references and known labels; they are not a proof
+of the truth of arbitrary natural language. Keep its model provenance visible.
 """
 
 from collections import Counter
 import json
+import re
+from pathlib import Path
+from functools import lru_cache
 from .scenes import SETTINGS, environment_text
 from .methods import method_details
 
@@ -38,8 +41,8 @@ def action_choices(evidence):
     return choices
 
 
-def response_schema(choices):
-    return {
+def response_schema(choices, explain=False):
+    schema = {
         "type": "object",
         "properties": {
             "environment": {"type": "string", "enum": list(ENVIRONMENTS)},
@@ -49,10 +52,14 @@ def response_schema(choices):
         "required": ["environment", "setting", "next_step"],
         "additionalProperties": False,
     }
+    if explain:
+        schema["properties"]["reason"] = {"type": "string", "minLength": 20, "maxLength": 350}
+        schema["required"].append("reason")
+    return schema
 
 
-def parse_choice(content, choices):
-    """Reject the entire answer if it contains prose, extra fields or unknown IDs."""
+def parse_choice(content, choices, evidence=None):
+    """Validate bounded choices and, when requested, the cited explanation."""
     def unique_keys(pairs):
         result = {}
         for key, value in pairs:
@@ -64,7 +71,8 @@ def parse_choice(content, choices):
     if not isinstance(content, str) or len(content) > 2000:
         raise ValueError("Invalid model choice")
     answer = json.loads(content, object_pairs_hook=unique_keys)
-    if not isinstance(answer, dict) or set(answer) != {"environment", "setting", "next_step"}:
+    expected_keys = {"environment", "setting", "next_step"} | ({"reason"} if evidence is not None else set())
+    if not isinstance(answer, dict) or set(answer) != expected_keys:
         raise ValueError("Unexpected model fields")
     if not isinstance(answer["environment"], str) or answer["environment"] not in ENVIRONMENTS:
         raise ValueError("Unsupported environment")
@@ -75,12 +83,62 @@ def parse_choice(content, choices):
         raise ValueError("Setting contradicts indoor/outdoor estimate")
     if not isinstance(answer["next_step"], str) or answer["next_step"] not in choices:
         raise ValueError("Unsupported suggestion or detection ID")
+    if evidence is not None:
+        validate_reason(answer["reason"], evidence, choices[answer["next_step"]]["detection_id"])
     return answer
+
+
+@lru_cache(maxsize=1)
+def known_object_labels():
+    return json.loads(Path(__file__).with_name("scene_model.json").read_text())["labels"]
+
+
+def validate_reason(reason, evidence, target):
+    """Require explicit evidence references and reject known unsupported labels.
+
+This intentionally does not claim semantic verification of generated prose.
+"""
+    if not isinstance(reason, str) or not 20 <= len(reason) <= 350 or any(ord(c) < 32 for c in reason):
+        raise ValueError("Invalid explanation")
+    references = re.findall(r"\[(d[1-9][0-9]*)\]", reason)
+    by_id = {item["id"]: item for item in evidence}
+    if not references or not set(references) <= by_id.keys() or (target and target not in references):
+        raise ValueError("Explanation must cite the supplied target evidence")
+    prose = re.sub(r"\[d[1-9][0-9]*\]", "", reason)
+    if re.search(r"[\[\]{}<>]|https?://|\d|%", prose):
+        raise ValueError("Explanation must use references, not new numeric claims or markup")
+    allowed = {by_id[ident]["label"].casefold() for ident in references}
+    for label in sorted(allowed, key=len, reverse=True):
+        prose = re.sub(r"(?<!\w)" + re.escape(label) + r"(?:s|es)?(?!\w)", "", prose, flags=re.I)
+    # Reject uncited names and common unsupported state/background assertions.
+    # This remains a limited lexical check, not semantic proof of arbitrary prose.
+    prohibited = (set(known_object_labels()) - allowed) | {
+        "people", "pedestrian", "vehicle", "sofa", "television", "building", "balcony",
+        "road", "pavement", "tree", "window", "wall", "safe", "safely", "unsafe",
+        "danger", "dangerous", "hazard", "distance", "near", "far", "moving", "stationary",
+        "crossing", "collision", "emergency", "urgent", "red", "green", "blue"}
+    if "person" in allowed:
+        prohibited -= {"people", "pedestrian"}
+    # Conditional advice can mention moving; remove just this bounded condition.
+    prose = re.sub(r"if moving nearby", "", prose, flags=re.I)
+    for label in prohibited:
+        if re.search(r"(?<!\w)" + re.escape(label) + r"(?:s|es)?(?!\w)", prose, flags=re.I):
+            raise ValueError("Explanation must use references and avoid unsupported scene claims")
+
+
+def resolve_reason(reason, evidence):
+    by_id = {item["id"]: item for item in evidence}
+    def replacement(match):
+        item = by_id[match[1]]
+        named = re.search(r"(?<!\w)" + re.escape(item["label"]) + r"(?:s|es)?(?!\w)", reason, flags=re.I)
+        return (f"[{item['id']}, {item['confidence_percent']:g}% YOLO]" if named else
+                f"{item['label']} [{item['id']}] ({item['confidence_percent']:g}% YOLO)")
+    return re.sub(r"\[(d[1-9][0-9]*)\]", replacement, reason)
 
 
 def render_description(evidence, total, width, height, cfg, choice=None, status="validated",
                        context_override=None, reason_note=""):
-    """All object words, counts, scores and locations originate in YOLO evidence."""
+    """Render detector-owned facts/actions and a checked, attributed explanation."""
     choices = action_choices(evidence)
     environment = choice["environment"] if choice else "unclear"
     setting = choice["setting"] if choice else "unclear"
@@ -134,13 +192,23 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         reason = "The model answer failed validation, so only YOLO facts are shown."
     if reason_note:
         reason += " " + reason_note
+    generated_reason = choice.get("reason") if choice and status == "validated" else None
+    if generated_reason:
+        reason = "LLM explanation: " + resolve_reason(generated_reason, evidence)
     scores = "; ".join(
         f"{item['label']} ({item.get('position', 'classification')}, {item['confidence_percent']:g}%)"
         for item in evidence)
     summary = "YOLO scores: " + (scores or "No predictions above the selected threshold.")
     detections = facts + (f"\n{summary}" if evidence and not classification else "")
+    if cfg.describe_backend == "Search Algorithm":
+        text = f"Detections: {detections}\n\nDecision: {decision}\n{advice}\n\nReason: {reason}"
+        environment = setting = None
+    elif cfg.describe_backend == "LLM":
+        text = f"Detections: {detections}\n\nEnvironment (LLM): {context}\n\nDecision (LLM): {decision}\n{advice}\n\nDescription (LLM): {reason}"
+    else:
+        text = f"Detections: {detections}\n\nEnvironment: {context}\n\nDecision: {decision}\n{advice}\n\nReason: {reason}"
     return {
-        "text": f"Detections: {detections}\n\nEnvironment: {context}\n\nDecision: {decision}\n{advice}\n\nReason: {reason}",
+        "text": text,
         "grounding_summary": summary,
         "model": cfg.describe_model,
         "evidence": evidence, "total_predictions": total, "frame_size": [width, height],
@@ -148,5 +216,7 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         "backend": cfg.describe_backend, **method_details(cfg),
         "action_decision": decision,
         "reason": reason,
+        "reason_source": "LLM" if generated_reason else "application / algorithm",
+        **({"model_explanation": generated_reason} if generated_reason else {}),
         "suggested_action": {**step, "text": advice},
     }

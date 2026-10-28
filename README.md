@@ -2,15 +2,30 @@
 
 # CNN + LLM Based Descriptor
 
-A desktop visual descriptor combining a YOLO CNN detector with either quantized Qwen3-VL 2B or named **search and probability algorithms** backed by a YOLO-label knowledge base. It describes **only objects detected by YOLO**, with exact counts, bounding-box positions and confidence scores, then suggests a next step tied to a detected object.
+A desktop experiment for comparing **LLM-based decision making with conventional AI** in latency, accuracy against reference labels, and computational work. It combines a YOLO CNN detector with either quantized Qwen3-VL 2B or named **search and probability algorithms** backed by a YOLO-label knowledge base. Detection facts and action targets come from **YOLO detections**, with exact counts, bounding-box positions and confidence scores. Each method exposes its decision explanation: LLM natural language, search traversal, or probability calculations.
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
 ## Screenshots
 
-The main app shows the live preview and scene description together, including detections, environment, decision, and reason. Descriptions identify their sampled frame and can lag behind the live preview.
+The preview and descriptor stay together. This real local Qwen example shows **Environment (LLM)**, **Decision (LLM)** and its natural-language **Description (LLM)**. The shown latency is one sample, not a performance benchmark.
 
-![Main app with live YOLO detections and scene description](Screenshots/Main%20App.png)
+![LLM environment, decision and explanation](Screenshots/LLM%20Explanation.png)
+
+<details>
+<summary>Search traversal, probability calculations, and method comparison</summary>
+
+The search screenshot uses an explicitly labeled **synthetic detector fixture** to show a nonempty review graph. It has no Environment section.
+
+![Search traversal with labeled detection states and costs](Screenshots/Search%20Traversal.png)
+
+The probability and comparison screenshots use the bundled bus image and its actual YOLO detections. The comparison has no reference labels supplied, so accuracy is not scored.
+
+![Numeric probability calculations](Screenshots/Probability%20Calculations.png)
+
+![Same-frame method comparison](Screenshots/Method%20Comparison.png)
+
+</details>
 
 The launcher provides device selection, installation status, and setup controls.
 
@@ -41,7 +56,7 @@ Open **Settings → Descriptions → Descriptor type** before opening the input.
 
 These search methods match the state-space search material in the CIS 579 search project; probability mode uses the conditional-probability and enumeration material. Old settings with the label “CIS 579” migrate to **Search Algorithm → Uniform-Cost Search (UCS)**. Existing LLM settings retain the selected model.
 
-**Description inference latency** is shown beneath the method, in milliseconds for fast results and seconds for longer ones. It is measured for each complete descriptor call, including association/probability/search work or LLM prompt preparation, local-server work, and validation. It excludes YOLO inference, time waiting in the frame queue, saving the result, and GUI drawing. Full precision is saved as `inference_latency_ms` and `elapsed_seconds`; this is separate from the YOLO timing below the preview. **No Action** is green; **Take Action** is red.
+**Description inference latency** is shown beneath the method, in milliseconds for fast results and seconds for longer ones. It is measured for each complete descriptor call, including probability/search work and explanation formatting or LLM prompt preparation, local-server work, and validation. It excludes YOLO inference, time waiting in the frame queue, saving the result, and GUI drawing. Full precision is saved as `inference_latency_ms` and `elapsed_seconds`; this is separate from the YOLO timing below the preview. **No Action** is green; **Take Action** is red.
 
 <details>
 <summary>Updated descriptor and algorithm-selector screenshots</summary>
@@ -58,11 +73,11 @@ Search and probability modes use YOLO's returned labels, confidence scores, and 
 
 **Every eligible returned detection is assessed.** The LLM's object/prompt limit does not apply to search or probability modes. The old ten-object and eight-review-target cutoffs are removed. This still respects the selected YOLO confidence threshold, class filter, NMS, and maximum-detection setting; a label in the model vocabulary is not treated as a detected object. Missing labels remain unobserved. All returned boxes remain in the facts and decision assessment, including duplicate classes and tentative detections.
 
-Scene associations use each observed class once at its strongest returned score, preventing repeated people/chairs from multiplying the same evidence. Low-score detections contribute weaker scene evidence and get verification advice. Custom labels also receive a decision assessment: tentative labels can be verified, while confident object presence alone implies no action. With no defined scene association, their likelihood is equal across settings and does not invent a location. Generic labels can therefore have a neutral influence without being discarded.
+Probability scene associations use each observed class once at its strongest returned score, preventing repeated people/chairs from multiplying the same evidence. Low-score detections contribute weaker scene evidence and get verification advice. Custom labels also receive a decision assessment: tentative labels can be verified, while confident object presence alone implies no action. With no defined scene association, their likelihood is equal across settings and does not invent a location. Generic labels can therefore have a neutral influence without being discarded.
 
 ### Search algorithms
 
-Search mode first matches observed labels to the knowledge base to estimate the setting. These are cue-match weights, not probabilities. The chosen search algorithm then plans conditional review suggestions for **all** rule-triggered targets. Signals can prompt checking their actual state; knives/scissors can prompt care if handled; low-score boxes can prompt verification. Every other detection is explicitly assessed as object presence without a required action.
+Search mode has **no environment prediction or Environment section**. The chosen search algorithm plans conditional review suggestions for **all** rule-triggered targets. Signals can prompt checking their actual state; knives/scissors can prompt care if handled; low-score boxes can prompt verification. Every other detection is explicitly assessed as object presence without a required action.
 
 | Algorithm | Frontier behavior | Review-plan tradeoff |
 | --- | --- | --- |
@@ -75,7 +90,7 @@ Search mode first matches observed labels to the knowledge base to estimate the 
 
 State consists of the targets already included in the plan and the last target. Each edge adds one allowed, detection-linked review suggestion. Cost is illustrative review effort plus the normalized Manhattan attention shift between image-box centers. The heuristic sums the remaining minimum review efforts and the cheapest initial shift; it is a lower bound because further shifts are omitted.
 
-Targets are processed in consecutive batches of five to bound exponential work. **Every batch is processed, with no omitted targets.** UCS/A* optimality is within each batch; the combined plan is not claimed to be globally optimal. This plans how to review an image; it is not physical navigation and does not execute actions. The first planned suggestion becomes the displayed decision. The full plan, per-detection assessments, batch costs, and expanded-state counts appear in **Details** and saved metadata.
+Targets are processed in consecutive batches of five to bound exponential work. **Every batch is processed, with no omitted targets.** UCS/A* optimality is within each batch; the combined plan is not claimed to be globally optimal. This plans how to review an image; it is not physical navigation and does not execute actions. The first planned suggestion becomes the displayed decision. The descriptor shows **Description (Search Algorithm)**: actual visited states with detection labels/IDs, path prefixes, depth limits for IDS, accumulated cost `g`, heuristic `h`, priorities where used, goal markers, and the selected review path. It also reports generated/expanded states and peak frontier size. All targets are processed; at most 250 expansion records are displayed/stored, with any omitted count explicit. **Details** and saved metadata retain these values and all selected steps. If no rule fires, the description explains why no search frontier is expanded.
 
 ### Probability algorithm
 
@@ -85,26 +100,42 @@ Targets are processed in consecutive batches of five to bound exponential work. 
 
 The model assumes distinct observed classes are conditionally independent given the scene. For a low-score observation, its likelihood blends 30% of the class table with 70% of the prior-predictive mean, making it less informative. This blend is an illustrative model parameter, not the YOLO score treated as a probability of correctness. A specific setting requires at least two strong informative cues, top posterior ≥55%, and a ≥15-point lead; otherwise it stays unclear.
 
-Probability mode evaluates each detection with the explicit conditional table `P(review useful | detected label, score band)` and selects the strongest recommendation at or above 50%. The initial illustrative values are 80% for verifying a tentative label, 85% for checking a detected signal, 75% for care if a detected knife/scissors is handled, and 15% for presence-only cases. These express a review policy, **not danger or object-correctness probabilities**. Probability mode performs no search. The scene posterior and every detection's review probability are saved separately.
+Probability mode evaluates each detection with the explicit conditional table `P(review useful | detected label, score band)` and selects the strongest recommendation at or above 50%. The initial illustrative values are 80% for verifying a tentative label, 85% for checking a detected signal, 75% for care if a detected knife/scissors is handled, and 15% for presence-only cases. These express a review policy, **not danger or object-correctness probabilities**. Probability mode performs no search. The descriptor shows **Description (Probability Algorithm)** with every detection's YOLO score and conditional review probability, the maximum-probability/threshold calculation, all scene priors and posteriors, numeric log-joint normalization, and the leading scenario's likelihood products. Low-score mixing is shown as an explicit weighted calculation. Full factors and intermediate values are saved separately for verification.
 
 All priors, likelihoods, cue rules, review probabilities, and effort costs are hand-authored teaching assumptions. They have not been calibrated on a labeled dataset. The GUI labels probability estimates accordingly. **No Action** does not certify that a scene is safe. Classification-only input and empty detections produce YOLO facts without object-based scene or action inference.
 
 Algorithm references: [probability and inference by enumeration](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/inference.html), [uninformed search](https://inst.eecs.berkeley.edu/~cs188/textbook/search/uninformed.html), [greedy and A* search](https://inst.eecs.berkeley.edu/~cs188/textbook/search/informed.html).
 
+## Compare methods on the same frame
+
+Open an image, or stop a camera/video on a frame with YOLO enabled, then click **Compare** above the preview. This freezes the clean image and its full detection result. The comparison runs all six searches, Inference by Enumeration, and the selected LLM serially without rerunning YOLO. Use one to five repetitions; method order rotates across repetitions. Select any result to read its explanation/traversal/calculations and export **CSV** or full **JSON**. Exports include a stable frame/evidence identifier so independent samples can be grouped without counting repeated runs as new frames.
+
+- **Latency:** complete descriptor-call time, including preparation, inference, validation and explanation formatting. Model loading is included when it occurs; lightweight client/knowledge-base construction happens outside the descriptor-call timing boundary. YOLO, queue wait, GUI updates and saving are excluded. Repetitions show individual measurements; no warmup is silently discarded.
+- **Accuracy:** optionally supply independently determined **Expected decision** and **Expected setting**. The table shows match/mismatch for this frame. Search has no environment output, so its setting match is not applicable. Invalid answers count as mismatches when a reference exists. Without a reference, accuracy is not scored. Repeated runs on one frame are not additional accuracy samples; evaluate many independently labeled frames and aggregate the exports before claiming dataset accuracy. YOLO confidence and probability-model posteriors are not accuracy.
+- **Efficiency:** search reports expanded/generated states and peak frontier nodes; probability reports hypothesis/likelihood and review counts; LLM reports input/output tokens and server timing when available. These work units differ, so they do not establish a common energy, memory, or operation-count ranking. Energy and peak RAM/VRAM are not measured.
+
+**Comparison conditions are visible.** The LLM receives image context as well as detections; conventional methods only use labels, confidence and boxes. All eligible predictions reach the conventional algorithms, while the LLM object/context limit can omit some. Coverage is shown per row. The frozen image is limited to preview resolution (1280×900), and box coordinates are scaled consistently. System load, model residency, image context and evidence coverage affect results. This compares the configured pipelines, not strictly identical information or independently measured general accuracy.
+
+The decision policies also differ: conventional methods use the explicit teaching table; the LLM selects from the offered grounded suggestions. Searches order review suggestions rather than learning a scene classifier. Interpret decision disagreement in that context and define the annotation policy before labeling an evaluation dataset.
+
 ## Local vision descriptions
 
 1. Install [Ollama](https://ollama.com/download) (0.12.7 or newer). The app starts its own local model service when needed.
-2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; structured descriptions took about 6–7 seconds in a warmed sample-image test (first loading can take longer), so it is not a per-frame real-time captioner. LLM weights are stored in the project’s `Models/ollama/` folder; YOLO weights are stored directly in `Models/`. Weights are excluded from Git.
+2. Open **Settings → Descriptions → Download model** (or run `python3 setup_descriptor.py` from this project). It downloads and verifies **qwen3-vl:2b**, a small **Q4_K_M (4-bit)** vision-language model, about **1.9 GB** on disk. Runtime RAM/VRAM usage is higher than download size. YOLO also needs memory; use Nano or CPU inference on a 4 GB GPU. The Qwen pipeline was tested with YOLO Nano on a 4 GB RTX 3050 Ti; the earlier choices-only version took about 6–7 seconds in a warmed sample-image test; the current decision-plus-explanation pipeline makes a decision call and explanation call (plus at most one correction) and reports its actual timing in the GUI, so it is not a per-frame real-time captioner. LLM weights are stored in the project’s `Models/ollama/` folder; YOLO weights are stored directly in `Models/`. Weights are excluded from Git.
 3. Open **Run_CNN_LLM_Based_Descriptor.sh**, select your source, and leave YOLO inference enabled. Descriptions are enabled by default. Use **Settings → Descriptions** to disable them or change the local model, server, sample interval, or timeout.
-4. Read the **Descriptor** panel beside or below the preview. It shows **Detections** (YOLO objects, counts, scores and positions), **Environment** (what kind of place it looks like, marked as an estimate), **Decision** (either **Take Action** or **No Action**), and **Reason** (the evidence behind that recommendation). Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
+4. Read the **Descriptor** panel beside or below the preview. It shows **Detections** plus the sections appropriate to the selected method. LLM sections are explicitly labeled **(LLM)**, search descriptions show traversal without Environment, and probability descriptions show calculations. Its frame number (and source timestamp for video files) identifies the described frame; descriptions can lag behind live video. **Details** includes the full description, validation status, action decision, reason and exact detection evidence.
 
-The model receives the frame for context, but **cannot write free-form object descriptions**. It returns three structured choices: an `environment` (`indoor`, `outdoor`, or `unclear`), a `setting` from the supported place categories, and `next_step`, either `no_action` or one suggestion from a list tied to the supplied detection IDs. Object presence alone does not force an action. The application checks the complete answer and builds all displayed text from YOLO facts and fixed suggestion/reason wording. Reasons for an action identify its detected object, position and exact confidence score, then explain the selected suggestion. Extra fields, unknown IDs, unsupported actions/settings, contradictory indoor/outdoor choices, prose and malformed answers are discarded; a YOLO-only summary is shown instead and the next frame can try again. Unchecked model text is never displayed or saved in description records.
+The LLM uses its predicted environment together with the supplied YOLO labels, confidence scores and boxes to choose a decision. Its sections are **Environment (LLM)**, **Decision (LLM)**, and **Description (LLM)**. The description is a concise model-written explanation of that decision, not an application-generated reason template or a transcript of internal reasoning.
+
+The vision call returns three JSON choices: `environment`, `setting`, and `next_step`. A second text-only call writes `reason` from those validated choices, the suggestion meaning, and detection IDs, labels and confidence bands. References resolve to YOLO labels and scores; explicitly named labels must be cited; the explanation call sees no image. The explanation can make one correction attempt if it fails validation. All local calls, including that correction when needed, are included in latency and token totals; `model_calls` records the count. The first three remain bounded choices; actions must target supplied detections. The explanation is model-generated natural language, with checks that can reject unsupported wording. The reason must cite current evidence as `[d1]`, `[d2]`, etc., including the selected target. The app replaces references with the detector's label and exact confidence, and rejects malformed answers, unknown references, uncited object names, a list of unsupported background/state/distance claims, new numeric claims, and markup. Object lists, counts, positions, and action wording remain generated from YOLO evidence.
+
+Natural-language checks are **not a proof that every sentence is true**. The displayed explanation is explicitly attributed to the LLM; it can still be mistaken and should be evaluated against independent reference labels. The place estimate is also unconfirmed. Failed answer validation shows YOLO facts and explains why no recommendation is available; raw rejected text is not saved.
 
 **No Action** means no specific action is recommended from the supplied evidence; it does not declare the scene safe. An empty detection list, classification-only input or an invalid model answer also shows **No Action**, with **Reason** explaining why a recommendation is unavailable. A valid model answer can select **No Action** even when objects are detected.
 
 Suggestions are general scene guidance: inspect a detected object, allow space if moving nearby, confirm a low-score detection, inspect before handling a detected knife/scissors, or check the actual state of a detected signal. These suggestions do not assert motion, signal color, distance, danger, or that a route is clear. For example, a person detected at the left may prompt “If moving nearby, leave space around the detected person.” A visible object absent from YOLO's supplied detections cannot appear in the object summary or suggestion. The place type and indoor/outdoor context are separately marked as **model estimates** and can be wrong. The setting label cannot introduce extra object descriptions.
 
-The Qwen3-VL compatibility prefill avoids the forced reasoning in older Ollama builds so the bounded output budget is used for these structured choices.
+The Qwen3-VL vision decision uses the compatibility prefill. Its text-only explanation uses Ollama's raw generation endpoint with a Qwen prompt and a simple JSON schema, avoiding the installed chat renderer's forced-thinking behavior. Alternative model families use their normal chat template. Rejected explanations can be corrected once, and every call is measured.
 
 The default samples at most once every three seconds, with a 220-token output limit and a 180-second request timeout to allow the first model load. One background request and one latest pending frame keep memory bounded and video preview responsive. Cancel download stops after the current network read; downloading again resumes cached progress. Ollama chooses its GPU/CPU placement independently of YOLO. The model receives the original frame resized to at most 640 px, plus up to 10 predictions ordered by confidence: IDs, labels, scores, normalized boxes, and spatial positions. Exact pixel boxes remain in the saved evidence. Only valid boxes at or above the selected detection threshold qualify. Axis-aligned extents represent oriented boxes. Extra predictions and objects dropped to fit the context window are counted as omitted and cannot be suggestion targets. Counts cover listed predictions only. With no detections, the app skips the model and says no objects were detected; it does not call the scene empty. Classification results are shown as class candidates, with no object counts, positions or object-specific advice, and no vision-model call.
 
@@ -114,7 +145,7 @@ Descriptions are generated only when YOLO inference is on. A missing model, fail
 
 When recording or saving an image, sampled descriptions are written to `descriptions.jsonl` beside `predictions.jsonl`, with their original frame number, source time, model name, generation time, frame dimensions, exact evidence, `action_decision` and `reason`. A caption can finish after its recording is stopped, and still belongs to that recording's directory. Manual Stop can discard unfinished captions. Captions are displayed in the panel and saved as metadata; they are not burned into video frames.
 
-Source: [Qwen3-VL 2B model and quantization](https://ollama.com/library/qwen3-vl:2b), [Ollama vision API](https://docs.ollama.com/capabilities/vision), [Ollama structured outputs](https://docs.ollama.com/capabilities/structured-outputs).
+Source: [Ollama generation API](https://docs.ollama.com/api/generate), [Qwen3-VL 2B model and quantization](https://ollama.com/library/qwen3-vl:2b), [Ollama vision API](https://docs.ollama.com/capabilities/vision), [Ollama structured outputs](https://docs.ollama.com/capabilities/structured-outputs).
 
 ## Live camera and recording
 
@@ -177,6 +208,8 @@ GUI setup offers existing-package reuse, CPU-only PyTorch, or NVIDIA CUDA packag
 New environments are verified before activation; failed or cancelled installs leave the working environment available. The active environment is recorded in `launcher_settings.json`, with the original `.venv/` also supported. Repairs retain prior working environments and can require additional disk space.
 
 ## Verification
+
+Additional checks cover actual traversal logs, numeric probability factors and normalization, evidence-referenced LLM explanations, mode-specific sections, comparison exports, reference-label scoring, and minimum-size comparison controls.
 
 Checks cover all six searches, all 80 standard labels plus custom labels, more than the previous object/target limits, exact probability arithmetic, UCS/A* agreement with exhaustive small-case plans, saved method/latency metadata, grounding, no-detection/classification behavior, mode selection, red/green highlights, and minimum GUI sizes. All six searches have also been checked with 1,000 returned detections.
 

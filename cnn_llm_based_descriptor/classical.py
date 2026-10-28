@@ -13,6 +13,7 @@ from .grounding import LOW_SCORE, action_choices, render_description
 from .methods import DEFAULT_SEARCH, method_details
 from .scenes import SETTINGS, environment_text
 from .search import plan_reviews
+from .explanations import search_explanation, probability_explanation
 
 MODEL_PATH = Path(__file__).with_name("scene_model.json")
 
@@ -41,6 +42,8 @@ def load_scene_model(path=MODEL_PATH):
         raise ValueError("Review probabilities and threshold must be valid probabilities.")
     if set(review["probabilities"]) != {"no_action", "verify", "check_signal", "handle_carefully"}:
         raise ValueError("Unsupported review probability table.")
+    if review["probabilities"]["no_action"] >= review["threshold"]:
+        raise ValueError("Presence-only review probability must stay below the recommendation threshold.")
     if not set(model["label_actions"].values()) <= {"no_action", "check_signal", "handle_carefully"}:
         raise ValueError("Unsupported label action in knowledge base.")
     # Only the matching detected classes may receive these specific suggestions.
@@ -76,12 +79,14 @@ def infer_setting(evidence, model):
     scenes, observations = model["scenes"], class_observations(evidence)
     means = {label: sum(row["prior"] * label_likelihood(row, label) for row in scenes.values())
              for label in observations}
-    log_joint = {}
+    log_joint, factors = {}, {}
     for setting, data in scenes.items():
         value = math.log(data["prior"])
+        factors[setting] = {}
         for label, score in observations.items():
             weight = 1.0 if score >= LOW_SCORE else model["low_score_weight"]
             likelihood = weight * label_likelihood(data, label) + (1-weight) * means[label]
+            factors[setting][label] = likelihood
             value += math.log(likelihood)
         log_joint[setting] = value
     offset = max(log_joint.values())
@@ -96,34 +101,16 @@ def infer_setting(evidence, model):
                 and posterior[top]-posterior[second] >= .15)
     return {"setting": top if accepted else "unclear", "posterior": posterior,
             "observed_labels": sorted(observations), "label_confidences": observations,
+            "priors": {name: row["prior"] for name, row in scenes.items()},
+            "likelihood_factors": factors,
+            "raw_likelihoods": {name: {label: label_likelihood(row, label) for label in observations} for name, row in scenes.items()},
+            "evidence_weights": {label: 1.0 if score >= LOW_SCORE else model["low_score_weight"] for label, score in observations.items()},
+            "predictive_means": means, "log_joint": log_joint,
+            "normalization_offset": offset, "scaled_normalizer": normalizer,
             "custom_labels": sorted(set(observations)-set(model["labels"])),
             "candidates": ranked[:3], "method": "Inference by Enumeration",
             "calibrated": False, "table_version": model["version"],
             "assumption": "Distinct observed labels are conditionally independent given the setting. Missing labels are unobserved. Custom labels have equal neutral likelihoods."}
-
-
-def associate_setting(evidence, model):
-    """Search mode's scene estimate uses explicit cue associations, not Bayes."""
-    observations = class_observations(evidence)
-    scores, matches = {}, {}
-    for setting, data in model["scenes"].items():
-        if setting == "unclear":
-            continue
-        matches[setting] = [label for label in observations
-                            if label in model["labels"] and label_likelihood(data, label) >= .45
-                            and len({label_likelihood(row, label) for row in model["scenes"].values()}) > 1]
-        scores[setting] = sum(label_likelihood(data, label) *
-                              (1 if observations[label] >= LOW_SCORE else model["low_score_weight"])
-                              for label in matches[setting])
-    ranked = sorted(scores, key=lambda name: (-scores[name], name))
-    top, second = ranked[:2]
-    strong = sum(observations[label] >= LOW_SCORE for label in matches[top])
-    accepted = strong >= 2 and scores[top] >= 1 and scores[top]-scores[second] >= .2
-    return {"setting": top if accepted else "unclear", "method": "Knowledge-base label associations",
-            "observed_labels": sorted(observations), "scores": scores, "matches": matches,
-            "candidates": [name for name in ranked[:3] if scores[name] > 0],
-            "custom_labels": sorted(set(observations)-set(model["labels"])),
-            "score_meaning": "Cue-match weights, not probabilities or measured accuracy."}
 
 
 def assess_detections(evidence, model):
@@ -205,17 +192,21 @@ class ClassicalClient:
         if classification or not evidence:
             result = render_description(evidence, total, width, height, self.cfg,
                                         status="classification" if classification else "no_detections")
+            operation = "Search traversal" if self.cfg.describe_backend == "Search Algorithm" else "Probability calculation"
+            result["text"] += f"\n\nDescription ({self.cfg.describe_backend}): {operation} was not performed because no eligible object-box evidence was available."
         else:
             if self.cfg.describe_backend == "Search Algorithm":
-                scene = associate_setting(evidence, self.model)
+                scene = {"setting": "unclear", "custom_labels": []}
                 plan = search_review_plan(evidence, self.cfg.describe_search, self.model)
                 step = plan["steps"][0]["choice"] if plan["steps"] else "no_action"
                 source = "knowledge-base"
                 note = (f"{self.cfg.describe_search} assessed all {len(evidence)} detections and planned "
-                        f"{len(plan['steps'])} review steps in {len(plan['batches'])} batch(es); the first suggestion is shown.")
+                        f"{len(plan['steps'])} review steps in {len(plan['batches'])} batch(es).")
+                if plan["steps"]:
+                    note += " The first suggestion is shown as the decision."
                 if not plan["steps"]:
                     note += " No review rule was triggered by the detected labels and scores."
-                extra = {"scene_associations": scene, "decision_search": plan}
+                extra = {"decision_search": plan}
             else:
                 scene = infer_setting(evidence, self.model)
                 decision = infer_review(assess_detections(evidence, self.model), self.model)
@@ -232,14 +223,24 @@ class ClassicalClient:
                 ranking = "; ".join(f"{SETTINGS[name][0]} {scene['posterior'][name]*100:.1f}%"
                                     for name in scene["candidates"] if scene["posterior"][name] >= .01)
                 context += f"\nPossible settings: {ranking}.\nIllustrative model probabilities, not measured accuracy."
-            elif scene["candidates"]:
-                context += "\nLabel associations suggest: " + "; ".join(SETTINGS[name][0] for name in scene["candidates"]) + "."
             if scene["custom_labels"]:
                 context += " Custom labels without scene associations use a neutral fallback."
             choice = {"environment": environment, "setting": setting, "next_step": step}
             result = render_description(evidence, total, width, height, self.cfg, choice=choice,
                                         context_override=context, reason_note=note)
             result.update(extra)
+            reasoning = (search_explanation(plan, evidence) if self.cfg.describe_backend == "Search Algorithm"
+                         else probability_explanation(scene, decision))
+            result["reasoning_trace"] = reasoning
+            result["text"] += "\n\n" + reasoning
+            result["efficiency"] = ({"expanded_states": plan["expanded_states"],
+                                     "generated_states": plan["generated_states"],
+                                     "peak_frontier_nodes": plan["peak_frontier"],
+                                     "planned_reviews": len(plan["steps"])}
+                                    if self.cfg.describe_backend == "Search Algorithm" else
+                                    {"scene_hypotheses": len(scene["posterior"]),
+                                     "likelihood_factors": sum(map(len, scene["likelihood_factors"].values())),
+                                     "review_assessments": len(decision["assessments"])})
         result.update(model=details["algorithm"], backend=self.cfg.describe_backend, **details,
                       detections_considered=len(evidence), knowledge_base_labels=len(self.model["labels"]))
         return result

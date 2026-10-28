@@ -65,7 +65,7 @@ jobs:
                       assert app.description_body.winfo_height() >= 50
                       assert bool(app.description_body.tag_ranges('take_action')) == (step!='no_action')
                       assert bool(app.description_body.tag_ranges('no_action')) == (step=='no_action')
-                      assert 'Reason:' in packet['text'] and '91%' in packet['text']
+                      assert 'Description (LLM):' in packet['text'] and '91%' in packet['text']
               app._destroy()
           try:
               parse_choice('{"environment":"indoor","setting":"home","next_step":"inspect:d99"}',action_choices(evidence))
@@ -95,12 +95,15 @@ jobs:
                   cfg.validate_descriptor();packet=ClassicalClient(cfg).describe(frame,records)
                   assert len(packet['evidence'])==81 and packet['detections_considered']==81
                   assert packet['descriptor_type']==backend
-                  scene=packet.get('scene_inference',packet.get('scene_associations'))
+                  scene=packet.get('scene_inference')
                   decision=packet.get('decision_inference',packet.get('decision_search'))
-                  assert len(scene['observed_labels'])==81 and len(decision['assessments'])==81
-                  assert scene['custom_labels']==['custom gauge']
+                  assert len(decision['assessments'])==81
+                  if scene:
+                      assert len(scene['observed_labels'])==81 and scene['custom_labels']==['custom gauge']
+                  else:
+                      assert 'Environment' not in packet['text'] and packet['setting'] is None
                   for labels in [('laptop','keyboard','mouse'),('couch','tv','remote')]:
-                      p=ClassicalClient(cfg).describe(frame,[record(l) for l in labels]);assert p['setting'] in {'home','office'},p
+                      p=ClassicalClient(cfg).describe(frame,[record(l) for l in labels]);assert p['setting'] in ({'home','office'} if scene else {None}),p
                   assert ClassicalClient(cfg).describe(frame,[])['grounding_status']=='no_detections'
                   assert ClassicalClient(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
           # Independent Bayes arithmetic and neutral custom observations.
@@ -165,7 +168,7 @@ jobs:
               except ValueError:
                   pass
           llm=OllamaVisionClient(RunConfig());llm.checked=True
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',return_value={'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}):
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[{'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}, {'response':'{"reason":"[d1] establishes presence in the estimated setting without a specific reason to intervene."}'}]):
               packet=llm.describe(frame,[record('person')])
               assert 'ballroom or event hall' in packet['text'] and packet['algorithm']=='qwen3-vl:2b'
           # Every named method and precise latency stays visible in the descriptor.
@@ -214,6 +217,79 @@ jobs:
                   app._save_settings(app._config())
                   assert app._load_settings().describe_search=='A* Search'
               window.destroy();app._destroy()
+          from cnn_llm_based_descriptor.comparison import expected_matches, export_results, run_comparison
+          from cnn_llm_based_descriptor.measurement import measure_description
+          records=[record('traffic light'),record('knife',.8,40),record('custom gauge',.4,70)]
+          for algorithm in SEARCH_ALGORITHMS:
+              packet=measure_description(ClassicalClient(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm)),frame,records)
+              plan=packet['decision_search']
+              assert 'Environment' not in packet['text'] and packet['setting'] is None
+              assert len(plan['traversal'])==plan['expanded_states'] and plan['traversal'][-1]['goal']
+              assert plan['generated_states']>=plan['expanded_states'] and plan['peak_frontier']>0
+              assert 'traffic light [d1]' in packet['text']
+          packet=ClassicalClient(RunConfig(describe_backend='Probability Algorithm')).describe(frame,records)
+          scene=packet['scene_inference']
+          for name,joint in scene['log_joint'].items():
+              assert math.isclose(math.exp(joint-scene['normalization_offset'])/scene['scaled_normalizer'],scene['posterior'][name])
+              assert math.isclose(math.log(scene['priors'][name])+sum(math.log(v) for v in scene['likelihood_factors'][name].values()),joint)
+          assert 'Decision calculation:' in packet['text'] and 'Scenario probabilities:' in packet['text']
+          evidence=facts(records)
+          answer={'environment':'outdoor','setting':'street','next_step':'check_signal:d1','reason':'In the estimated street setting, I recommend checking [d1] because its detected presence does not establish its current state.'}
+          assert parse_choice(json.dumps(answer),action_choices(evidence),evidence)['reason']==answer['reason']
+          for reason in ('A dog appears next to [d1] and needs attention.', 'I recommend checking [d99] before acting.', 'I see [d1] with 100% certainty.'):
+              try:
+                  parse_choice(json.dumps({**answer,'reason':reason}),action_choices(evidence),evidence)
+                  raise AssertionError('Unsupported explanation accepted')
+              except ValueError:
+                  pass
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[{'message':{'content':json.dumps({k:v for k,v in answer.items() if k!='reason'})}}, {'response':json.dumps({'reason':answer['reason']}),'eval_count':55,'prompt_eval_count':200}]):
+              packet=measure_description(llm,frame,records)
+              assert packet['reason_source']=='LLM' and 'I recommend checking' in packet['reason']
+              assert all(label in packet['text'] for label in ('Environment (LLM):','Decision (LLM):','Description (LLM):'))
+              assert packet['efficiency']['eval_count']==55 and packet['efficiency']['model_calls']==2
+          # One rejected explanation can be corrected; all three calls are measured.
+          first={'message':{'content':json.dumps({k:v for k,v in answer.items() if k!='reason'})},'eval_count':10}
+          bad={'response':json.dumps({'reason':'[d1] is at a safe distance and requires no response.'}),'eval_count':20}
+          good={'response':json.dumps({'reason':answer['reason']}),'eval_count':30}
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[first,bad,good]) as requests:
+              fixed=measure_description(llm,frame,records)
+              assert fixed['grounding_status']=='validated' and fixed['efficiency']['model_calls']==3
+              assert fixed['efficiency']['eval_count']==60
+              assert requests.call_args_list[1].args[1]=='/api/generate'
+              assert requests.call_args_list[1].args[2]['raw'] is True
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[first,bad,bad]):
+              assert llm.describe(frame,records)['grounding_status']=='fallback'
+          assert expected_matches(packet,'Take Action','street')=={'decision_match':True,'setting_match':True}
+          assert not expected_matches({**packet,'grounding_status':'fallback'},'Take Action','street')['decision_match']
+          results=[]
+          with patch('cnn_llm_based_descriptor.descriptor.OllamaVisionClient.describe',return_value=packet):
+              run_comparison(RunConfig(),frame,records,2,lambda k,v:results.append(v) if k=='result' else None,threading.Event())
+          assert len(results)==16 and len({r['algorithm'] for r in results})==8
+          with tempfile.TemporaryDirectory() as directory:
+              for ext in ('csv','json'):
+                  path=Path(directory)/('comparison.'+ext)
+                  export_results(path,results,'Take Action','street',{'frame':1})
+                  assert path.stat().st_size>100
+          # Comparison keeps both results and explanation controls visible at minimum size.
+          from cnn_llm_based_descriptor.comparison import ComparisonWindow
+          with patch.object(App,'refresh_devices'), patch.object(App,'refresh_cameras'):
+              root=tk.Tk(); app=App(root); app.selected_device.set('CPU')
+              app._preview({'rgb':frame,'comparison_bgr':frame,'original_size':[100,100],'task':'Object detection','confidence':.25,'inference':True,'records':records,'fps':1,'resolution':'100 x 100','count':3,'frame':1,'inference_ms':3})
+              app.show_comparison(); comparison=app.comparison_window
+              for size in ('1180x820','760x520'):
+                  comparison.window.geometry(size);settle(root)
+                  for widget in (comparison.run_button,comparison.cancel_button,comparison.export_button,comparison.table,comparison.detail):visible(widget,comparison.window)
+                  assert comparison.detail.winfo_height()>=40
+              comparison.results=results;comparison.refresh();settle(root)
+              assert comparison.table.item('0','values')[6]=='Not applicable'
+              comparison.decision.set('Take Action');comparison.refresh()
+              assert comparison.table.item('0','values')[5]=='Match'
+              comparison.close();app._destroy()
+          # A trace cap never drops review targets or changes the cost solution.
+          many=[record('custom gauge',.4,x=i%90) for i in range(60)]
+          plan=ClassicalClient(RunConfig(describe_backend='Search Algorithm')).describe(frame,many)['decision_search']
+          assert len(plan['traversal'])==250 and plan['trace_omitted']==plan['expanded_states']-250
+          assert len(plan['steps'])==60 and plan['omitted_targets']==0
           assert RunConfig().weights.parent.name == 'Models'
           print('Desktop, algorithm, grounding and latency checks passed.')
           PY

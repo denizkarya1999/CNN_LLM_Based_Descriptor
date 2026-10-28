@@ -52,6 +52,7 @@ class App:
         self.latest_records = []
         self.last_packet = None
         self.latest_description = None
+        self.comparison_window = None
         self.system_text = ''
         self.device_map = {'CPU': 'cpu'}
         self.camera_map = {}
@@ -177,6 +178,8 @@ class App:
         ttk.Label(preview_header, text='Live preview', style='Card.TLabel', font=self.bold_font).pack(side='left')
         self.record_label = ttk.Label(preview_header, textvariable=self.record_status, style='Card.TLabel', foreground=MUTED)
         self.record_label.pack(side='right')
+        self.compare_button = ttk.Button(preview_header, text='Compare', command=self.show_comparison)
+        self.compare_button.pack(side='right', padx=(6, 10))
         self.canvas = tk.Canvas(self.preview_card, background='#080e17', highlightthickness=0, width=1, height=1)
         self.canvas.grid(row=1, column=0, sticky='nsew')
         self.canvas.bind('<Configure>', self._resize)
@@ -223,12 +226,12 @@ class App:
         self.description_body.tag_configure('take_action',font=self.bold_font,foreground='#ff6b78',background='#4a2028')
         self.description_body.tag_configure('no_action',font=self.bold_font,foreground='#65e08c',background='#163824')
         for index, line in enumerate(self.description_text.get().splitlines(), 1):
-            for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:'):
+            for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:', 'Environment (LLM):', 'Decision (LLM):', 'Description (LLM):', 'Description (Search Algorithm):', 'Description (Probability Algorithm):', 'Search traversal:', 'Selected review path:', 'Label probabilities:', 'Scenario probabilities:', 'Calculation for leading scenario:', 'Efficiency:'):
                 if line.startswith(heading):
                     self.description_body.tag_add('section', f'{index}.0', f'{index}.{len(heading)}')
-            if line in ('Decision: Take Action', 'Decision: No Action'):
+            if line in ('Decision: Take Action', 'Decision: No Action', 'Decision (LLM): Take Action', 'Decision (LLM): No Action'):
                 self.description_body.tag_add('take_action' if line.endswith('Take Action') else 'no_action',
-                                               f'{index}.10', f'{index}.end')
+                                               f'{index}.{line.index(":")+2}', f'{index}.end')
         self.description_body.configure(state='disabled')
 
     def _window_resized(self, event):
@@ -371,6 +374,9 @@ class App:
     def start(self):
         if self.worker or self.probe or self.closing:
             return
+        if self.comparison_window and (self.comparison_window.running or not self.comparison_window.closed):
+            self.status.set('Finish and close the comparison before opening another input.')
+            return
         if self.named_cameras and self.vars['source_kind'].get()=='Webcam':
             self.refresh_cameras()
         try:
@@ -393,7 +399,7 @@ class App:
         self.ready = self.recording = self.record_pending = False
         self.outcome = self.last_output = self.stopping_since = None
         self.last_error = None
-        self.image = None; self._draw_preview()
+        self.image = None; self.last_packet = None; self._draw_preview()
         self.snapshot_button.configure(state='disabled')
         self.latest_records = []
         self.latest_description = None
@@ -629,7 +635,7 @@ class App:
         self.description_algorithm_combo.bind('<<ComboboxSelected>>',lambda _e: method_changed())
         method_changed(clear=False)
         self._field(description,'Minimum seconds between frames','describe_interval')
-        wrap_label(ttk.Label(description,text='Search options: BFS, DFS, IDS, UCS, Greedy Best-First, and A*. Probability uses Inference by Enumeration. Both evaluate every returned YOLO detection, using label associations and confidence scores; no LLM is needed.',foreground=MUTED)).pack(fill='x',pady=8)
+        wrap_label(ttk.Label(description,text='Search options: BFS, DFS, IDS, UCS, Greedy Best-First, and A*. Probability uses Inference by Enumeration. Both evaluate every returned YOLO detection and confidence score. Search shows review traversal without an environment estimate; probability shows its calculations.',foreground=MUTED)).pack(fill='x',pady=8)
         wrap_label(ttk.Label(description,text='The knowledge base covers all 80 standard YOLO labels. Custom labels use a neutral scene association and generic review rules. Probabilities are illustrative, not calibrated accuracy. Descriptor inference latency is shown separately from YOLO timing.',foreground=MUTED)).pack(fill='x',pady=8)
         ttk.Separator(description).pack(fill='x',pady=8)
         ttk.Label(description,text='LLM settings (used only in LLM mode)',font=self.bold_font).pack(anchor='w')
@@ -673,6 +679,41 @@ class App:
     def apply_sbc_preset(self):
         for key,value in {'scale':'N · Nano','device':'cpu','image_size':320,'half':False,'cpu_threads':2,'frame_stride':2,'camera_width':640,'camera_height':480,'camera_fps':30}.items(): self.vars[key].set(value)
         self.selected_device.set('CPU')
+
+    def show_comparison(self):
+        if self.comparison_window and not self.comparison_window.closed:
+            self.comparison_window.window.lift(); return
+        if self.comparison_window and self.comparison_window.running:
+            self.status.set('The cancelled comparison is finishing its current request.'); return
+        if self.worker:
+            messagebox.showinfo('Compare a frozen frame', 'Stop the input first, or wait for an image to finish. This keeps live inference from competing with the comparison.', parent=self.root)
+            return
+        packet = self.last_packet
+        if not packet or 'comparison_bgr' not in packet or not packet.get('inference'):
+            messagebox.showinfo('Compare a frozen frame', 'Open an input with YOLO inference enabled, then stop on a frame to compare.', parent=self.root)
+            return
+        try:
+            cfg = replace(self._config(), task=packet['task'], confidence=packet['confidence'])
+        except (ValueError, tk.TclError) as exc:
+            messagebox.showerror('Check settings', str(exc), parent=self.root); return
+        from copy import deepcopy
+        from .comparison import ComparisonWindow
+        frame = packet['comparison_bgr']
+        width, height = packet['original_size']
+        records = deepcopy(packet['records'])
+        for record in records:
+            for key, value in record.get('box', {}).items():
+                if key.startswith('x'): record['box'][key] = value * frame.shape[1] / width
+                elif key.startswith('y'): record['box'][key] = value * frame.shape[0] / height
+        import hashlib
+        sample_id = hashlib.sha256(frame.tobytes() + json.dumps(records, sort_keys=True).encode()).hexdigest()[:16]
+        context = {'sample_id': sample_id, 'frame': packet['frame'], 'source_seconds': packet.get('source_seconds'),
+                   'frame_size': [frame.shape[1], frame.shape[0]], 'original_size': [width, height],
+                   'confidence_threshold': cfg.confidence, 'task': cfg.task, 'host_platform': platform.platform(),
+                   'llm_model': cfg.describe_model, 'llm_object_limit': cfg.describe_max_objects,
+                   'accuracy_scope': 'Reference-label matches on this frame only, not dataset accuracy.',
+                   'timing_scope': 'Serial descriptor calls; YOLO excluded; loading included; no warmup discarded.'}
+        self.comparison_window = ComparisonWindow(self.root, cfg, frame, records, context)
 
     def show_details(self):
         if self.details_window and self.details_window.winfo_exists(): self.details_window.destroy()
@@ -745,6 +786,8 @@ class App:
         if self.worker: self.stop()
 
     def _destroy(self):
+        if self.comparison_window and not self.comparison_window.closed:
+            self.comparison_window.close()
         if self.probe:
             self.probe.kill(); self.probe.join(.2)
         for job in (self.timer,self.resize_job,self.layout_job):

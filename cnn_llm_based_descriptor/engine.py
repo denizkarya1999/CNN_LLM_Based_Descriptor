@@ -399,7 +399,9 @@ def infer(cfg: RunConfig, messages, previews, stop, paused, commands=None, infer
                 h, w = annotated.shape[:2]
                 ratio = min(1.0, 1280 / w, 900 / h)
                 preview = cv2.resize(annotated, (max(1, int(w*ratio)), max(1, int(h*ratio)))) if ratio < 1 else annotated
-                publish_latest(previews, {"rgb": cv2.cvtColor(preview, cv2.COLOR_BGR2RGB), "records": records[:100],
+                publish_latest(previews, {"rgb": cv2.cvtColor(preview, cv2.COLOR_BGR2RGB), "records": records,
+                    "comparison_bgr": cv2.resize(frame, (preview.shape[1], preview.shape[0])) if ratio < 1 else frame.copy(),
+                    "original_size": [w, h], "task": cfg.task, "confidence": cfg.confidence, "source_seconds": source_seconds,
                     "count": len(records), "frame": frame_index, "total": total, "processed": processed,
                     "fps": measured_fps, "inference_ms": inference_ms, "gpu_mb": allocated,
                     "resolution": f"{w} × {h}", "inference": enabled, "recording": bool(recorder)})
