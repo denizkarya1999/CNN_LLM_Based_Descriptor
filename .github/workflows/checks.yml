@@ -78,7 +78,7 @@ jobs:
           import numpy as np
           from cnn_llm_based_descriptor.config import RunConfig
           from cnn_llm_based_descriptor.classical import ClassicalClient,load_scene_model,infer_setting,assess_detections,review_targets,search_review_plan
-          from cnn_llm_based_descriptor.descriptor import detection_evidence,FrameDescriber,OllamaVisionClient
+          from cnn_llm_based_descriptor.descriptor import detection_evidence,FrameDescriber,OllamaVisionClient,create_descriptor_client
           from cnn_llm_based_descriptor.grounding import action_choices,parse_choice
           from cnn_llm_based_descriptor.methods import SEARCH_ALGORITHMS,DESCRIBE_BACKENDS,latency_text
           from cnn_llm_based_descriptor.search import search_batch,heuristic
@@ -90,7 +90,7 @@ jobs:
           # Every default label and a custom label reaches both the scene and decision stages.
           records=[record(label) for label in model['labels']]+[record('custom gauge')]
           with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Unexpected LLM request')):
-              for backend in DESCRIBE_BACKENDS[1:]:
+              for backend in ("Search Algorithm", "Probability Algorithm"):
                   cfg=RunConfig(describe_backend=backend,describe_max_objects=1,describe_url='invalid')
                   cfg.validate_descriptor();packet=ClassicalClient(cfg).describe(frame,records)
                   assert len(packet['evidence'])==81 and packet['detections_considered']==81
@@ -176,10 +176,11 @@ jobs:
               root=tk.Tk(); app=App(root)
               configurations=[RunConfig(describe_backend='Search Algorithm',describe_search=a) for a in SEARCH_ALGORITHMS]
               configurations.append(RunConfig(describe_backend='Probability Algorithm'))
+              configurations.append(RunConfig(describe_backend='General Algorithmic Approach'))
               for size in ('1440x900','760x520'):
                   root.geometry(size)
                   for cfg in configurations:
-                      packet=ClassicalClient(cfg).describe(frame,[record('traffic light')])
+                      packet=create_descriptor_client(cfg).describe(frame,[record('traffic light')])
                       packet.update(type='description',frame=1,source_seconds=None,elapsed_seconds=.000371,inference_latency_ms=.371)
                       app._handle(packet);settle(root)
                       assert cfg.describe_backend in app.description_title.get()
@@ -207,6 +208,8 @@ jobs:
                       assert app.vars['describe_search'].get()=='A* Search'
                   elif backend=='Probability Algorithm':
                       assert app.description_algorithm_combo.get()=='Inference by Enumeration'
+                  elif backend=='General Algorithmic Approach':
+                      assert app.description_algorithm_combo.get()=='Priority-Based Robot Action Plans'
                   else:
                       assert app.description_algorithm_combo.get()==app.vars['describe_model'].get()
               with tempfile.TemporaryDirectory() as d:
@@ -216,6 +219,9 @@ jobs:
                   app.selected_device.set('CPU');app.vars['describe_backend'].set('Search Algorithm')
                   app._save_settings(app._config())
                   assert app._load_settings().describe_search=='A* Search'
+                  app.vars['describe_backend'].set('General Algorithmic Approach')
+                  app._save_settings(app._config())
+                  assert app._load_settings().describe_backend=='General Algorithmic Approach'
               window.destroy();app._destroy()
           from cnn_llm_based_descriptor.comparison import expected_matches, export_results, run_comparison
           from cnn_llm_based_descriptor.measurement import measure_description
@@ -264,7 +270,7 @@ jobs:
           results=[]
           with patch('cnn_llm_based_descriptor.descriptor.OllamaVisionClient.describe',return_value=packet):
               run_comparison(RunConfig(),frame,records,2,lambda k,v:results.append(v) if k=='result' else None,threading.Event())
-          assert len(results)==16 and len({r['algorithm'] for r in results})==8
+          assert len(results)==18 and len({r['algorithm'] for r in results})==9
           with tempfile.TemporaryDirectory() as directory:
               for ext in ('csv','json'):
                   path=Path(directory)/('comparison.'+ext)
@@ -290,6 +296,78 @@ jobs:
           plan=ClassicalClient(RunConfig(describe_backend='Search Algorithm')).describe(frame,many)['decision_search']
           assert len(plan['traversal'])==250 and plan['trace_omitted']==plan['expanded_states']-250
           assert len(plan['steps'])==60 and plan['omitted_targets']==0
+          # Robot plan policy: independent examples, boundary counts, all-label coverage,
+          # precedence, confidence gating, missing evidence, and real async/export paths.
+          from cnn_llm_based_descriptor.robot_plans import PLANS, GeneralAlgorithmicClient
+          from cnn_llm_based_descriptor.descriptor import create_descriptor_client
+          from cnn_llm_based_descriptor.measurement import measure_description
+          general_cfg=RunConfig(describe_backend='General Algorithmic Approach',describe_url='invalid',describe_max_objects=1)
+          general_cfg.validate_descriptor()
+          general=create_descriptor_client(general_cfg)
+          assert isinstance(general,GeneralAlgorithmicClient)
+          scenarios=[([], 'empty_area', 'No Action'),
+                     (['person']*4,'people_nearby','Take Action'),
+                     (['person']*5,'crowded_area','Take Action'),
+                     (['person','car'],'people_and_vehicles','Take Action'),
+                     (['traffic light'],'signal_review','Take Action'),
+                     (['dog'],'animal_presence','Take Action'),
+                     (['knife'],'tool_handling','Take Action'),
+                     (['car'],'vehicle_presence','Take Action'),
+                     (['cup']*3,'sparse_objects','No Action'),
+                     (['cup']*4,'moderate_objects','No Action'),
+                     (['cup']*9,'moderate_objects','No Action'),
+                     (['cup']*10,'dense_objects','Take Action')]
+          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Robot plans called an LLM')):
+              for labels,plan_id,decision in scenarios:
+                  packet=measure_description(general,frame,[record(label) for label in labels])
+                  assert packet['action_plan']['selected_plan']['id']==plan_id, (labels,packet)
+                  assert packet['action_decision']==decision
+                  assert packet['grounding_status']=='validated'
+                  assert packet['environment'] is None and packet['setting'] is None and 'Environment' not in packet['text']
+                  assert packet['efficiency']['rules_evaluated']==12
+                  assert packet['inference_latency_ms']>0 and packet['detections_considered']==len(labels)
+                  assert expected_matches(packet,decision,'street')=={'decision_match':True,'setting_match':None}
+              low=general.describe(frame,[record('person',.499)]*5)
+              assert low['action_plan']['selected_plan']['id']=='uncertain_detections'
+              assert low['action_plan']['counts']['people']==0
+              assert general.describe(frame,[record('person',.5)]*5)['action_plan']['selected_plan']['id']=='crowded_area'
+              mixture=general.describe(frame,[record('person')]*5+[record('car'),record('knife'),record('custom gauge',.3)])
+              assert mixture['action_plan']['selected_plan']['id']=='crowded_area'
+              assert {p['id'] for p in mixture['action_plan']['applicable_plans']} >= {'crowded_area','people_and_vehicles','tool_handling','uncertain_detections','vehicle_presence'}
+              assert all(p['action_decision']=='Take Action' for p in mixture['action_plan']['applicable_plans'])
+              assert all(p['name'] in mixture['suggested_action']['text'] for p in mixture['action_plan']['applicable_plans'])
+              one_tool=general.describe(frame,[record('knife')])
+              assert one_tool['action_decision']=='Take Action' and 'scissors' not in one_tool['suggested_action']['text']
+              assert 'idle plan overridden' in one_tool['text']
+              all_labels=general.describe(frame,[record(label) for label in model['labels']]+[record('custom gauge')])
+              assert len(all_labels['action_plan']['assessments'])==81
+              assert all_labels['action_plan']['counts']['strong']==81
+              many=general.describe(frame,[record('custom gauge',x=i%90) for i in range(1000)])
+              assert many['action_plan']['counts']['total']==1000 and len(many['action_plan']['selected_plan']['detection_ids'])==1000
+              assert many['action_plan']['selected_plan']['id']=='dense_objects'
+              bad=[record('person',float('nan')),record('person',.24),{'name':'person','confidence':.9},
+                   {'name':'person','confidence':.9,'box':{'x1':1,'x2':1,'y1':1,'y2':5}}]
+              assert general.describe(frame,bad)['action_plan']['selected_plan']['id']=='empty_area'
+              filtered=create_descriptor_client(replace(general_cfg,confidence=.95)).describe(frame,[record('person')]*5)
+              assert filtered['action_plan']['counts']['total']==0
+              classified=create_descriptor_client(replace(general_cfg,task='Image classification')).describe(frame,[record('person')])
+              assert classified['grounding_status']=='classification' and 'action_plan' not in classified
+              # The plan evaluates detector evidence only; pixel content cannot change it.
+              assert general.describe(frame,[record('dog')])['action_plan']==general.describe(np.full_like(frame,255),[record('dog')])['action_plan']
+              with tempfile.TemporaryDirectory() as directory:
+                  stop=threading.Event();switch=threading.Event();switch.set();messages=queue.Queue()
+                  worker=FrameDescriber(general_cfg,messages,stop,switch)
+                  assert worker.submit(frame,[record('person')]*5,7,None,time.monotonic(),directory)
+                  packet=messages.get(timeout=5);worker.close()
+                  saved=json.loads((Path(directory)/'descriptions.jsonl').read_text())
+                  assert packet['type']=='description' and saved['action_plan']['selected_plan']['id']=='crowded_area'
+                  assert saved['algorithm']=='Priority-Based Robot Action Plans' and saved['inference_latency_ms']>0
+                  for ext in ('json','csv'):
+                      path=Path(directory)/('plans.'+ext)
+                      export_results(path,[saved],'Take Action','street',{'frame':7})
+                      assert 'General Algorithmic Approach' in path.read_text()
+                  assert 'Crowded-Area Robot Action Plan' in path.read_text()
+          print('Robot plans: 12 rules, counts, confidence boundaries, precedence, all labels, 1000 objects, async saving and exports passed.')
           assert RunConfig().weights.parent.name == 'Models'
           print('Desktop, algorithm, grounding and latency checks passed.')
           PY

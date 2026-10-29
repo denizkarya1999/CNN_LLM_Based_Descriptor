@@ -25,7 +25,7 @@ from .window import resizable_window, FlowRow, ScrollFrame, wrap_label
 from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT
 from .model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
 from .branding import apply_icon
-from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, PROBABILITY_ALGORITHM, method_details, latency_text
+from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, PROBABILITY_ALGORITHM, GENERAL_ALGORITHM, method_details, latency_text
 
 
 
@@ -71,7 +71,7 @@ class App:
         selected = method_details(initial)
         self.description_title = tk.StringVar(value=f"Descriptor: {selected['descriptor_type']} · {selected['algorithm']}")
         self.description_latency = tk.StringVar(value=latency_text(None))
-        self.description_text = tk.StringVar(value='Enable descriptions in Settings for Detections, Environment, Take Action or No Action, and Reason.')
+        self.description_text = tk.StringVar(value='Enable descriptions in Settings to see detections, decisions, and the selected method’s reasoning.')
         self._style()
         self._build()
         root.bind('<Configure>', self._window_resized, add='+')
@@ -226,7 +226,7 @@ class App:
         self.description_body.tag_configure('take_action',font=self.bold_font,foreground='#ff6b78',background='#4a2028')
         self.description_body.tag_configure('no_action',font=self.bold_font,foreground='#65e08c',background='#163824')
         for index, line in enumerate(self.description_text.get().splitlines(), 1):
-            for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:', 'Environment (LLM):', 'Decision (LLM):', 'Description (LLM):', 'Description (Search Algorithm):', 'Description (Probability Algorithm):', 'Search traversal:', 'Selected review path:', 'Label probabilities:', 'Scenario probabilities:', 'Calculation for leading scenario:', 'Efficiency:'):
+            for heading in ('Detections:', 'Environment:', 'Decision:', 'Reason:', 'Environment (LLM):', 'Decision (LLM):', 'Description (LLM):', 'Description (Search Algorithm):', 'Description (Probability Algorithm):', 'Search traversal:', 'Selected review path:', 'Label probabilities:', 'Scenario probabilities:', 'Calculation for leading scenario:', 'Action Plan:', 'Robot steps:', 'Description (General Algorithmic Approach):', 'Rule evaluation (priority order):', 'Detection assignments:', 'Efficiency:'):
                 if line.startswith(heading):
                     self.description_body.tag_add('section', f'{index}.0', f'{index}.{len(heading)}')
             if line in ('Decision: Take Action', 'Decision: No Action', 'Decision (LLM): Take Action', 'Decision (LLM): No Action'):
@@ -249,6 +249,7 @@ class App:
         self.layout_job = None
         width, height = self.layout_size
         compact = height < 700 or width < 1000
+        self.description_card.configure(padding=8 if compact else 12)
         self.heading_label.configure(text='CNN + LLM Descriptor' if compact else 'CNN + LLM Based Descriptor')
         self.title_font.configure(size=16 if compact else 22)
         self._arrange_workspace(width, height)
@@ -619,11 +620,14 @@ class App:
                 self.description_algorithm_combo.configure(textvariable=self.vars['describe_search'], values=SEARCH_ALGORITHMS, state='readonly')
             elif category == 'Probability Algorithm':
                 self.description_algorithm_combo.configure(textvariable=probability_name, values=(PROBABILITY_ALGORITHM,), state='disabled')
+            elif category == 'General Algorithmic Approach':
+                self.description_algorithm_combo.configure(textvariable=general_name, values=(GENERAL_ALGORITHM,), state='disabled')
             else:
                 self.description_algorithm_combo.configure(textvariable=self.vars['describe_model'], values=(), state='disabled')
             if clear:
                 algorithm = (self.vars['describe_search'].get() if category == 'Search Algorithm' else
-                             PROBABILITY_ALGORITHM if category == 'Probability Algorithm' else self.vars['describe_model'].get())
+                             PROBABILITY_ALGORITHM if category == 'Probability Algorithm' else
+                             GENERAL_ALGORITHM if category == 'General Algorithmic Approach' else self.vars['describe_model'].get())
                 self.latest_description = None
                 self.description_title.set(f'Descriptor: {category} · {algorithm}')
                 self.description_latency.set(latency_text(None))
@@ -631,11 +635,13 @@ class App:
         self._combo(description,'Descriptor type','describe_backend',DESCRIBE_BACKENDS,method_changed)
         ttk.Label(description,text='Algorithm / LLM model').pack(anchor='w',pady=(8,3))
         probability_name = tk.StringVar(value=PROBABILITY_ALGORITHM)
+        general_name = tk.StringVar(value=GENERAL_ALGORITHM)
         self.description_algorithm_combo = ttk.Combobox(description,font=self.body_font)
         self.description_algorithm_combo.pack(fill='x')
         self.description_algorithm_combo.bind('<<ComboboxSelected>>',lambda _e: method_changed())
         method_changed(clear=False)
         self._field(description,'Minimum seconds between frames','describe_interval')
+        wrap_label(ttk.Label(description,text='General Algorithmic Approach automatically selects among 12 robot action plans: crowded/empty areas, people with vehicles, signals, animals, tools, uncertain detections, dense, sparse, and moderate object counts. It shows each rule, the matching plans, and recommended steps. No model download or robot connection is needed.',foreground=MUTED)).pack(fill='x',pady=8)
         wrap_label(ttk.Label(description,text='Search options: BFS, DFS, IDS, UCS, Greedy Best-First, and A*. Probability uses Inference by Enumeration. Both evaluate every returned YOLO detection and confidence score. Search shows review traversal without an environment estimate; probability shows its calculations.',foreground=MUTED)).pack(fill='x',pady=8)
         wrap_label(ttk.Label(description,text='The knowledge base covers all 80 standard YOLO labels. Custom labels use a neutral scene association and generic review rules. Probabilities are illustrative, not calibrated accuracy. Descriptor inference latency is shown separately from YOLO timing.',foreground=MUTED)).pack(fill='x',pady=8)
         ttk.Separator(description).pack(fill='x',pady=8)

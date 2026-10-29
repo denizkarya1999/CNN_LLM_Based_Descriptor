@@ -300,17 +300,23 @@ class OllamaVisionClient:
         return result
 
 
+def create_descriptor_client(cfg):
+    if cfg.describe_backend == "General Algorithmic Approach":
+        from .robot_plans import GeneralAlgorithmicClient
+        return GeneralAlgorithmicClient(cfg)
+    if cfg.describe_backend in {"Search Algorithm", "Probability Algorithm"}:
+        from .classical import ClassicalClient
+        return ClassicalClient(cfg)
+    if cfg.describe_backend == "LLM":
+        return OllamaVisionClient(cfg)
+    raise ValueError("Choose a supported descriptor type.")
+
+
 class FrameDescriber:
     """One request in flight and one latest pending frame; never block YOLO."""
     def __init__(self, cfg, messages, stop, inference_switch, client=None):
         self.cfg, self.messages, self.stop, self.inference_switch = cfg, messages, stop, inference_switch
-        if client is not None:
-            self.client = client
-        elif cfg.describe_backend in {"Search Algorithm", "Probability Algorithm"}:
-            from .classical import ClassicalClient
-            self.client = ClassicalClient(cfg)
-        else:
-            self.client = OllamaVisionClient(cfg)
+        self.client = client if client is not None else create_descriptor_client(cfg)
         self.pending = queue.Queue(maxsize=1)
         self.closed = threading.Event()
         self.busy = threading.Event()

@@ -2,7 +2,7 @@
 
 # CNN + LLM Based Descriptor
 
-A desktop experiment for comparing **LLM-based decision making with conventional AI** in latency, accuracy against reference labels, and computational work. It combines a YOLO CNN detector with either quantized Qwen3-VL 2B or named **search and probability algorithms** backed by a YOLO-label knowledge base. Detection facts and action targets come from **YOLO detections**, with exact counts, bounding-box positions and confidence scores. Each method exposes its decision explanation: LLM natural language, search traversal, or probability calculations.
+A desktop experiment for comparing **LLM-based decision making with conventional AI** in latency, accuracy against reference labels, and computational work. It combines a YOLO CNN detector with either quantized Qwen3-VL 2B or named **search and probability algorithms**, or **General Algorithmic Approach** with predefined robot action plans backed by a YOLO-label knowledge base. Detection facts and action targets come from **YOLO detections**, with exact counts, bounding-box positions and confidence scores. Each method exposes its decision explanation: LLM natural language, search traversal, probability calculations, or matched robot-plan rules.
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
@@ -13,7 +13,13 @@ The preview and descriptor stay together. This real local Qwen example shows **E
 ![LLM environment, decision and explanation](Screenshots/LLM%20Explanation.png)
 
 <details>
-<summary>Search traversal, probability calculations, and method comparison</summary>
+<summary>Robot action plans, search traversal, probability calculations, and method comparison</summary>
+
+The robot-plan screenshots use the bundled bus image and actual YOLO detections. The selected plan, rule matches, recommended steps and measured latency are shown; the timing is a single sample, not a benchmark.
+
+![Automatic robot action plan and decision](Screenshots/General%20Robot%20Plans.png)
+
+![Robot action-plan rule evaluations](Screenshots/Robot%20Plan%20Rules.png)
 
 The search screenshot uses an explicitly labeled **synthetic detector fixture** to show a nonempty review graph. It has no Environment section.
 
@@ -53,6 +59,7 @@ Open **Settings → Descriptions → Descriptor type** before opening the input.
 | Search Algorithm | Greedy Best-First Search (GBFS) |
 | Search Algorithm | A* Search |
 | Probability Algorithm | Inference by Enumeration |
+| General Algorithmic Approach | Priority-Based Robot Action Plans (12 automatic plans) |
 
 These search methods match the state-space search material in the CIS 579 search project; probability mode uses the conditional-probability and enumeration material. Old settings with the label “CIS 579” migrate to **Search Algorithm → Uniform-Cost Search (UCS)**. Existing LLM settings retain the selected model.
 
@@ -106,17 +113,44 @@ All priors, likelihoods, cue rules, review probabilities, and effort costs are h
 
 Algorithm references: [probability and inference by enumeration](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/inference.html), [uninformed search](https://inst.eecs.berkeley.edu/~cs188/textbook/search/uninformed.html), [greedy and A* search](https://inst.eecs.berkeley.edu/~cs188/textbook/search/informed.html).
 
+### General Algorithmic Approach
+
+Choose **Settings → Descriptions → Descriptor type → General Algorithmic Approach**. The **Priority-Based Robot Action Plans** method evaluates 12 predefined rules on every sampled frame and automatically selects the applicable plan. No LLM or probability calculation is used. All eligible YOLO boxes and labels, including custom classes, contribute to object counts; the LLM object limit does not apply.
+
+The descriptor displays **Action Plan**, **Decision**, **Reason**, **Robot steps**, and **Description (General Algorithmic Approach)**. It shows each rule's actual count, threshold, pass/fail result, priority, and detection assignments. There is no environment prediction. Latency and computational work (rules, conditions, detections assessed) are recorded for comparison.
+
+Rules below are evaluated in priority order. Counts for named groups and strong objects use boxes with **at least 50% YOLO confidence**; tentative boxes meet the user's detection threshold but are below 50%. All eligible boxes contribute to the total. Confidence is a detector score, not a probability that an action is correct.
+
+| Automatic robot action plan | Rule | Decision / recommendation |
+| --- | --- | --- |
+| Crowded-Area | At least 5 people | Take Action: pause intended movement nearby and review positions |
+| People-and-Vehicles | At least 1 person and 1 vehicle | Take Action: hold intended movement and review both groups |
+| Signal-Review | At least 1 traffic light or stop sign | Take Action: check the actual signal state before related movement |
+| Animal-Presence | At least 1 animal | Take Action: review positions before moving nearby |
+| Tool-Handling | At least 1 knife or scissors | Take Action: inspect before any planned handling |
+| Uncertain-Detection | At least 1 tentative box | Take Action: acquire another view to verify the label |
+| Dense-Object | At least 10 strong boxes of any labels | Take Action: pause intended movement and review object positions |
+| Vehicle-Presence | At least 1 vehicle | Take Action: review positions before moving nearby |
+| People-Presence | 1–4 people | Take Action: allow space if moving nearby |
+| Empty-Area | Zero eligible boxes | No Action: retain idle/monitoring state |
+| Sparse-Object | 1–3 strong boxes and no tentative boxes | No Action, unless an action rule above matches |
+| Moderate-Object | 4–9 strong boxes and no tentative boxes | No Action, unless an action rule above matches |
+
+**Any action match overrides idle rules.** The first matching action plan is the primary plan; steps from every matching action plan are retained and attributed. A few detected objects can therefore trigger a specific plan, while several ordinary objects can yield No Action. Vehicle and animal groups enumerate the corresponding standard YOLO labels in [`robot_plans.py`](cnn_llm_based_descriptor/robot_plans.py). Other standard and custom labels still participate in strong/tentative/total count rules. Saved metadata includes the selected and matching plans, all rule evaluations, conditions, counts, detection IDs and scores, and policy version.
+
+The 5-person and 10-object cutoffs are explicit, hand-authored demonstration thresholds. Counts are filtered detections in one frame, not unique tracked objects or measured physical density. **Empty-Area** means zero eligible detections, not proof of an empty or traversable space. Classification mode cannot count objects and does not run these rules. These are recommended robot steps; the app sends no robot commands and does not establish distance, motion, or a clear route. No Action means no change requested by this policy, not permission to move.
+
 ## Compare methods on the same frame
 
-Open an image, or stop a camera/video on a frame with YOLO enabled, then click **Compare** above the preview. This freezes the clean image and its full detection result. The comparison runs all six searches, Inference by Enumeration, and the selected LLM serially without rerunning YOLO. Use one to five repetitions; method order rotates across repetitions. Select any result to read its explanation/traversal/calculations and export **CSV** or full **JSON**. Exports include a stable frame/evidence identifier so independent samples can be grouped without counting repeated runs as new frames.
+Open an image, or stop a camera/video on a frame with YOLO enabled, then click **Compare** above the preview. This freezes the clean image and its full detection result. The comparison runs all six searches, Inference by Enumeration, Priority-Based Robot Action Plans, and the selected LLM serially without rerunning YOLO. Use one to five repetitions; method order rotates across repetitions. Select any result to read its explanation/traversal/calculations and export **CSV** or full **JSON**. Exports include a stable frame/evidence identifier so independent samples can be grouped without counting repeated runs as new frames.
 
 - **Latency:** complete descriptor-call time, including preparation, inference, validation and explanation formatting. Model loading is included when it occurs; lightweight client/knowledge-base construction happens outside the descriptor-call timing boundary. YOLO, queue wait, GUI updates and saving are excluded. Repetitions show individual measurements; no warmup is silently discarded.
-- **Accuracy:** optionally supply independently determined **Expected decision** and **Expected setting**. The table shows match/mismatch for this frame. Search has no environment output, so its setting match is not applicable. Invalid answers count as mismatches when a reference exists. Without a reference, accuracy is not scored. Repeated runs on one frame are not additional accuracy samples; evaluate many independently labeled frames and aggregate the exports before claiming dataset accuracy. YOLO confidence and probability-model posteriors are not accuracy.
-- **Efficiency:** search reports expanded/generated states and peak frontier nodes; probability reports hypothesis/likelihood and review counts; LLM reports input/output tokens and server timing when available. These work units differ, so they do not establish a common energy, memory, or operation-count ranking. Energy and peak RAM/VRAM are not measured.
+- **Accuracy:** optionally supply independently determined **Expected decision** and **Expected setting**. The table shows match/mismatch for this frame. Search and robot plans have no environment output, so its setting match is not applicable. Invalid answers count as mismatches when a reference exists. Without a reference, accuracy is not scored. Repeated runs on one frame are not additional accuracy samples; evaluate many independently labeled frames and aggregate the exports before claiming dataset accuracy. YOLO confidence and probability-model posteriors are not accuracy.
+- **Efficiency:** search reports expanded/generated states and peak frontier nodes; probability reports hypothesis/likelihood and review counts; robot plans report rules, conditions and detection counts; LLM reports input/output tokens and server timing when available. These work units differ, so they do not establish a common energy, memory, or operation-count ranking. Energy and peak RAM/VRAM are not measured.
 
 **Comparison conditions are visible.** The LLM receives image context as well as detections; conventional methods only use labels, confidence and boxes. All eligible predictions reach the conventional algorithms, while the LLM object/context limit can omit some. Coverage is shown per row. The frozen image is limited to preview resolution (1280×900), and box coordinates are scaled consistently. System load, model residency, image context and evidence coverage affect results. This compares the configured pipelines, not strictly identical information or independently measured general accuracy.
 
-The decision policies also differ: conventional methods use the explicit teaching table; the LLM selects from the offered grounded suggestions. Searches order review suggestions rather than learning a scene classifier. Interpret decision disagreement in that context and define the annotation policy before labeling an evaluation dataset.
+The decision policies also differ: search/probability methods use the explicit teaching table, robot plans use the count-and-label policy above; the LLM selects from the offered grounded suggestions. Searches order review suggestions rather than learning a scene classifier. Interpret decision disagreement in that context and define the annotation policy before labeling an evaluation dataset.
 
 ## Local vision descriptions
 
@@ -174,7 +208,7 @@ The main screen contains input, model size, device, inference, and recording con
 
 - **Model:** detection, instance segmentation, pose, classification, or oriented detection; inference resolution, confidence, class filter, custom weights, FP16, and labels.
 - **Camera:** requested resolution/FPS, inference frame stride, CPU threads, and the **Raspberry Pi / SBC preset**.
-- **Descriptions:** descriptor type, named search algorithm or probability method, sampling interval, and the local vision model/server/timeout used in LLM mode.
+- **Descriptions:** descriptor type, named search algorithm, probability method or automatic robot plans, sampling interval, and the local vision model/server/timeout used in LLM mode.
 - **Saving:** optional default save folder and **Record from start / save image result** for automatic export, including short files that might finish before you can click Record. Automatic video recording asks for a filename when opening the source. Cancelling starts preview without recording.
 
 Change these settings before opening the source. A camera may choose a supported capture size or FPS different from the request. Model checkpoints download on first use; Nano, Small, Medium, and Large detection checkpoints are cached on this PC.
@@ -208,6 +242,8 @@ GUI setup offers existing-package reuse, CPU-only PyTorch, or NVIDIA CUDA packag
 New environments are verified before activation; failed or cancelled installs leave the working environment available. The active environment is recorded in `launcher_settings.json`, with the original `.venv/` also supported. Repairs retain prior working environments and can require additional disk space.
 
 ## Verification
+
+Robot-plan checks cover all 12 rules, 4/5-person and 9/10-object boundaries, confidence gating, action-over-idle priority, combined plans, all 80 labels plus custom classes, 1,000 detections, classification, empty results, saved settings, asynchronous output and comparison exports. A real YOLO bus-frame check selected the People-and-Vehicles Robot Action Plan for one bus and four people.
 
 Additional checks cover actual traversal logs, numeric probability factors and normalization, evidence-referenced LLM explanations, mode-specific sections, comparison exports, reference-label scoring, and minimum-size comparison controls.
 

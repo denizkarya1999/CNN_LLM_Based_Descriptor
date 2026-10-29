@@ -9,7 +9,7 @@ import time
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from .methods import SEARCH_ALGORITHMS, method_details
+from .methods import SEARCH_ALGORITHMS, method_details, NO_ENVIRONMENT_BACKENDS
 from .measurement import measure_description, efficiency_text
 from .scenes import SETTINGS
 from .theme import BG, PANEL, FG, MUTED
@@ -22,6 +22,7 @@ def comparison_configs(cfg):
     return ([replace(cfg, describe_enabled=True, describe_backend='Search Algorithm', describe_search=algorithm)
              for algorithm in SEARCH_ALGORITHMS] +
             [replace(cfg, describe_enabled=True, describe_backend='Probability Algorithm'),
+             replace(cfg, describe_enabled=True, describe_backend='General Algorithmic Approach'),
              replace(cfg, describe_enabled=True, describe_backend='LLM')])
 
 
@@ -30,7 +31,7 @@ def expected_matches(result, decision=UNLABELED, setting=UNLABELED):
     # Invalid answers are incorrect when a reference exists, never a successful No Action.
     return {
         'decision_match': None if decision == UNLABELED else bool(valid and result.get('action_decision') == decision),
-        'setting_match': (None if setting == UNLABELED or result['descriptor_type'] == 'Search Algorithm'
+        'setting_match': (None if setting == UNLABELED or result['descriptor_type'] in NO_ENVIRONMENT_BACKENDS
                           else bool(valid and result.get('setting') == setting)),
     }
 
@@ -41,10 +42,9 @@ def run_comparison(cfg, frame, records, repeats, emit, cancelled):
     Method order rotates between repetitions. Timing is descriptive: loading,
     OS/GPU contention and input differences are reported, not normalized away.
     """
-    from .classical import ClassicalClient
-    from .descriptor import OllamaVisionClient
+    from .descriptor import create_descriptor_client
     configs = comparison_configs(cfg)
-    clients = [OllamaVisionClient(c) if c.describe_backend == 'LLM' else ClassicalClient(c) for c in configs]
+    clients = [create_descriptor_client(c) for c in configs]
     for repetition in range(repeats):
         order = list(range(len(configs)))
         order = order[repetition % len(order):] + order[:repetition % len(order)]
@@ -81,7 +81,7 @@ def export_results(path, results, decision, setting, context):
         Path(path).write_text(json.dumps({'context': context, 'results': records}, indent=2), encoding='utf-8')
         return
     fields = ['sample_id', 'frame', 'source_seconds', 'descriptor_type', 'algorithm', 'repetition', 'inference_latency_ms', 'grounding_status',
-              'action_decision', 'setting', 'expected_decision', 'decision_match', 'expected_setting',
+              'action_decision', 'action_plan_name', 'setting', 'expected_decision', 'decision_match', 'expected_setting',
               'setting_match', 'detections_considered', 'total_input_predictions', 'input_pixels',
               'input_note', 'efficiency', 'error']
     with open(path, 'w', encoding='utf-8', newline='') as stream:
@@ -112,7 +112,7 @@ class ComparisonWindow:
         wrap_label(ttk.Label(footer, textvariable=self.status, foreground=MUTED)).pack(fill='x', pady=(6, 0))
         outer = ttk.Frame(window, padding=12); outer.pack(fill='both', expand=True)
         wrap_label(ttk.Label(outer, text='Same frozen frame and detector result · latency, reference-label matches, and method-specific work', font=('DejaVu Sans', 11, 'bold'))).pack(fill='x')
-        wrap_label(ttk.Label(outer, text='LLM also sees the image and may retain fewer detections. Search has no environment output. Loading is included; work counts use different units and are not energy or memory measurements.', foreground=MUTED)).pack(fill='x', pady=6)
+        wrap_label(ttk.Label(outer, text='LLM also sees the image and may retain fewer detections. Search and robot plans have no environment output. Loading is included; work counts use different units and are not energy or memory measurements.', foreground=MUTED)).pack(fill='x', pady=6)
         controls = FlowRow(outer); controls.pack(fill='x')
         for label, var, values, width in (
                 ('Expected decision', self.decision, (UNLABELED, 'No Action', 'Take Action'), 15),
@@ -188,7 +188,7 @@ class ComparisonWindow:
         for i, result in enumerate(self.results):
             matches = expected_matches(result, self.decision.get(), self.setting.get())
             def label(value): return 'Not scored' if value is None else 'Match' if value else 'Mismatch'
-            setting_match = 'Not applicable' if result['descriptor_type'] == 'Search Algorithm' else label(matches['setting_match'])
+            setting_match = 'Not applicable' if result['descriptor_type'] in NO_ENVIRONMENT_BACKENDS else label(matches['setting_match'])
             decision = result.get('action_decision', 'Error') if result.get('grounding_status') == 'validated' else 'Unavailable'
             values = (result['algorithm'], result['repetition'], f"{result['inference_latency_ms']:.3f}",
                       decision, result.get('setting') or '—', label(matches['decision_match']), setting_match,
@@ -209,7 +209,7 @@ class ComparisonWindow:
                     f"Latency: {result['inference_latency_ms']:.3f} ms\n"
                     f"Efficiency: {efficiency_text(result)}\n\n" + result['text'])
         else:
-            text = 'Select a result to read its explanation, traversal, or calculations.'
+            text = 'Select a result to read its explanation, traversal, calculations, or robot plan.'
         self.detail.configure(state='normal'); self.detail.delete('1.0', 'end'); self.detail.insert('1.0', text); self.detail.configure(state='disabled')
 
     def poll(self):

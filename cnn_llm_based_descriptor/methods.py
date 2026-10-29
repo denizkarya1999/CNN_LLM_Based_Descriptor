@@ -1,6 +1,6 @@
 """Names shared by settings, descriptor output, and saved metadata."""
 
-DESCRIBE_BACKENDS = ("LLM", "Search Algorithm", "Probability Algorithm")
+DESCRIBE_BACKENDS = ("LLM", "Search Algorithm", "Probability Algorithm", "General Algorithmic Approach")
 SEARCH_ALGORITHMS = (
     "Breadth-First Search (BFS)",
     "Depth-First Search (DFS)",
@@ -10,12 +10,15 @@ SEARCH_ALGORITHMS = (
     "A* Search",
 )
 PROBABILITY_ALGORITHM = "Inference by Enumeration"
+GENERAL_ALGORITHM = "Priority-Based Robot Action Plans"
+NO_ENVIRONMENT_BACKENDS = frozenset({"Search Algorithm", "General Algorithmic Approach"})
 DEFAULT_SEARCH = "Uniform-Cost Search (UCS)"
 
 
 def method_details(cfg):
     algorithm = (cfg.describe_model if cfg.describe_backend == "LLM" else
                  cfg.describe_search if cfg.describe_backend == "Search Algorithm" else
+                 GENERAL_ALGORITHM if cfg.describe_backend == "General Algorithmic Approach" else
                  PROBABILITY_ALGORITHM)
     return {"descriptor_type": cfg.describe_backend, "algorithm": algorithm}
 

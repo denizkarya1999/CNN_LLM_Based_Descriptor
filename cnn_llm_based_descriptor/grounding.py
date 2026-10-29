@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from functools import lru_cache
 from .scenes import SETTINGS, environment_text
-from .methods import method_details
+from .methods import method_details, NO_ENVIRONMENT_BACKENDS
 
 ENVIRONMENTS = ("indoor", "outdoor", "unclear")
 LOW_SCORE = 0.5
@@ -200,7 +200,7 @@ def render_description(evidence, total, width, height, cfg, choice=None, status=
         for item in evidence)
     summary = "YOLO scores: " + (scores or "No predictions above the selected threshold.")
     detections = facts + (f"\n{summary}" if evidence and not classification else "")
-    if cfg.describe_backend == "Search Algorithm":
+    if cfg.describe_backend in NO_ENVIRONMENT_BACKENDS:
         text = f"Detections: {detections}\n\nDecision: {decision}\n{advice}\n\nReason: {reason}"
         environment = setting = None
     elif cfg.describe_backend == "LLM":

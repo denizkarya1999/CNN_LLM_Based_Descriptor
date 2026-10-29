@@ -4,6 +4,9 @@ import time
 
 def efficiency_text(result):
     data = result.get('efficiency', {})
+    if 'rules_evaluated' in data:
+        return (f"{data['rules_evaluated']} rules / {data['conditions_evaluated']} conditions; "
+                f"{data['detections_assessed']} detections assessed")
     if 'expanded_states' in data:
         return (f"{data['expanded_states']} expanded / {data['generated_states']} generated states; "
                 f"peak frontier {data['peak_frontier_nodes']} nodes")

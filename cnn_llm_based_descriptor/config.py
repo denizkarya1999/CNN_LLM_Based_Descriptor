@@ -78,7 +78,7 @@ class RunConfig:
         if not self.describe_enabled:
             return
         if self.describe_backend not in DESCRIBE_BACKENDS:
-            raise ValueError("Choose LLM, Search Algorithm, or Probability Algorithm.")
+            raise ValueError("Choose LLM, Search Algorithm, Probability Algorithm, or General Algorithmic Approach.")
         for label, value, low, high in (
             ("Description interval", self.describe_interval, .5, 300),
         ):
