@@ -51,6 +51,57 @@ The launcher checks your installation. Select a device and click **Open app**. L
 
 The app opens at 1440×900 on larger displays, with the camera preview and scene description side by side. Preview and Description remain visible together at every supported size: side by side on wide or short windows, and stacked on narrow, taller windows. The description scrolls independently. Open, Stop, Record and Snapshot stay in a fixed bottom bar. **Decision:** is prominent, with red **Take Action** and green **No Action** highlights. Settings pages scroll, including every model-download button. The app supports windows down to 760×520; the launcher supports 640×480 and does not shrink itself after checking dependencies.
 
+## Code organization
+
+Post-YOLO methods live in `cnn_llm_based_descriptor/algorithms/`, grouped by approach:
+
+```text
+cnn_llm_based_descriptor/
+├── algorithms/
+│   ├── factory.py                 # Select a client from RunConfig
+│   ├── llm/
+│   │   ├── client.py              # Vision decision, explanation and retry
+│   │   ├── prompts.py             # Detection-grounded vision prompt
+│   │   ├── transport.py           # Local requests and model download
+│   │   └── model_store.py         # Project-local Ollama service/weights
+│   ├── search/
+│   │   ├── client.py              # Search descriptor and result rendering
+│   │   ├── targets.py             # Detected objects -> review targets
+│   │   ├── planner.py             # Strategy dispatch and five-target batches
+│   │   ├── breadth_first.py       # BFS
+│   │   ├── depth_first.py          # DFS
+│   │   ├── iterative_deepening.py  # IDS
+│   │   ├── uniform_cost.py        # UCS: accumulated cost
+│   │   ├── greedy_best_first.py   # GBFS: heuristic only
+│   │   ├── astar.py               # A*: accumulated cost + heuristic
+│   │   ├── priority.py            # Shared heap frontier handling
+│   │   ├── state.py               # States, costs, heuristic and audit
+│   │   └── explanation.py         # Search trace and selected plan
+│   ├── probability/
+│   │   ├── client.py              # Probability descriptor
+│   │   ├── inference.py           # Scene enumeration and review probability
+│   │   └── explanation.py         # Probability calculations
+│   ├── robot_plans/
+│   │   ├── client.py              # General Algorithmic Approach descriptor
+│   │   └── plans.py               # Twelve rules, priority and count logic
+│   └── shared/
+│       ├── evidence.py            # YOLO filtering and box normalization
+│       ├── grounding.py           # Allowed choices, validation and rendering
+│       ├── review_policy.py       # Label/score rules for search/probability
+│       ├── knowledge.py           # Knowledge-base loading and validation
+│       ├── scene_model.json       # Shared label/action and scene tables
+│       ├── scenes.py              # Allowed environments/settings
+│       └── action_names.py        # Shared suggestion display names
+├── descriptor.py                  # Async frame scheduling and saving only
+├── methods.py                     # GUI/settings method names
+├── measurement.py                 # Common descriptor timing boundary
+└── paths.py                       # Stable project root for stored models
+```
+
+The GUI, camera, YOLO engine, recording and comparison modules remain at package level. All approaches expose `client.describe(frame, records)` through `algorithms.factory.create_descriptor_client(cfg)`. Frame scheduling is independent of the algorithm, and shared evidence/output rules keep comparisons consistent. To change one search strategy, open its named file; UCS, greedy best-first and A* reuse `priority.py` while defining their own ranking rule.
+
+Search and probability now have separate `SearchClient` and `ProbabilityClient` classes instead of a combined `ClassicalClient`. Internal imports should use the folders above. Stored settings, method names, result fields, model locations and existing action policies are unchanged. The historical evaluation report refers to its recorded source commit; the reorganization does not remeasure its latency figures.
+
 ## Choose a descriptor and algorithm
 
 Open **Settings → Descriptions → Descriptor type** before opening the input. The **Algorithm / LLM model** field shows the actual method. The descriptor panel identifies the selected category and method for every result:
@@ -82,7 +133,7 @@ These search methods match the state-space search material in the CIS 579 search
 
 ### Knowledge base and all-label coverage
 
-Search and probability modes use YOLO's returned labels, confidence scores, and boxes, without reading image pixels or calling Ollama. The knowledge base in [`scene_model.json`](cnn_llm_based_descriptor/scene_model.json) explicitly covers **all 80 standard YOLO/COCO labels**, with a scene-association likelihood and a decision association for each. It includes rooms and public places, farms, wildlife areas, waterfronts, snowy recreation areas, and airports. A place estimate never adds an object to the detection list.
+Search and probability modes use YOLO's returned labels, confidence scores, and boxes, without reading image pixels or calling Ollama. The knowledge base in [`scene_model.json`](cnn_llm_based_descriptor/algorithms/shared/scene_model.json) explicitly covers **all 80 standard YOLO/COCO labels**, with a scene-association likelihood and a decision association for each. It includes rooms and public places, farms, wildlife areas, waterfronts, snowy recreation areas, and airports. A place estimate never adds an object to the detection list.
 
 **Every eligible returned detection is assessed.** The LLM's object/prompt limit does not apply to search or probability modes. The old ten-object and eight-review-target cutoffs are removed. This still respects the selected YOLO confidence threshold, class filter, NMS, and maximum-detection setting; a label in the model vocabulary is not treated as a detected object. Missing labels remain unobserved. All returned boxes remain in the facts and decision assessment, including duplicate classes and tentative detections.
 
@@ -142,7 +193,7 @@ Rules below are evaluated in priority order. Counts for named groups and strong 
 | Sparse-Object | 1–3 strong boxes and no tentative boxes | No Action, unless an action rule above matches |
 | Moderate-Object | 4–9 strong boxes and no tentative boxes | No Action, unless an action rule above matches |
 
-**Any action match overrides idle rules.** The first matching action plan is the primary plan; steps from every matching action plan are retained and attributed. A few detected objects can therefore trigger a specific plan, while several ordinary objects can yield No Action. Vehicle and animal groups enumerate the corresponding standard YOLO labels in [`robot_plans.py`](cnn_llm_based_descriptor/robot_plans.py). Other standard and custom labels still participate in strong/tentative/total count rules. Saved metadata includes the selected and matching plans, all rule evaluations, conditions, counts, detection IDs and scores, and policy version.
+**Any action match overrides idle rules.** The first matching action plan is the primary plan; steps from every matching action plan are retained and attributed. A few detected objects can therefore trigger a specific plan, while several ordinary objects can yield No Action. Vehicle and animal groups enumerate the corresponding standard YOLO labels in [`plans.py`](cnn_llm_based_descriptor/algorithms/robot_plans/plans.py). Other standard and custom labels still participate in strong/tentative/total count rules. Saved metadata includes the selected and matching plans, all rule evaluations, conditions, counts, detection IDs and scores, and policy version.
 
 The 5-person and 10-object cutoffs are explicit, hand-authored demonstration thresholds. Counts are filtered detections in one frame, not unique tracked objects or measured physical density. **Empty-Area** means zero eligible detections, not proof of an empty or traversable space. Classification mode cannot count objects and does not run these rules. These are recommended robot steps; the app sends no robot commands and does not establish distance, motion, or a clear route. No Action means no change requested by this policy, not permission to move.
 

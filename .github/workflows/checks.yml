@@ -29,8 +29,8 @@ jobs:
           from launcher import SetupWindow
           from cnn_llm_based_descriptor.app import App
           from cnn_llm_based_descriptor.config import RunConfig
-          from cnn_llm_based_descriptor.descriptor import detection_evidence
-          from cnn_llm_based_descriptor.grounding import action_choices, parse_choice, render_description
+          from cnn_llm_based_descriptor.algorithms.shared.evidence import detection_evidence
+          from cnn_llm_based_descriptor.algorithms.shared.grounding import action_choices, parse_choice, render_description
           def settle(root):
               for _ in range(10):
                   root.update()
@@ -77,11 +77,28 @@ jobs:
           import itertools, math, queue, random, threading
           import numpy as np
           from cnn_llm_based_descriptor.config import RunConfig
-          from cnn_llm_based_descriptor.classical import ClassicalClient,load_scene_model,infer_setting,assess_detections,review_targets,search_review_plan
-          from cnn_llm_based_descriptor.descriptor import detection_evidence,FrameDescriber,OllamaVisionClient,create_descriptor_client
-          from cnn_llm_based_descriptor.grounding import action_choices,parse_choice
+          from cnn_llm_based_descriptor.algorithms.shared.knowledge import load_scene_model
+          from cnn_llm_based_descriptor.algorithms.probability.inference import infer_setting
+          from cnn_llm_based_descriptor.algorithms.shared.review_policy import assess_detections
+          from cnn_llm_based_descriptor.algorithms.search.targets import review_targets,search_review_plan
+          from cnn_llm_based_descriptor.algorithms.shared.evidence import detection_evidence
+          from cnn_llm_based_descriptor.descriptor import FrameDescriber
+          from cnn_llm_based_descriptor.algorithms.llm.client import OllamaVisionClient
+          from cnn_llm_based_descriptor.algorithms.factory import create_descriptor_client
+          from cnn_llm_based_descriptor.algorithms.shared.grounding import action_choices,parse_choice
           from cnn_llm_based_descriptor.methods import SEARCH_ALGORITHMS,DESCRIBE_BACKENDS,latency_text
-          from cnn_llm_based_descriptor.search import search_batch,heuristic
+          from cnn_llm_based_descriptor.algorithms.search.planner import search_batch
+          from cnn_llm_based_descriptor.algorithms.search.state import heuristic
+          # Moving algorithm modules must not move stored model paths or break imports.
+          import importlib, pkgutil
+          import cnn_llm_based_descriptor.algorithms as algorithms
+          from cnn_llm_based_descriptor.paths import PROJECT_ROOT
+          from cnn_llm_based_descriptor.algorithms.llm.model_store import MODEL_DIRECTORY
+          assert PROJECT_ROOT == Path.cwd().resolve()
+          assert MODEL_DIRECTORY == PROJECT_ROOT / 'Models' / 'ollama'
+          assert RunConfig().weights.parent == PROJECT_ROOT / 'Models'
+          for module in pkgutil.walk_packages(algorithms.__path__, algorithms.__name__ + '.'):
+              importlib.import_module(module.name)
           model=load_scene_model();frame=np.zeros((100,100,3),dtype=np.uint8)
           def record(label,score=.9,x=10,y=10):return {'name':label,'confidence':score,'box':{'x1':x,'y1':y,'x2':x+10,'y2':y+10}}
           def facts(records):return detection_evidence(records,100,100,None,require_boxes=True)[0]
@@ -89,10 +106,10 @@ jobs:
           assert all(set(row['likelihoods'])==set(model['labels']) for row in model['scenes'].values())
           # Every default label and a custom label reaches both the scene and decision stages.
           records=[record(label) for label in model['labels']]+[record('custom gauge')]
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Unexpected LLM request')):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=AssertionError('Unexpected LLM request')):
               for backend in ("Search Algorithm", "Probability Algorithm"):
                   cfg=RunConfig(describe_backend=backend,describe_max_objects=1,describe_url='invalid')
-                  cfg.validate_descriptor();packet=ClassicalClient(cfg).describe(frame,records)
+                  cfg.validate_descriptor();packet=create_descriptor_client(cfg).describe(frame,records)
                   assert len(packet['evidence'])==81 and packet['detections_considered']==81
                   assert packet['descriptor_type']==backend
                   scene=packet.get('scene_inference')
@@ -103,9 +120,9 @@ jobs:
                   else:
                       assert 'Environment' not in packet['text'] and packet['setting'] is None
                   for labels in [('laptop','keyboard','mouse'),('couch','tv','remote')]:
-                      p=ClassicalClient(cfg).describe(frame,[record(l) for l in labels]);assert p['setting'] in ({'home','office'} if scene else {None}),p
-                  assert ClassicalClient(cfg).describe(frame,[])['grounding_status']=='no_detections'
-                  assert ClassicalClient(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
+                      p=create_descriptor_client(cfg).describe(frame,[record(l) for l in labels]);assert p['setting'] in ({'home','office'} if scene else {None}),p
+                  assert create_descriptor_client(cfg).describe(frame,[])['grounding_status']=='no_detections'
+                  assert create_descriptor_client(replace(cfg,task='Image classification')).describe(frame,[{'name':'cat','confidence':.9}])['grounding_status']=='classification'
           # Independent Bayes arithmetic and neutral custom observations.
           base=infer_setting(facts([record('laptop')]),model)
           weights={key:row['prior']*row['likelihoods']['laptop'] for key,row in model['scenes'].items()}
@@ -139,7 +156,7 @@ jobs:
                       assert plan['globally_cost_optimal']
           # More than both old caps; every target is planned, including last/lowest-score.
           for algorithm in SEARCH_ALGORITHMS:
-              packet=ClassicalClient(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm,describe_max_objects=1)).describe(frame,[record('custom gauge',.4,x=i%90) for i in range(17)])
+              packet=create_descriptor_client(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm,describe_max_objects=1)).describe(frame,[record('custom gauge',.4,x=i%90) for i in range(17)])
               plan=packet['decision_search']
               assert len(plan['steps'])==17 and plan['omitted_targets']==0 and len(plan['batches'])==4
               assert len({s['detection_id'] for s in plan['steps']})==17
@@ -168,7 +185,7 @@ jobs:
               except ValueError:
                   pass
           llm=OllamaVisionClient(RunConfig());llm.checked=True
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[{'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}, {'response':'{"reason":"[d1] establishes presence in the estimated setting without a specific reason to intervene."}'}]):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=[{'message':{'content':'{"environment":"indoor","setting":"ballroom","next_step":"no_action"}'}}, {'response':'{"reason":"[d1] establishes presence in the estimated setting without a specific reason to intervene."}'}]):
               packet=llm.describe(frame,[record('person')])
               assert 'ballroom or event hall' in packet['text'] and packet['algorithm']=='qwen3-vl:2b'
           # Every named method and precise latency stays visible in the descriptor.
@@ -227,13 +244,13 @@ jobs:
           from cnn_llm_based_descriptor.measurement import measure_description
           records=[record('traffic light'),record('knife',.8,40),record('custom gauge',.4,70)]
           for algorithm in SEARCH_ALGORITHMS:
-              packet=measure_description(ClassicalClient(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm)),frame,records)
+              packet=measure_description(create_descriptor_client(RunConfig(describe_backend='Search Algorithm',describe_search=algorithm)),frame,records)
               plan=packet['decision_search']
               assert 'Environment' not in packet['text'] and packet['setting'] is None
               assert len(plan['traversal'])==plan['expanded_states'] and plan['traversal'][-1]['goal']
               assert plan['generated_states']>=plan['expanded_states'] and plan['peak_frontier']>0
               assert 'traffic light [d1]' in packet['text']
-          packet=ClassicalClient(RunConfig(describe_backend='Probability Algorithm')).describe(frame,records)
+          packet=create_descriptor_client(RunConfig(describe_backend='Probability Algorithm')).describe(frame,records)
           scene=packet['scene_inference']
           for name,joint in scene['log_joint'].items():
               assert math.isclose(math.exp(joint-scene['normalization_offset'])/scene['scaled_normalizer'],scene['posterior'][name])
@@ -248,7 +265,7 @@ jobs:
                   raise AssertionError('Unsupported explanation accepted')
               except ValueError:
                   pass
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[{'message':{'content':json.dumps({k:v for k,v in answer.items() if k!='reason'})}}, {'response':json.dumps({'reason':answer['reason']}),'eval_count':55,'prompt_eval_count':200}]):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=[{'message':{'content':json.dumps({k:v for k,v in answer.items() if k!='reason'})}}, {'response':json.dumps({'reason':answer['reason']}),'eval_count':55,'prompt_eval_count':200}]):
               packet=measure_description(llm,frame,records)
               assert packet['reason_source']=='LLM' and 'I recommend checking' in packet['reason']
               assert all(label in packet['text'] for label in ('Environment (LLM):','Decision (LLM):','Description (LLM):'))
@@ -257,18 +274,18 @@ jobs:
           first={'message':{'content':json.dumps({k:v for k,v in answer.items() if k!='reason'})},'eval_count':10}
           bad={'response':json.dumps({'reason':'[d1] is at a safe distance and requires no response.'}),'eval_count':20}
           good={'response':json.dumps({'reason':answer['reason']}),'eval_count':30}
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[first,bad,good]) as requests:
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=[first,bad,good]) as requests:
               fixed=measure_description(llm,frame,records)
               assert fixed['grounding_status']=='validated' and fixed['efficiency']['model_calls']==3
               assert fixed['efficiency']['eval_count']==60
               assert requests.call_args_list[1].args[1]=='/api/generate'
               assert requests.call_args_list[1].args[2]['raw'] is True
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=[first,bad,bad]):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=[first,bad,bad]):
               assert llm.describe(frame,records)['grounding_status']=='fallback'
           assert expected_matches(packet,'Take Action','street')=={'decision_match':True,'setting_match':True}
           assert not expected_matches({**packet,'grounding_status':'fallback'},'Take Action','street')['decision_match']
           results=[]
-          with patch('cnn_llm_based_descriptor.descriptor.OllamaVisionClient.describe',return_value=packet):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.OllamaVisionClient.describe',return_value=packet):
               run_comparison(RunConfig(),frame,records,2,lambda k,v:results.append(v) if k=='result' else None,threading.Event())
           assert len(results)==18 and len({r['algorithm'] for r in results})==9
           with tempfile.TemporaryDirectory() as directory:
@@ -293,13 +310,14 @@ jobs:
               comparison.close();app._destroy()
           # A trace cap never drops review targets or changes the cost solution.
           many=[record('custom gauge',.4,x=i%90) for i in range(60)]
-          plan=ClassicalClient(RunConfig(describe_backend='Search Algorithm')).describe(frame,many)['decision_search']
+          plan=create_descriptor_client(RunConfig(describe_backend='Search Algorithm')).describe(frame,many)['decision_search']
           assert len(plan['traversal'])==250 and plan['trace_omitted']==plan['expanded_states']-250
           assert len(plan['steps'])==60 and plan['omitted_targets']==0
           # Robot plan policy: independent examples, boundary counts, all-label coverage,
           # precedence, confidence gating, missing evidence, and real async/export paths.
-          from cnn_llm_based_descriptor.robot_plans import PLANS, GeneralAlgorithmicClient
-          from cnn_llm_based_descriptor.descriptor import create_descriptor_client
+          from cnn_llm_based_descriptor.algorithms.robot_plans.plans import PLANS
+          from cnn_llm_based_descriptor.algorithms.robot_plans.client import GeneralAlgorithmicClient
+          from cnn_llm_based_descriptor.algorithms.factory import create_descriptor_client
           from cnn_llm_based_descriptor.measurement import measure_description
           general_cfg=RunConfig(describe_backend='General Algorithmic Approach',describe_url='invalid',describe_max_objects=1)
           general_cfg.validate_descriptor()
@@ -317,7 +335,7 @@ jobs:
                      (['cup']*4,'moderate_objects','No Action'),
                      (['cup']*9,'moderate_objects','No Action'),
                      (['cup']*10,'dense_objects','Take Action')]
-          with patch('cnn_llm_based_descriptor.descriptor.request_json',side_effect=AssertionError('Robot plans called an LLM')):
+          with patch('cnn_llm_based_descriptor.algorithms.llm.client.request_json',side_effect=AssertionError('Robot plans called an LLM')):
               for labels,plan_id,decision in scenarios:
                   packet=measure_description(general,frame,[record(label) for label in labels])
                   assert packet['action_plan']['selected_plan']['id']==plan_id, (labels,packet)

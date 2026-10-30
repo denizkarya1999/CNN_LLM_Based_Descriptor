@@ -11,7 +11,7 @@ from tkinter import ttk, filedialog, messagebox
 
 from .methods import SEARCH_ALGORITHMS, method_details, NO_ENVIRONMENT_BACKENDS
 from .measurement import measure_description, efficiency_text
-from .scenes import SETTINGS
+from .algorithms.shared.scenes import SETTINGS
 from .theme import BG, PANEL, FG, MUTED
 from .window import resizable_window, FlowRow, wrap_label
 
@@ -42,7 +42,7 @@ def run_comparison(cfg, frame, records, repeats, emit, cancelled):
     Method order rotates between repetitions. Timing is descriptive: loading,
     OS/GPU contention and input differences are reported, not normalized away.
     """
-    from .descriptor import create_descriptor_client
+    from .algorithms.factory import create_descriptor_client
     configs = comparison_configs(cfg)
     clients = [create_descriptor_client(c) for c in configs]
     for repetition in range(repeats):

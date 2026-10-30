@@ -5,10 +5,10 @@ from pathlib import Path
 import re
 import math
 from urllib.parse import urlsplit
-from .model_store import PROJECT_ENDPOINT
+from .algorithms.llm.model_store import PROJECT_ENDPOINT
 from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, DEFAULT_SEARCH
+from .paths import PROJECT_ROOT as ROOT
 
-ROOT = Path(__file__).resolve().parent.parent
 TASKS = {
     "Object detection": "",
     "Instance segmentation": "-seg",
@@ -88,7 +88,7 @@ class RunConfig:
             raise ValueError("Choose a supported search algorithm.")
         if self.describe_backend != "LLM":
             return
-        from .descriptor import validate_endpoint
+        from .algorithms.llm.transport import validate_endpoint
         validate_endpoint(self.describe_url)
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}", self.describe_model):
             raise ValueError("Enter a local Ollama model tag, for example qwen3-vl:2b.")

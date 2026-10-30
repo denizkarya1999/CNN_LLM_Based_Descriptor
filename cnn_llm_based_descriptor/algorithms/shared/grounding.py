@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from functools import lru_cache
 from .scenes import SETTINGS, environment_text
-from .methods import method_details, NO_ENVIRONMENT_BACKENDS
+from ...methods import method_details, NO_ENVIRONMENT_BACKENDS
 
 ENVIRONMENTS = ("indoor", "outdoor", "unclear")
 LOW_SCORE = 0.5

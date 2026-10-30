@@ -5,8 +5,9 @@ import shutil
 import threading
 import sys
 
-from cnn_llm_based_descriptor.descriptor import DEFAULT_MODEL, request_json, download_model
-from cnn_llm_based_descriptor.model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
+from cnn_llm_based_descriptor.algorithms.llm.client import DEFAULT_MODEL
+from cnn_llm_based_descriptor.algorithms.llm.transport import request_json, download_model
+from cnn_llm_based_descriptor.algorithms.llm.model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
 
 
 def main():

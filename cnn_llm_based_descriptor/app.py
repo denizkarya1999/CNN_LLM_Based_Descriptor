@@ -18,12 +18,12 @@ from tkinter import filedialog, messagebox, ttk, font as tkfont
 from PIL import Image, ImageTk
 from .config import ROOT, RunConfig, SCALES, TASKS, RECORD_MODES
 from .engine import infer, probe_devices
-from .descriptor import download_model
+from .algorithms.llm.transport import download_model
 from .recording import recording_destinations
 from .cameras import discover_cameras, linux_camera_path
 from .window import resizable_window, FlowRow, ScrollFrame, wrap_label
 from .theme import apply_theme, BG, PANEL, FG, MUTED, ACCENT
-from .model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
+from .algorithms.llm.model_store import PROJECT_ENDPOINT, MODEL_DIRECTORY
 from .branding import apply_icon
 from .methods import DESCRIBE_BACKENDS, SEARCH_ALGORITHMS, PROBABILITY_ALGORITHM, GENERAL_ALGORITHM, method_details, latency_text
 

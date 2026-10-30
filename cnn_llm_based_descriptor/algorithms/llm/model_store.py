@@ -1,14 +1,14 @@
 """Run the project's local Ollama service with weights under Models/."""
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import threading
 import time
 from urllib.request import ProxyHandler, build_opener
 
-ROOT = Path(__file__).resolve().parent.parent
+from ...paths import PROJECT_ROOT as ROOT
+
 MODEL_DIRECTORY = ROOT / 'Models' / 'ollama'
 PROJECT_ENDPOINT = 'http://127.0.0.1:11435'
 _LOCK = threading.Lock()
