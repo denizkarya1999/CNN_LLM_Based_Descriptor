@@ -1,10 +1,15 @@
-VISUAL APPENDIX - PAGES 7-11
+VISUAL APPENDIX - PAGES 7-12, ORDERED BY EFFICIENCY
 
-Pages 7-8: six search trees (BFS, DFS, IDS, UCS, greedy best-first, A*)
-with actual visit numbers, selected review paths, costs and work counts.
-Page 9: separate scene-probability and review-selection calculations.
-Page 10: confidence grouping, all 12 robot-plan rule matches, and selection.
-Page 11: LLM input, structured decision, validation, explanation and fallback.
+Page 7: rank 1 - general robot plans.
+Page 8: rank 2 (tie) - A* and UCS search trees.
+Page 9: rank 3 - probability calculations and review selection.
+Page 10: rank 4 - greedy search; rank 5 (tie) - BFS.
+Page 11: rank 5 (tie) - IDS; rank 6 - DFS.
+Page 12: rank 7 - LLM processing, validation, explanation and fallback.
+
+Visuals follow the efficiency recommendation on page 1: usable actions,
+policy fit, review-plan cost and computation. This is not a latency-only
+sort. Equal recommendation tiers retain the same rank number.
 
 The main example is COCO val2017 image 43314 (skiing). The LLM rejection
 example is image 555050 (street intersection). All recorded values come
@@ -38,7 +43,7 @@ From the project root:
 python Reports/Post_YOLO_Evaluation/visuals/build_visual_appendix.py
 
 The generator reads visualization_data.json, preserves the report's first
-six pages, and replaces the five visual pages. Repeated runs do not append
+six pages, and replaces the six visual pages. Repeated runs do not append
 duplicate pages. Use --report PATH and --output PATH to work on another copy.
 The PDF uses vector lines, boxes, text and bars so the diagrams stay sharp
 when zoomed. After editing the diagrams, render and visually check every
@@ -50,4 +55,7 @@ Matched all six saved search traces to the original benchmark records and
 recalculated each path's cost from normalized box centers. Independently
 normalized all 20 scene scores, checked the 12 robot rules and two LLM
 response routes, confirmed that original report pages 1-6 are unchanged,
-and rendered/reviewed all five added pages.
+and rendered/reviewed all six visual pages.
+
+The ranked revision also checks that all nine diagrams follow ranks
+1, 2, 2, 3, 4, 5, 5, 6, 7, with source measurements unchanged.

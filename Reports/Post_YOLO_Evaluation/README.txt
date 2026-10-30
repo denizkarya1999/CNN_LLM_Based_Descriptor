@@ -1,6 +1,6 @@
 POST-YOLO ACTION EVALUATION - OCTOBER 29, 2026
 
-Post_YOLO_Evaluation.pdf is an eleven-page report covering all nine implemented
+Post_YOLO_Evaluation.pdf is a twelve-page report covering all nine implemented
 methods: how each processes YOLO evidence, its recorded responses, numerical
 performance against two reference policies, and an efficiency recommendation.
 Ranking is an engineering judgment with explicit tradeoffs, not a universal
@@ -10,10 +10,16 @@ explanations without rerunning models.
 
 VISUAL PAGE GUIDE
 
-Pages 7-8: search trees for BFS, DFS, IDS, UCS, greedy best-first and A*.
-Page 9: probability calculations and review selection.
-Page 10: robot-plan counts, rule matches and selected recommendation.
-Page 11: LLM inputs, decision, validation, explanation and fallback.
+Page 7: rank 1 - general robot plans.
+Page 8: rank 2 (tie) - A* and UCS search trees.
+Page 9: rank 3 - probability calculations and review selection.
+Page 10: rank 4 - greedy search; rank 5 (tie) - BFS.
+Page 11: rank 5 (tie) - IDS; rank 6 - DFS.
+Page 12: rank 7 - LLM processing, validation, explanation and fallback.
+
+Visuals follow the efficiency recommendation on page 1: usable actions,
+policy fit, review-plan cost and computation. This is not a latency-only
+sort. Equal recommendation tiers retain the same rank number.
 
 The drawings use recorded examples; search nodes show actual visit numbers,
 costs and selected paths. visuals/ contains extracted source data and a

@@ -1,4 +1,4 @@
-"""Draw five vector diagram pages from saved benchmark traces; preserve pages 1-6.
+"""Draw six vector diagram pages in the report's efficiency ranking from saved benchmark traces; preserve pages 1-6.
 
 Requires reportlab and pypdf. No inference or network access is performed.
 Usage: python build_visual_appendix.py --report ../Post_YOLO_Evaluation.pdf
@@ -124,7 +124,7 @@ def tree_panel(c, top, key, description, sequence, priority=None):
     c.setFillColor(colors.white)
     c.setStrokeColor(colors.HexColor(LINE))
     c.roundRect(L, H-top-183, WIDTH, 183, 7, fill=1, stroke=1)
-    paragraph(c, NAMES[key], L+12, top+8, WIDTH-24, 11, INK, True)
+    paragraph(c, RANK_LABELS[key] + ' | ' + NAMES[key], L+12, top+8, WIDTH-24, 11, INK, True)
     pos = {(): (L+143, top+42), ('P',): (L+68, top+92), ('K',): (L+218, top+92),
            ('P','K'): (L+68, top+142), ('K','P'): (L+218, top+142)}
     for p in PATHS[1:]:
@@ -165,44 +165,57 @@ def tree_panel(c, top, key, description, sequence, priority=None):
               x, top+151, 205, 8.5, GREEN)
 
 
-def search_pages(c):
-    start(c, 'Search trees: depth and order', 'Recorded example: COCO 43314 (skiing), first measured repetition', 7)
+RANK_LABELS = {
+    'A* Search': 'Rank 2 (tie)',
+    'Uniform-Cost Search (UCS)': 'Rank 2 (tie)',
+    'Greedy Best-First Search (GBFS)': 'Rank 4',
+    'Breadth-First Search (BFS)': 'Rank 5 (tie)',
+    'Iterative Deepening Search (IDS)': 'Rank 5 (tie)',
+    'Depth-First Search (DFS)': 'Rank 6',
+}
+TREE_TEXT = {
+    'A* Search': (
+        'Selects the smallest f. K has f=2.200 versus P at 2.283. The K > P goal also has f=2.200, '
+        'so A* returns it with fewer visits than UCS.',
+        '<b>Visit order:</b> Start > K > K,P<br/>First recommendation: verify skis.', 'f'),
+    'Uniform-Cost Search (UCS)': (
+        'Selects the smallest g. K is cheaper than P, but P is still cheaper than either complete plan, '
+        'so UCS visits it before returning K > P.',
+        '<b>Visit order:</b> Start > K > P > K,P<br/>First recommendation: verify skis.', 'g'),
+    'Greedy Best-First Search (GBFS)': (
+        'Selects the smallest h and ignores g. P and K tie at h=1.083; insertion order favors P. '
+        'The next goal has h=0, so it stops.',
+        '<b>Visit order:</b> Start > P > P,K<br/>First recommendation: verify person.', 'h'),
+    'Breadth-First Search (BFS)': (
+        'A queue visits all shallower states first. Both one-step choices are visited before the first complete plan. '
+        'Equal depth does not imply equal cost.',
+        '<b>Visit order:</b> Start > P > K > P,K<br/>First recommendation: verify person.', None),
+    'Iterative Deepening Search (IDS)': (
+        'Depth-limited DFS restarts with limits 0, 1 and 2. Multiple numbers on a node show revisits. '
+        'It returns the same plan as BFS here.',
+        '<b>Limits:</b> 0: Start<br/>1: Start > P > K<br/>2: Start > P > P,K', None),
+    'Depth-First Search (DFS)': (
+        'A stack follows the first branch to a complete plan. It stops before visiting K first, so it misses '
+        'the cheaper complete plan in this example.',
+        '<b>Visit order:</b> Start > P > P,K<br/>First recommendation: verify person.', None),
+}
+
+
+def search_page(c, title, page, methods, rank_reason):
+    start(c, title, 'Efficiency order from page 1 | Recorded example: COCO 43314 (skiing)', page)
     evidence(c)
     paragraph(c, '<b>P</b> = verify person d2; <b>K</b> = verify skis d3. d1 needs no review. '
-              'Each node is a partial review sequence; both leaves cover both targets. Blue badges show actual visit numbers; '
-              'green shows the returned path. Gray nodes were not visited before stopping.', L, 152, WIDTH, 8.4)
-    tree_panel(c, 198, 'Breadth-First Search (BFS)',
-               'A queue visits all shallower states first. Both one-step choices are visited before the first complete plan. '
-               'Equal depth does not imply equal cost.',
-               '<b>Visit order:</b> Start > P > K > P,K<br/>First recommendation: verify person.')
-    tree_panel(c, 389, 'Depth-First Search (DFS)',
-               'A stack follows the first branch to a complete plan. It stops before visiting K first, so it misses '
-               'the cheaper complete plan in this example.',
-               '<b>Visit order:</b> Start > P > P,K<br/>First recommendation: verify person.')
-    tree_panel(c, 580, 'Iterative Deepening Search (IDS)',
-               'Depth-limited DFS restarts with limits 0, 1 and 2. Multiple numbers on a node show revisits. '
-               'It returns the same plan as BFS here.',
-               '<b>Limits:</b> 0: Start<br/>1: Start > P > K<br/>2: Start > P > P,K')
-    c.showPage()
-    start(c, 'Search trees: cost and heuristics', 'Same two targets and possible tree | Different rules choose the next state', 8)
-    paragraph(c, '<b>g</b> is cost already paid; <b>h</b> estimates remaining cost; <b>f = g + h</b>. '
-              'A review costs 1 unit plus movement between normalized box centers. Starting at image center, '
-              'K costs 1.117 and P costs 1.200; moving between them adds a 1.083 review step.', L, 98, WIDTH, 9)
-    paragraph(c, 'P > K totals 2.283; K > P totals 2.200. At either one-step node, h = 1.083. '
-              'These are review-effort units, not milliseconds or robot travel distance. Blue badges = visits; green = selected path.',
-              L, 151, WIDTH, 8.4)
-    tree_panel(c, 198, 'Uniform-Cost Search (UCS)',
-               'Selects the smallest g. K is cheaper than P, but P is still cheaper than either complete plan, '
-               'so UCS visits it before returning K > P.',
-               '<b>Visit order:</b> Start > K > P > K,P<br/>First recommendation: verify skis.', 'g')
-    tree_panel(c, 389, 'Greedy Best-First Search (GBFS)',
-               'Selects the smallest h and ignores g. P and K tie at h=1.083; insertion order favors P. '
-               'The next goal has h=0, so it stops.',
-               '<b>Visit order:</b> Start > P > P,K<br/>First recommendation: verify person.', 'h')
-    tree_panel(c, 580, 'A* Search',
-               'Selects the smallest f. K has f=2.200 versus P at 2.283. The K > P goal also has f=2.200, '
-               'so A* returns it with fewer visits than UCS.',
-               '<b>Visit order:</b> Start > K > K,P<br/>First recommendation: verify skis.', 'f')
+              'Nodes are partial review sequences; both leaves cover both targets. '
+              '<b>g</b> = cost paid; <b>h</b> = estimated cost remaining; <b>f = g + h</b>.', L, 152, WIDTH, 8.4)
+    paragraph(c, 'Blue badges = actual visit numbers; green = returned path; gray = not visited before stopping.',
+              L, 190, WIDTH, 8.4)
+    for top, method in zip((219, 422), methods):
+        tree_panel(c, top, method, *TREE_TEXT[method])
+    box(c, L, 625, WIDTH, 67, 'How to read the example costs',
+        'Each review costs 1 unit plus movement between normalized box centers. Starting at image center, '
+        'K costs 1.117 and P costs 1.200; reviewing the other target adds 1.083. '
+        'P > K totals 2.283; K > P totals 2.200. These are effort units, not time or physical distance.', size=8.7)
+    box(c, L, 708, WIDTH, 65, 'Why these methods appear here', rank_reason, fill=GREEN_PALE, stroke=GREEN, size=8.7)
     c.showPage()
 
 
@@ -216,7 +229,7 @@ def bar(c, x, top, width, label, value, color=BLUE):
 
 
 def probability_page(c):
-    start(c, 'Probability: two calculations', 'Recorded skiing example | Scene estimation and action selection use separate calculations', 9)
+    start(c, 'Rank 3 | Probability enumeration', 'One review choice without graph expansion | Recorded skiing example', 9)
     evidence(c)
     left,right = L,L+265
     arrow(c, L+WIDTH/2, 147, left+121, 176)
@@ -262,7 +275,7 @@ def probability_page(c):
 
 
 def robot_page(c):
-    start(c, 'Robot plans: count, match, select', 'Recorded skiing example | A fixed rule table chooses a named action plan', 10)
+    start(c, 'Rank 1 | General robot plans', 'Best fit for the predefined robot policy | Recorded skiing example', 7)
     evidence(c)
     box(c,L,165,WIDTH,64,'1. Build counts from eligible boxes',
         '<b>Total 3 | strong 1 | tentative 2 | strong people 0 | vehicles / signals / animals / tools 0.</b><br/>'
@@ -298,11 +311,14 @@ def robot_page(c):
     paragraph(c,'All 12 rules and 18 conditions were evaluated in the recorded call; this diagram does not imply '
               'that checking stops at rule 6. Idle plans apply only when no action rule matches. '
               'The application displays recommendations and does not execute physical robot commands.',L,707,WIDTH,8.7)
+    paragraph(c, '<b>Efficiency ranking:</b> the order follows page 1 and weighs usable policy-matched actions, '
+              'review-plan cost and computation. It is an engineering recommendation; ordering by latency alone would differ.',
+              L, 760, WIDTH, 8.1)
     c.showPage()
 
 
 def llm_page(c):
-    start(c, 'LLM: propose, validate, explain', 'Observed application flow for Qwen3-VL 2B | Internal model reasoning is not recorded', 11)
+    start(c, 'Rank 7 | LLM processing flow', 'Qwen3-VL 2B: slow, frequent rejected outputs | Internal model reasoning is not recorded', 12)
     box(c,L,101,WIDTH,63,'1. Prepare the model input',
         'Image pixels + YOLO labels, IDs, scores and boxes + allowed action choices. '
         'At most 10 boxes; prompts can be shortened further. The skiing call retained all 3 boxes.')
@@ -353,23 +369,37 @@ def build(report, output):
     assert 'Ground truth and reference labels' in source.pages[5].extract_text()
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer,pagesize=A4)
-    search_pages(c)
-    probability_page(c)
     robot_page(c)
+    search_page(c, 'Rank 2 | A* and UCS', 8,
+                ('A* Search', 'Uniform-Cost Search (UCS)'),
+                'A* and UCS share rank 2: each found optimal plans on all 100 small graphs. '
+                'A* used fewer visits in this scene and less time in the 1,000-target stress test; '
+                'both provide economical review ordering.')
+    probability_page(c)
+    search_page(c, 'Ranks 4-5 | Greedy and BFS', 10,
+                ('Greedy Best-First Search (GBFS)', 'Breadth-First Search (BFS)'),
+                'Greedy is rank 4 for faster approximate ordering at scale. BFS is rank 5 (tied with IDS): '
+                'it finds a complete shallow plan, but depth does not minimize weighted review effort. '
+                'These placements follow the overall recommendation, not this scene alone.')
+    search_page(c, 'Ranks 5-6 | IDS and DFS', 11,
+                ('Iterative Deepening Search (IDS)', 'Depth-First Search (DFS)'),
+                'IDS shares rank 5 with BFS: the same plan quality, with repeated exploration. DFS is rank 6 '
+                'because its selected plans had the largest cost overhead in the synthetic tests, '
+                'despite fast plan generation. A speed-only ranking would place DFS higher.')
     llm_page(c)
     c.save()
     appendix = PdfReader(buffer)
-    assert len(appendix.pages) == 5
+    assert len(appendix.pages) == 6
     writer = PdfWriter()
     for p in list(source.pages)[:6] + list(appendix.pages):
         writer.add_page(p)
-    writer.add_metadata({'/Title':'Post-YOLO Evaluation: Metrics, References and Visual Explanations',
+    writer.add_metadata({'/Title':'Post-YOLO Evaluation: Metrics and Visuals Ranked by Efficiency',
                          '/Author':'Benchmark report'})
     # Assemble bytes before writing so an in-place update is safe and repeatable.
     merged = io.BytesIO()
     writer.write(merged)
     output.write_bytes(merged.getvalue())
-    print(f'Built {output} (11 pages; first six report pages preserved)')
+    print(f'Built {output} (12 pages; first six report pages preserved)')
 
 
 if __name__ == '__main__':

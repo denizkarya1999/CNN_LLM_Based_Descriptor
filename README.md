@@ -10,7 +10,7 @@ A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU 
 
 Read the [action-selection report](Reports/Post_YOLO_Evaluation/Post_YOLO_Evaluation.pdf) for how all nine methods process YOLO evidence, their recorded responses, numerical performance, and a practical ranking by action-selection efficiency. The October 29, 2026 benchmark uses 24 COCO validation images, separate policy/plan-quality tests, and measured post-YOLO latency. COCO provides human object annotations; action scores are **policy agreement**, not human-labeled robot action accuracy.
 
-Pages **7-11** provide visual explanations: six search trees with visit order and selected paths, probability calculations, robot-plan rules, and the LLM validation flow. [Diagram data and regeneration instructions](Reports/Post_YOLO_Evaluation/visuals/) are included.
+Pages **7-12** present the visuals in the report's efficiency order: **robot plans → A*/UCS → probability → greedy search → BFS/IDS → DFS → LLM**. Rank labels preserve tied recommendations. The order considers usable actions, plan quality and computation; it is not a latency-only sort. [Diagram data and regeneration instructions](Reports/Post_YOLO_Evaluation/visuals/) are included.
 
 [Per-method metrics](Reports/Post_YOLO_Evaluation/performance_metrics.csv) include accuracy, precision, recall, F1, balanced accuracy, response availability and latency. [Reference labels for every image](Reports/Post_YOLO_Evaluation/ground_truth.csv), original annotation details, and [supporting measurements and response examples](Reports/Post_YOLO_Evaluation/) accompany the report.
 
