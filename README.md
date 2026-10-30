@@ -8,9 +8,9 @@ A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU 
 
 ## Post-YOLO action evaluation
 
-Read the [action-selection report](Reports/Post_YOLO_Evaluation/Post_YOLO_Evaluation.pdf) for what all nine methods did, recorded response examples, and a practical ranking by action-selection efficiency. The October 29, 2026 benchmark uses 24 COCO validation images, separate policy/plan-quality tests, and measured post-YOLO latency. Scores are **policy agreement**, not human-labeled robot action accuracy.
+Read the [action-selection report](Reports/Post_YOLO_Evaluation/Post_YOLO_Evaluation.pdf) for how all nine methods process YOLO evidence, their recorded responses, numerical performance, and a practical ranking by action-selection efficiency. The October 29, 2026 benchmark uses 24 COCO validation images, separate policy/plan-quality tests, and measured post-YOLO latency. COCO provides human object annotations; action scores are **policy agreement**, not human-labeled robot action accuracy.
 
-[Supporting measurements and response examples](Reports/Post_YOLO_Evaluation/) accompany the report.
+[Per-method metrics](Reports/Post_YOLO_Evaluation/performance_metrics.csv) include accuracy, precision, recall, F1, balanced accuracy, response availability and latency. [Reference labels for every image](Reports/Post_YOLO_Evaluation/ground_truth.csv), original annotation details, and [supporting measurements and response examples](Reports/Post_YOLO_Evaluation/) accompany the report.
 
 ## Screenshots
 

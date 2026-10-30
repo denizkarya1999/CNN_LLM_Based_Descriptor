@@ -1,0 +1,2462 @@
+{
+  "dataset": "COCO val2017",
+  "annotation_source": "https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2017.zip",
+  "annotation_member": "annotations/instances_val2017.json",
+  "annotation_member_sha256": "e8c7f7908f1d7278341fae127d0da654f102f11bd7b21d8aeefa635b8c810b6f",
+  "ground_truth_kind": "Human object annotations; action references are derived from explicit policies, not human-labeled actions.",
+  "filter": "iscrowd == 0; all retained annotations treated as confirmed, no detector-score threshold applied",
+  "selection_seed": 20261029,
+  "review_policy": "Take Action iff a confirmed traffic light, stop sign, knife or scissors is annotated.",
+  "robot_policy": "Take Action iff annotated people, vehicles, signals, animals or tools are present, or total annotated object count >= 10. Primary plan follows documented priority.",
+  "uncertainty_rule": "No uncertainty rule can be triggered by confirmed annotations. Predicted YOLO boxes between 0.25 and 0.5 can trigger verification and hence disagree with these references.",
+  "groups": {
+    "vehicles": [
+      "airplane",
+      "bicycle",
+      "boat",
+      "bus",
+      "car",
+      "motorcycle",
+      "train",
+      "truck"
+    ],
+    "animals": [
+      "bear",
+      "bird",
+      "cat",
+      "cow",
+      "dog",
+      "elephant",
+      "giraffe",
+      "horse",
+      "sheep",
+      "zebra"
+    ],
+    "signals": [
+      "stop sign",
+      "traffic light"
+    ],
+    "tools": [
+      "knife",
+      "scissors"
+    ]
+  },
+  "images": [
+    {
+      "image_id": 157365,
+      "stratum": "signals",
+      "file_name": "000000157365.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000157365.jpg",
+      "label_counts": {
+        "car": 4,
+        "person": 1,
+        "skateboard": 1,
+        "traffic light": 3
+      },
+      "object_count": 9,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "people_and_vehicles",
+        "matched_robot_action_rules": [
+          "people_and_vehicles",
+          "signal_review",
+          "vehicle_presence",
+          "people_nearby"
+        ],
+        "review_trigger_labels": [
+          "traffic light"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 344442,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            1.53,
+            193.05,
+            123.95,
+            183.42
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 348803,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            208.86,
+            160.86,
+            74.11,
+            73.35
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 349189,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            2.83,
+            171.85,
+            108.28,
+            70.41
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 403940,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            231.56,
+            89.85,
+            13.51,
+            14.44
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 480194,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            106.78,
+            116.58,
+            125.74,
+            363.56
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1387121,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            0.0,
+            90.08,
+            12.43,
+            59.03
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1776660,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            354.71,
+            114.44,
+            72.29,
+            122.27
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1860019,
+          "category_id": 41,
+          "label": "skateboard",
+          "bbox_xywh": [
+            141.64,
+            468.24,
+            66.21,
+            27.9
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2056853,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            313.11,
+            15.88,
+            31.89,
+            36.29
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 335800,
+      "stratum": "signals",
+      "file_name": "000000335800.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000335800.jpg",
+      "label_counts": {
+        "traffic light": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "signal_review",
+        "matched_robot_action_rules": [
+          "signal_review"
+        ],
+        "review_trigger_labels": [
+          "traffic light"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 404758,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            52.66,
+            255.24,
+            210.62,
+            171.76
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 555050,
+      "stratum": "signals",
+      "file_name": "000000555050.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000555050.jpg",
+      "label_counts": {
+        "car": 2,
+        "chair": 6,
+        "couch": 3,
+        "cow": 1,
+        "dining table": 1,
+        "person": 1,
+        "traffic light": 4
+      },
+      "object_count": 18,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "people_and_vehicles",
+        "matched_robot_action_rules": [
+          "people_and_vehicles",
+          "signal_review",
+          "animal_presence",
+          "dense_objects",
+          "vehicle_presence",
+          "people_nearby"
+        ],
+        "review_trigger_labels": [
+          "traffic light"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 70383,
+          "category_id": 21,
+          "label": "cow",
+          "bbox_xywh": [
+            221.72,
+            170.33,
+            55.82,
+            53.12
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 98245,
+          "category_id": 63,
+          "label": "couch",
+          "bbox_xywh": [
+            470.47,
+            201.71,
+            29.53,
+            35.94
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 101212,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            339.64,
+            201.11,
+            18.76,
+            31.1
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 101248,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            358.25,
+            200.89,
+            19.02,
+            30.53
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 103990,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            317.85,
+            200.82,
+            23.54,
+            30.47
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 105325,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            470.9,
+            202.98,
+            29.1,
+            33.84
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 105814,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            344.88,
+            171.62,
+            17.24,
+            31.84
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 111488,
+          "category_id": 63,
+          "label": "couch",
+          "bbox_xywh": [
+            386.17,
+            199.17,
+            72.82,
+            33.54
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 116550,
+          "category_id": 63,
+          "label": "couch",
+          "bbox_xywh": [
+            419.35,
+            172.03,
+            37.76,
+            32.75
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 141497,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            0.72,
+            177.28,
+            234.45,
+            91.9
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 145358,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            40.68,
+            147.02,
+            23.63,
+            23.22
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 184327,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            97.1,
+            185.73,
+            28.66,
+            27.72
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 402842,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            5.1,
+            50.72,
+            31.03,
+            82.11
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 403228,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            102.87,
+            78.09,
+            34.29,
+            34.91
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 404809,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            437.2,
+            85.11,
+            22.23,
+            64.79
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 405997,
+          "category_id": 10,
+          "label": "traffic light",
+          "bbox_xywh": [
+            201.3,
+            105.86,
+            16.34,
+            29.23
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1588824,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            313.23,
+            197.28,
+            8.1,
+            31.73
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1619842,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            326.22,
+            203.66,
+            54.66,
+            27.3
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 130613,
+      "stratum": "tools",
+      "file_name": "000000130613.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000130613.jpg",
+      "label_counts": {
+        "carrot": 2,
+        "dining table": 1,
+        "fork": 1,
+        "knife": 1
+      },
+      "object_count": 5,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "tool_handling",
+        "matched_robot_action_rules": [
+          "tool_handling"
+        ],
+        "review_trigger_labels": [
+          "knife"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 695332,
+          "category_id": 49,
+          "label": "knife",
+          "bbox_xywh": [
+            130.26,
+            5.8,
+            183.5,
+            38.98
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1062384,
+          "category_id": 57,
+          "label": "carrot",
+          "bbox_xywh": [
+            434.0,
+            147.07,
+            128.0,
+            115.0
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1063057,
+          "category_id": 57,
+          "label": "carrot",
+          "bbox_xywh": [
+            601.0,
+            146.07,
+            37.0,
+            201.0
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2102209,
+          "category_id": 48,
+          "label": "fork",
+          "bbox_xywh": [
+            591.81,
+            337.27,
+            48.19,
+            51.95
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2131300,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            235.42,
+            0.97,
+            404.58,
+            49.88
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 10583,
+      "stratum": "tools",
+      "file_name": "000000010583.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000010583.jpg",
+      "label_counts": {
+        "dining table": 1,
+        "knife": 1,
+        "sandwich": 2
+      },
+      "object_count": 4,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "tool_handling",
+        "matched_robot_action_rules": [
+          "tool_handling"
+        ],
+        "review_trigger_labels": [
+          "knife"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 697623,
+          "category_id": 49,
+          "label": "knife",
+          "bbox_xywh": [
+            475.22,
+            191.44,
+            136.78,
+            79.79
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1619221,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            0.0,
+            0.0,
+            612.0,
+            612.0
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2219494,
+          "category_id": 54,
+          "label": "sandwich",
+          "bbox_xywh": [
+            220.71,
+            64.1,
+            219.63,
+            145.64
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2219694,
+          "category_id": 54,
+          "label": "sandwich",
+          "bbox_xywh": [
+            90.44,
+            135.16,
+            388.91,
+            337.66
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 174123,
+      "stratum": "tools",
+      "file_name": "000000174123.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000174123.jpg",
+      "label_counts": {
+        "dining table": 1,
+        "fork": 1,
+        "knife": 1,
+        "person": 2,
+        "pizza": 1
+      },
+      "object_count": 6,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "tool_handling",
+        "matched_robot_action_rules": [
+          "tool_handling",
+          "people_nearby"
+        ],
+        "review_trigger_labels": [
+          "knife"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 459370,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            117.11,
+            345.77,
+            151.26,
+            53.23
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 687551,
+          "category_id": 48,
+          "label": "fork",
+          "bbox_xywh": [
+            50.6,
+            106.03,
+            133.21,
+            278.85
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1071490,
+          "category_id": 59,
+          "label": "pizza",
+          "bbox_xywh": [
+            0.0,
+            0.0,
+            495.4,
+            368.74
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1615135,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            0.0,
+            0.0,
+            500.0,
+            399.0
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1721461,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            344.89,
+            0.0,
+            154.59,
+            37.5
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1891500,
+          "category_id": 49,
+          "label": "knife",
+          "bbox_xywh": [
+            308.13,
+            0.41,
+            58.93,
+            58.93
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 361180,
+      "stratum": "animals",
+      "file_name": "000000361180.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000361180.jpg",
+      "label_counts": {
+        "bear": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "animal_presence",
+        "matched_robot_action_rules": [
+          "animal_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 588006,
+          "category_id": 23,
+          "label": "bear",
+          "bbox_xywh": [
+            168.86,
+            35.02,
+            291.68,
+            346.37
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 121586,
+      "stratum": "animals",
+      "file_name": "000000121586.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000121586.jpg",
+      "label_counts": {
+        "book": 13,
+        "cat": 1,
+        "tv": 1
+      },
+      "object_count": 15,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "animal_presence",
+        "matched_robot_action_rules": [
+          "animal_presence",
+          "dense_objects"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 33470,
+          "category_id": 72,
+          "label": "tv",
+          "bbox_xywh": [
+            96.59,
+            57.41,
+            202.04,
+            136.99
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1139801,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            338.62,
+            328.64,
+            14.01,
+            65.48
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1649054,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            594.78,
+            348.78,
+            44.66,
+            12.8
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1658652,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            539.65,
+            332.09,
+            51.33,
+            15.05
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1659017,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            331.56,
+            422.57,
+            41.48,
+            10.1
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1659673,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            296.67,
+            322.23,
+            21.8,
+            73.92
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1659903,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            590.17,
+            327.17,
+            33.36,
+            23.38
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1661087,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            599.86,
+            245.97,
+            39.69,
+            62.47
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1661303,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            614.4,
+            399.45,
+            25.6,
+            31.05
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1661977,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            314.81,
+            326.68,
+            18.8,
+            68.09
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1662372,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            543.61,
+            319.13,
+            48.12,
+            14.04
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1663092,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            310.74,
+            326.32,
+            13.92,
+            69.05
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1663133,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            332.2,
+            328.96,
+            14.76,
+            63.3
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1816133,
+          "category_id": 17,
+          "label": "cat",
+          "bbox_xywh": [
+            187.7,
+            101.59,
+            50.15,
+            47.37
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2141616,
+          "category_id": 84,
+          "label": "book",
+          "bbox_xywh": [
+            220.13,
+            411.14,
+            48.46,
+            28.22
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 206831,
+      "stratum": "animals",
+      "file_name": "000000206831.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000206831.jpg",
+      "label_counts": {
+        "dog": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "animal_presence",
+        "matched_robot_action_rules": [
+          "animal_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 2883,
+          "category_id": 18,
+          "label": "dog",
+          "bbox_xywh": [
+            18.98,
+            48.31,
+            621.02,
+            377.83
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 458702,
+      "stratum": "transport",
+      "file_name": "000000458702.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000458702.jpg",
+      "label_counts": {
+        "car": 2,
+        "parking meter": 2
+      },
+      "object_count": 4,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "vehicle_presence",
+        "matched_robot_action_rules": [
+          "vehicle_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 418646,
+          "category_id": 14,
+          "label": "parking meter",
+          "bbox_xywh": [
+            109.3,
+            153.45,
+            46.03,
+            140.94
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1350482,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            3.61,
+            447.49,
+            149.4,
+            51.05
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1810192,
+          "category_id": 14,
+          "label": "parking meter",
+          "bbox_xywh": [
+            175.63,
+            153.09,
+            59.22,
+            138.19
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2169137,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            0.0,
+            446.07,
+            116.21,
+            54.28
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 156071,
+      "stratum": "transport",
+      "file_name": "000000156071.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000156071.jpg",
+      "label_counts": {
+        "car": 2,
+        "person": 13,
+        "sheep": 1
+      },
+      "object_count": 16,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "crowded_area",
+        "matched_robot_action_rules": [
+          "crowded_area",
+          "people_and_vehicles",
+          "animal_presence",
+          "dense_objects",
+          "vehicle_presence",
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 142937,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            305.77,
+            76.16,
+            161.54,
+            46.22
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 143886,
+          "category_id": 3,
+          "label": "car",
+          "bbox_xywh": [
+            446.87,
+            74.21,
+            81.16,
+            46.77
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1208555,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            7.55,
+            202.66,
+            127.28,
+            215.73
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1239235,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            461.66,
+            131.6,
+            62.56,
+            131.59
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1247026,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            419.6,
+            85.21,
+            39.91,
+            98.16
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1295539,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            0.0,
+            139.15,
+            51.78,
+            131.59
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1300362,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            227.55,
+            101.84,
+            72.08,
+            149.16
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1686714,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            505.52,
+            96.35,
+            59.85,
+            168.94
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1692969,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            214.71,
+            45.07,
+            28.88,
+            26.72
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1694392,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            340.57,
+            111.8,
+            69.21,
+            129.42
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1720914,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            564.5,
+            80.48,
+            50.24,
+            186.86
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1740502,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            602.84,
+            95.98,
+            37.16,
+            126.01
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1818289,
+          "category_id": 20,
+          "label": "sheep",
+          "bbox_xywh": [
+            341.47,
+            229.92,
+            62.42,
+            75.41
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2018032,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            388.34,
+            78.72,
+            25.88,
+            36.73
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2021948,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            273.95,
+            99.64,
+            40.03,
+            67.54
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2157401,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            281.25,
+            77.65,
+            29.2,
+            29.2
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 108440,
+      "stratum": "transport",
+      "file_name": "000000108440.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000108440.jpg",
+      "label_counts": {
+        "train": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "vehicle_presence",
+        "matched_robot_action_rules": [
+          "vehicle_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 169653,
+          "category_id": 7,
+          "label": "train",
+          "bbox_xywh": [
+            14.63,
+            166.77,
+            487.64,
+            61.45
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 14226,
+      "stratum": "kitchen_dining",
+      "file_name": "000000014226.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000014226.jpg",
+      "label_counts": {
+        "apple": 1,
+        "chair": 4,
+        "dining table": 1,
+        "laptop": 1,
+        "person": 1
+      },
+      "object_count": 8,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "people_nearby",
+        "matched_robot_action_rules": [
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 377650,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            59.33,
+            399.85,
+            167.19,
+            72.27
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 380478,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            394.79,
+            16.93,
+            198.47,
+            254.56
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 476415,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            208.65,
+            30.81,
+            332.97,
+            339.46
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1099277,
+          "category_id": 73,
+          "label": "laptop",
+          "bbox_xywh": [
+            221.54,
+            236.56,
+            213.04,
+            133.31
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1579697,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            0.0,
+            357.03,
+            87.37,
+            117.58
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1582509,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            595.99,
+            27.86,
+            44.01,
+            203.53
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1619249,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            154.25,
+            295.55,
+            485.39,
+            174.74
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1906808,
+          "category_id": 53,
+          "label": "apple",
+          "bbox_xywh": [
+            311.98,
+            290.45,
+            22.44,
+            21.73
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 429623,
+      "stratum": "kitchen_dining",
+      "file_name": "000000429623.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000429623.jpg",
+      "label_counts": {
+        "chair": 1,
+        "dining table": 1,
+        "fork": 1,
+        "pizza": 1
+      },
+      "object_count": 4,
+      "reference": {
+        "review": "No Action",
+        "robot": "No Action",
+        "robot_plan": "moderate_objects",
+        "matched_robot_action_rules": [],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 1076480,
+          "category_id": 59,
+          "label": "pizza",
+          "bbox_xywh": [
+            4.31,
+            167.19,
+            497.26,
+            290.16
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1583673,
+          "category_id": 62,
+          "label": "chair",
+          "bbox_xywh": [
+            270.85,
+            0.73,
+            243.18,
+            152.86
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1958624,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            0.0,
+            117.64,
+            640.0,
+            355.64
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2184477,
+          "category_id": 48,
+          "label": "fork",
+          "bbox_xywh": [
+            480.01,
+            270.23,
+            159.41,
+            81.34
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 391722,
+      "stratum": "kitchen_dining",
+      "file_name": "000000391722.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000391722.jpg",
+      "label_counts": {
+        "cake": 1,
+        "cell phone": 1,
+        "dining table": 1,
+        "person": 5,
+        "tie": 1
+      },
+      "object_count": 9,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "crowded_area",
+        "matched_robot_action_rules": [
+          "crowded_area",
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 298188,
+          "category_id": 32,
+          "label": "tie",
+          "bbox_xywh": [
+            178.97,
+            127.57,
+            51.54,
+            246.26
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 329602,
+          "category_id": 77,
+          "label": "cell phone",
+          "bbox_xywh": [
+            514.6,
+            541.68,
+            72.65,
+            20.74
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 569591,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            218.61,
+            99.24,
+            394.06,
+            461.66
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1087318,
+          "category_id": 61,
+          "label": "cake",
+          "bbox_xywh": [
+            154.82,
+            373.17,
+            147.45,
+            65.99
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1681073,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            583.17,
+            293.31,
+            51.83,
+            235.59
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1751253,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            0.0,
+            252.84,
+            109.04,
+            320.79
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1964578,
+          "category_id": 67,
+          "label": "dining table",
+          "bbox_xywh": [
+            3.26,
+            537.93,
+            631.74,
+            102.07
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2029488,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            548.21,
+            274.65,
+            38.34,
+            36.65
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2153099,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            39.92,
+            1.19,
+            252.02,
+            562.99
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 529122,
+      "stratum": "home_office",
+      "file_name": "000000529122.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000529122.jpg",
+      "label_counts": {
+        "donut": 13,
+        "handbag": 1,
+        "knife": 1,
+        "person": 3,
+        "tv": 1
+      },
+      "object_count": 19,
+      "reference": {
+        "review": "Take Action",
+        "robot": "Take Action",
+        "robot_plan": "tool_handling",
+        "matched_robot_action_rules": [
+          "tool_handling",
+          "dense_objects",
+          "people_nearby"
+        ],
+        "review_trigger_labels": [
+          "knife"
+        ]
+      },
+      "annotations": [
+        {
+          "annotation_id": 496301,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            141.45,
+            100.4,
+            155.34,
+            177.44
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 508038,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            243.03,
+            77.84,
+            68.35,
+            80.38
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1079510,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            355.98,
+            236.65,
+            22.37,
+            14.84
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1080554,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            274.83,
+            262.75,
+            25.13,
+            17.92
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1080659,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            288.84,
+            225.72,
+            19.38,
+            12.56
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1081499,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            307.43,
+            234.83,
+            22.07,
+            16.56
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1082790,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            378.9,
+            241.88,
+            25.3,
+            12.47
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1082877,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            410.29,
+            252.27,
+            25.14,
+            14.37
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1083079,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            309.93,
+            231.38,
+            22.09,
+            15.85
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1083103,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            401.49,
+            265.78,
+            28.67,
+            15.22
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1083120,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            431.58,
+            272.81,
+            23.42,
+            8.19
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1083408,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            433.06,
+            266.7,
+            27.77,
+            14.3
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1083432,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            369.79,
+            255.0,
+            26.65,
+            24.25
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1179922,
+          "category_id": 31,
+          "label": "handbag",
+          "bbox_xywh": [
+            19.58,
+            105.26,
+            80.19,
+            155.97
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1223944,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            29.68,
+            18.31,
+            134.5,
+            257.64
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1572983,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            348.81,
+            245.7,
+            23.73,
+            15.97
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1624576,
+          "category_id": 72,
+          "label": "tv",
+          "bbox_xywh": [
+            359.99,
+            110.66,
+            96.44,
+            83.15
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2104042,
+          "category_id": 49,
+          "label": "knife",
+          "bbox_xywh": [
+            477.51,
+            0.0,
+            7.51,
+            18.67
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2118149,
+          "category_id": 60,
+          "label": "donut",
+          "bbox_xywh": [
+            253.9,
+            252.34,
+            18.86,
+            13.83
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 458768,
+      "stratum": "home_office",
+      "file_name": "000000458768.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000458768.jpg",
+      "label_counts": {
+        "bench": 1,
+        "couch": 1,
+        "oven": 3,
+        "sink": 1
+      },
+      "object_count": 6,
+      "reference": {
+        "review": "No Action",
+        "robot": "No Action",
+        "robot_plan": "moderate_objects",
+        "matched_robot_action_rules": [],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 111317,
+          "category_id": 63,
+          "label": "couch",
+          "bbox_xywh": [
+            48.65,
+            252.15,
+            156.72,
+            96.3
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 572915,
+          "category_id": 15,
+          "label": "bench",
+          "bbox_xywh": [
+            282.1,
+            229.76,
+            64.72,
+            23.82
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1125634,
+          "category_id": 79,
+          "label": "oven",
+          "bbox_xywh": [
+            479.66,
+            304.07,
+            152.22,
+            42.13
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1127607,
+          "category_id": 79,
+          "label": "oven",
+          "bbox_xywh": [
+            411.02,
+            246.19,
+            16.59,
+            49.59
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1132941,
+          "category_id": 81,
+          "label": "sink",
+          "bbox_xywh": [
+            205.51,
+            330.85,
+            102.56,
+            34.82
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1981139,
+          "category_id": 79,
+          "label": "oven",
+          "bbox_xywh": [
+            408.36,
+            206.98,
+            19.87,
+            45.9
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 7795,
+      "stratum": "home_office",
+      "file_name": "000000007795.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000007795.jpg",
+      "label_counts": {
+        "bed": 2,
+        "clock": 1,
+        "remote": 1
+      },
+      "object_count": 4,
+      "reference": {
+        "review": "No Action",
+        "robot": "No Action",
+        "robot_plan": "moderate_objects",
+        "matched_robot_action_rules": [],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 318893,
+          "category_id": 65,
+          "label": "bed",
+          "bbox_xywh": [
+            0.96,
+            191.43,
+            453.8,
+            226.91
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 319338,
+          "category_id": 65,
+          "label": "bed",
+          "bbox_xywh": [
+            163.72,
+            189.52,
+            319.77,
+            121.59
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1664794,
+          "category_id": 85,
+          "label": "clock",
+          "bbox_xywh": [
+            133.18,
+            245.94,
+            8.55,
+            12.62
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2135513,
+          "category_id": 75,
+          "label": "remote",
+          "bbox_xywh": [
+            625.52,
+            256.08,
+            14.32,
+            5.17
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 128748,
+      "stratum": "sports",
+      "file_name": "000000128748.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000128748.jpg",
+      "label_counts": {
+        "baseball bat": 1,
+        "baseball glove": 1,
+        "person": 3
+      },
+      "object_count": 5,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "people_nearby",
+        "matched_robot_action_rules": [
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 477030,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            307.72,
+            97.88,
+            156.03,
+            534.54
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 629797,
+          "category_id": 39,
+          "label": "baseball bat",
+          "bbox_xywh": [
+            291.96,
+            449.08,
+            48.89,
+            145.26
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 633410,
+          "category_id": 40,
+          "label": "baseball glove",
+          "bbox_xywh": [
+            0.07,
+            347.48,
+            20.16,
+            67.04
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2156705,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            156.02,
+            44.47,
+            199.37,
+            545.58
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2158530,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            0.0,
+            79.5,
+            209.09,
+            529.71
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 43314,
+      "stratum": "sports",
+      "file_name": "000000043314.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000043314.jpg",
+      "label_counts": {
+        "backpack": 1,
+        "person": 3,
+        "skis": 1
+      },
+      "object_count": 5,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "people_nearby",
+        "matched_robot_action_rules": [
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 477579,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            199.9,
+            98.18,
+            134.9,
+            107.03
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 524440,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            198.01,
+            100.8,
+            135.62,
+            104.68
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1826813,
+          "category_id": 27,
+          "label": "backpack",
+          "bbox_xywh": [
+            282.41,
+            124.17,
+            25.77,
+            70.02
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2148661,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            54.02,
+            155.16,
+            12.13,
+            21.51
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 2199831,
+          "category_id": 35,
+          "label": "skis",
+          "bbox_xywh": [
+            140.55,
+            60.79,
+            178.83,
+            182.63
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 239773,
+      "stratum": "sports",
+      "file_name": "000000239773.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000239773.jpg",
+      "label_counts": {
+        "baseball bat": 1,
+        "baseball glove": 2,
+        "person": 2,
+        "sports ball": 1
+      },
+      "object_count": 6,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "people_nearby",
+        "matched_robot_action_rules": [
+          "people_nearby"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 303400,
+          "category_id": 37,
+          "label": "sports ball",
+          "bbox_xywh": [
+            90.71,
+            172.26,
+            17.4,
+            15.27
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 500446,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            100.49,
+            63.39,
+            200.22,
+            276.74
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 631558,
+          "category_id": 39,
+          "label": "baseball bat",
+          "bbox_xywh": [
+            158.71,
+            3.76,
+            134.54,
+            164.35
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 634647,
+          "category_id": 40,
+          "label": "baseball glove",
+          "bbox_xywh": [
+            406.76,
+            243.67,
+            55.78,
+            56.56
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1728036,
+          "category_id": 1,
+          "label": "person",
+          "bbox_xywh": [
+            409.71,
+            139.92,
+            88.9,
+            199.44
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1859068,
+          "category_id": 40,
+          "label": "baseball glove",
+          "bbox_xywh": [
+            245.15,
+            121.6,
+            49.71,
+            53.92
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 503823,
+      "stratum": "air_water",
+      "file_name": "000000503823.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000503823.jpg",
+      "label_counts": {
+        "boat": 4
+      },
+      "object_count": 4,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "vehicle_presence",
+        "matched_robot_action_rules": [
+          "vehicle_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 175297,
+          "category_id": 9,
+          "label": "boat",
+          "bbox_xywh": [
+            175.5,
+            120.38,
+            204.75,
+            103.5
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 180216,
+          "category_id": 9,
+          "label": "boat",
+          "bbox_xywh": [
+            186.33,
+            110.75,
+            313.67,
+            147.42
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 182251,
+          "category_id": 9,
+          "label": "boat",
+          "bbox_xywh": [
+            350.21,
+            128.15,
+            143.68,
+            47.14
+          ],
+          "iscrowd": 0
+        },
+        {
+          "annotation_id": 1802806,
+          "category_id": 9,
+          "label": "boat",
+          "bbox_xywh": [
+            418.89,
+            125.44,
+            46.18,
+            28.23
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 96549,
+      "stratum": "air_water",
+      "file_name": "000000096549.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000096549.jpg",
+      "label_counts": {
+        "airplane": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "vehicle_presence",
+        "matched_robot_action_rules": [
+          "vehicle_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 156368,
+          "category_id": 5,
+          "label": "airplane",
+          "bbox_xywh": [
+            62.46,
+            11.42,
+            566.12,
+            157.14
+          ],
+          "iscrowd": 0
+        }
+      ]
+    },
+    {
+      "image_id": 336309,
+      "stratum": "air_water",
+      "file_name": "000000336309.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2017/000000336309.jpg",
+      "label_counts": {
+        "airplane": 1
+      },
+      "object_count": 1,
+      "reference": {
+        "review": "No Action",
+        "robot": "Take Action",
+        "robot_plan": "vehicle_presence",
+        "matched_robot_action_rules": [
+          "vehicle_presence"
+        ],
+        "review_trigger_labels": []
+      },
+      "annotations": [
+        {
+          "annotation_id": 157910,
+          "category_id": 5,
+          "label": "airplane",
+          "bbox_xywh": [
+            122.67,
+            190.02,
+            162.41,
+            47.24
+          ],
+          "iscrowd": 0
+        }
+      ]
+    }
+  ]
+}

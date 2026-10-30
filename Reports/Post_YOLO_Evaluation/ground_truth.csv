@@ -1,0 +1,25 @@
+image_id,stratum,object_count,label_counts,review_reference,robot_reference,primary_robot_plan,review_trigger_labels,image_url
+157365,signals,9,"{""car"": 4, ""person"": 1, ""skateboard"": 1, ""traffic light"": 3}",Take Action,Take Action,people_and_vehicles,traffic light,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000157365.jpg
+335800,signals,1,"{""traffic light"": 1}",Take Action,Take Action,signal_review,traffic light,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000335800.jpg
+555050,signals,18,"{""car"": 2, ""chair"": 6, ""couch"": 3, ""cow"": 1, ""dining table"": 1, ""person"": 1, ""traffic light"": 4}",Take Action,Take Action,people_and_vehicles,traffic light,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000555050.jpg
+130613,tools,5,"{""carrot"": 2, ""dining table"": 1, ""fork"": 1, ""knife"": 1}",Take Action,Take Action,tool_handling,knife,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000130613.jpg
+10583,tools,4,"{""dining table"": 1, ""knife"": 1, ""sandwich"": 2}",Take Action,Take Action,tool_handling,knife,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000010583.jpg
+174123,tools,6,"{""dining table"": 1, ""fork"": 1, ""knife"": 1, ""person"": 2, ""pizza"": 1}",Take Action,Take Action,tool_handling,knife,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000174123.jpg
+361180,animals,1,"{""bear"": 1}",No Action,Take Action,animal_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000361180.jpg
+121586,animals,15,"{""book"": 13, ""cat"": 1, ""tv"": 1}",No Action,Take Action,animal_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000121586.jpg
+206831,animals,1,"{""dog"": 1}",No Action,Take Action,animal_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000206831.jpg
+458702,transport,4,"{""car"": 2, ""parking meter"": 2}",No Action,Take Action,vehicle_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000458702.jpg
+156071,transport,16,"{""car"": 2, ""person"": 13, ""sheep"": 1}",No Action,Take Action,crowded_area,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000156071.jpg
+108440,transport,1,"{""train"": 1}",No Action,Take Action,vehicle_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000108440.jpg
+14226,kitchen_dining,8,"{""apple"": 1, ""chair"": 4, ""dining table"": 1, ""laptop"": 1, ""person"": 1}",No Action,Take Action,people_nearby,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000014226.jpg
+429623,kitchen_dining,4,"{""chair"": 1, ""dining table"": 1, ""fork"": 1, ""pizza"": 1}",No Action,No Action,moderate_objects,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000429623.jpg
+391722,kitchen_dining,9,"{""cake"": 1, ""cell phone"": 1, ""dining table"": 1, ""person"": 5, ""tie"": 1}",No Action,Take Action,crowded_area,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000391722.jpg
+529122,home_office,19,"{""donut"": 13, ""handbag"": 1, ""knife"": 1, ""person"": 3, ""tv"": 1}",Take Action,Take Action,tool_handling,knife,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000529122.jpg
+458768,home_office,6,"{""bench"": 1, ""couch"": 1, ""oven"": 3, ""sink"": 1}",No Action,No Action,moderate_objects,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000458768.jpg
+7795,home_office,4,"{""bed"": 2, ""clock"": 1, ""remote"": 1}",No Action,No Action,moderate_objects,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000007795.jpg
+128748,sports,5,"{""baseball bat"": 1, ""baseball glove"": 1, ""person"": 3}",No Action,Take Action,people_nearby,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000128748.jpg
+43314,sports,5,"{""backpack"": 1, ""person"": 3, ""skis"": 1}",No Action,Take Action,people_nearby,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000043314.jpg
+239773,sports,6,"{""baseball bat"": 1, ""baseball glove"": 2, ""person"": 2, ""sports ball"": 1}",No Action,Take Action,people_nearby,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000239773.jpg
+503823,air_water,4,"{""boat"": 4}",No Action,Take Action,vehicle_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000503823.jpg
+96549,air_water,1,"{""airplane"": 1}",No Action,Take Action,vehicle_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000096549.jpg
+336309,air_water,1,"{""airplane"": 1}",No Action,Take Action,vehicle_presence,,https://s3.amazonaws.com/images.cocodataset.org/val2017/000000336309.jpg
