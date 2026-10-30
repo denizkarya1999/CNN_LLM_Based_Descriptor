@@ -6,6 +6,12 @@ A desktop experiment for comparing **LLM-based decision making with conventional
 
 A camera-first Python GUI for YOLO26 n / s / m / l / x, with NVIDIA GPU and CPU support, including Raspberry Pi and other 64-bit single-board computers.
 
+## Post-YOLO action evaluation
+
+Read the [action-selection report](Reports/Post_YOLO_Evaluation/Post_YOLO_Evaluation.pdf) for what all nine methods did, recorded response examples, and a practical ranking by action-selection efficiency. The October 29, 2026 benchmark uses 24 COCO validation images, separate policy/plan-quality tests, and measured post-YOLO latency. Scores are **policy agreement**, not human-labeled robot action accuracy.
+
+[Supporting measurements and response examples](Reports/Post_YOLO_Evaluation/) accompany the report.
+
 ## Screenshots
 
 The preview and descriptor stay together. This real local Qwen example shows **Environment (LLM)**, **Decision (LLM)** and its natural-language **Description (LLM)**. The shown latency is one sample, not a performance benchmark.

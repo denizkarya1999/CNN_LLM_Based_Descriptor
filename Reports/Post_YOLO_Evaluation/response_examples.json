@@ -1,0 +1,3878 @@
+{
+  "scope": "First measured repetition, 24 unique COCO val2017 images",
+  "response_summary": {
+    "A* Search": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "Iterative Deepening Search (IDS)": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "Greedy Best-First Search (GBFS)": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "Uniform-Cost Search (UCS)": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "Robot plans": {
+      "images": 24,
+      "decisions": {
+        "Take Action": 21,
+        "No Action": 3
+      },
+      "actions": {
+        "uncertain_detections": 10,
+        "people_nearby": 2,
+        "vehicle_presence": 3,
+        "signal_review": 2,
+        "people_and_vehicles": 1,
+        "crowded_area": 1,
+        "animal_presence": 2,
+        "sparse_objects": 2,
+        "empty_area": 1
+      },
+      "status": {
+        "validated": 24
+      }
+    },
+    "Probability": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "no_detections": 1,
+        "validated": 23
+      }
+    },
+    "Depth-First Search (DFS)": {
+      "images": 24,
+      "decisions": {
+        "Take Action": 14,
+        "No Action": 10
+      },
+      "actions": {
+        "inspect": 2,
+        "no_action": 10,
+        "verify": 12
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "Breadth-First Search (BFS)": {
+      "images": 24,
+      "decisions": {
+        "No Action": 10,
+        "Take Action": 14
+      },
+      "actions": {
+        "no_action": 10,
+        "verify": 12,
+        "check_signal": 2
+      },
+      "status": {
+        "validated": 23,
+        "no_detections": 1
+      }
+    },
+    "LLM": {
+      "images": 24,
+      "decisions": {
+        "No Action": 23,
+        "Take Action": 1
+      },
+      "actions": {
+        "no_action": 23,
+        "verify": 1
+      },
+      "status": {
+        "fallback": 11,
+        "no_detections": 1,
+        "validated": 12
+      }
+    }
+  },
+  "examples": [
+    {
+      "method": "Uniform-Cost Search (UCS)",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d3",
+        "text": "Confirm the possible skis at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.20015,
+      "review_steps": [
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.1174499999999998
+        },
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Probability",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Depth-First Search (DFS)",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "inspect",
+        "detection_id": "d2",
+        "text": "Check the detected traffic light at top-left in the image directly before deciding how to interact with it."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 17.377750000000002,
+      "review_steps": [
+        {
+          "choice": "inspect:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 2.27495
+        },
+        {
+          "choice": "inspect:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 2.5358
+        },
+        {
+          "choice": "inspect:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 2.3382500000000004
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.274
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.27435
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.3163
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 1.09855
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 2.0208
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 1.3904999999999998
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.85425
+        }
+      ]
+    },
+    {
+      "method": "Probability",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Depth-First Search (DFS)",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "A* Search",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d3",
+        "text": "Confirm the possible skis at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.20015,
+      "review_steps": [
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.1174499999999998
+        },
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Greedy Best-First Search (GBFS)",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d5",
+        "text": "Check the actual state of the detected traffic light at top-left in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 16.65345,
+      "review_steps": [
+        {
+          "choice": "check_signal:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.4774
+        },
+        {
+          "choice": "check_signal:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.1975500000000001
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.47155
+        },
+        {
+          "choice": "check_signal:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.50385
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.7386
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.3163
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 1.92225
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 2.0208
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 2.1509
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.85425
+        }
+      ]
+    },
+    {
+      "method": "A* Search",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Probability",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Iterative Deepening Search (IDS)",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.28285,
+      "review_steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Iterative Deepening Search (IDS)",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d2",
+        "text": "Check the actual state of the detected traffic light at top-left in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 15.577750000000002,
+      "review_steps": [
+        {
+          "choice": "check_signal:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.67495
+        },
+        {
+          "choice": "check_signal:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.9358
+        },
+        {
+          "choice": "check_signal:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.73825
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.274
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.27435
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.3163
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 1.09855
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 2.0208
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 1.3904999999999998
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.85425
+        }
+      ]
+    },
+    {
+      "method": "Robot plans",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "uncertain_detections",
+        "detection_id": null,
+        "detection_ids": [
+          "d2",
+          "d3"
+        ],
+        "text": "Uncertain-Detection Robot Action Plan:\n  1. Acquire another view to verify the below-50% detections before using those labels for an action."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Greedy Best-First Search (GBFS)",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.28285,
+      "review_steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Depth-First Search (DFS)",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.28285,
+      "review_steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Robot plans",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "signal_review",
+        "detection_id": null,
+        "detection_ids": [
+          "d2",
+          "d4",
+          "d5"
+        ],
+        "text": "Signal-Review Robot Action Plan:\n  1. Check the actual state of each detected signal before any related movement.\nAnimal-Presence Robot Action Plan:\n  1. If moving nearby, pause and review the detected animals' current positions before proceeding.\nUncertain-Detection Robot Action Plan:\n  1. Acquire another view to verify the below-50% detections before using those labels for an action.\nVehicle-Presence Robot Action Plan:\n  1. If moving nearby, hold intended movement and inspect the detected vehicles' current positions."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Breadth-First Search (BFS)",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d2",
+        "text": "Check the actual state of the detected traffic light at top-left in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 15.577750000000002,
+      "review_steps": [
+        {
+          "choice": "check_signal:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.67495
+        },
+        {
+          "choice": "check_signal:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.9358
+        },
+        {
+          "choice": "check_signal:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.73825
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.274
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.27435
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.3163
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 1.09855
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 2.0208
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 1.3904999999999998
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.85425
+        }
+      ]
+    },
+    {
+      "method": "Uniform-Cost Search (UCS)",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "Breadth-First Search (BFS)",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "Uniform-Cost Search (UCS)",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d4",
+        "text": "Check the actual state of the detected traffic light at middle-right in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 13.1653,
+      "review_steps": [
+        {
+          "choice": "check_signal:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.53375
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.50385
+        },
+        {
+          "choice": "check_signal:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.274
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.0017500000000001
+        },
+        {
+          "choice": "check_signal:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.1972
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 1.24345
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.09855
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.4274
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 1.49485
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 1.3904999999999998
+        }
+      ]
+    },
+    {
+      "method": "Iterative Deepening Search (IDS)",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Greedy Best-First Search (GBFS)",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "Breadth-First Search (BFS)",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": 2.28285,
+      "review_steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ]
+    },
+    {
+      "method": "Greedy Best-First Search (GBFS)",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Uniform-Cost Search (UCS)",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Robot plans",
+      "coco_image_id": 206831,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "animal_presence",
+        "detection_id": null,
+        "detection_ids": [
+          "d1"
+        ],
+        "text": "Animal-Presence Robot Action Plan:\n  1. If moving nearby, pause and review the detected animals' current positions before proceeding."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "A* Search",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d4",
+        "text": "Check the actual state of the detected traffic light at middle-right in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": 13.1653,
+      "review_steps": [
+        {
+          "choice": "check_signal:d4",
+          "detection_id": "d4",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.53375
+        },
+        {
+          "choice": "verify:d6",
+          "detection_id": "d6",
+          "rule": "low_score",
+          "cost": 1.50385
+        },
+        {
+          "choice": "check_signal:d5",
+          "detection_id": "d5",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.274
+        },
+        {
+          "choice": "verify:d7",
+          "detection_id": "d7",
+          "rule": "low_score",
+          "cost": 1.0017500000000001
+        },
+        {
+          "choice": "check_signal:d2",
+          "detection_id": "d2",
+          "rule": "signal_state_unconfirmed",
+          "cost": 1.1972
+        },
+        {
+          "choice": "verify:d9",
+          "detection_id": "d9",
+          "rule": "low_score",
+          "cost": 1.24345
+        },
+        {
+          "choice": "verify:d8",
+          "detection_id": "d8",
+          "rule": "low_score",
+          "cost": 1.09855
+        },
+        {
+          "choice": "verify:d12",
+          "detection_id": "d12",
+          "rule": "low_score",
+          "cost": 1.4274
+        },
+        {
+          "choice": "verify:d10",
+          "detection_id": "d10",
+          "rule": "low_score",
+          "cost": 1.49485
+        },
+        {
+          "choice": "verify:d11",
+          "detection_id": "d11",
+          "rule": "low_score",
+          "cost": 1.3904999999999998
+        }
+      ]
+    },
+    {
+      "method": "Depth-First Search (DFS)",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "Breadth-First Search (BFS)",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Iterative Deepening Search (IDS)",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "A* Search",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": 0.0,
+      "review_steps": []
+    },
+    {
+      "method": "Probability",
+      "coco_image_id": 555050,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "check_signal",
+        "detection_id": "d2",
+        "text": "Check the actual state of the detected traffic light at top-left in the image before deciding what to do."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        },
+        {
+          "label": "bench",
+          "confidence": 0.30908,
+          "confidence_percent": 30.91,
+          "box_xyxy_pixels": [
+            470.3125,
+            202.34375,
+            499.60938,
+            236.71875
+          ],
+          "box_xyxy_normalized": [
+            0.9406,
+            0.6284,
+            0.9992,
+            0.7352
+          ],
+          "position": "bottom-right",
+          "id": "d11"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.29248,
+          "confidence_percent": 29.25,
+          "box_xyxy_pixels": [
+            200.58594,
+            104.29688,
+            217.77344,
+            139.84375
+          ],
+          "box_xyxy_normalized": [
+            0.4012,
+            0.3239,
+            0.4355,
+            0.4343
+          ],
+          "position": "middle-center",
+          "id": "d12"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "Robot plans",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "empty_area",
+        "detection_id": null,
+        "detection_ids": [],
+        "text": "Empty-Area Robot Action Plan:\n  1. No new robot action is requested by this detection-based policy; retain the current idle/monitoring state.\n  2. Keep sampling frames. Zero eligible boxes does not establish that the physical area is empty or clear."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "LLM",
+      "coco_image_id": 503823,
+      "decision": "No Action",
+      "status": "no_detections",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No object-based action can be recommended from this frame."
+      },
+      "model_explanation": null,
+      "evidence": [],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "LLM",
+      "coco_image_id": 206831,
+      "decision": "No Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No specific action is suggested for the listed detections."
+      },
+      "model_explanation": "[d1] indicates a dog's presence in the park, but no action is required as the detection alone does not establish a condition or interaction that necessitates intervention.",
+      "evidence": [
+        {
+          "label": "dog",
+          "confidence": 0.89893,
+          "confidence_percent": 89.89,
+          "box_xyxy_pixels": [
+            14.5,
+            45.25,
+            639.0,
+            426.5
+          ],
+          "box_xyxy_normalized": [
+            0.0227,
+            0.106,
+            0.9984,
+            0.9988
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "LLM",
+      "coco_image_id": 555050,
+      "decision": "No Action",
+      "status": "fallback",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No action recommendation is available."
+      },
+      "model_explanation": null,
+      "evidence": [
+        {
+          "label": "car",
+          "confidence": 0.93457,
+          "confidence_percent": 93.46,
+          "box_xyxy_pixels": [
+            0.19531,
+            177.53906,
+            238.28125,
+            269.14062
+          ],
+          "box_xyxy_normalized": [
+            0.0004,
+            0.5514,
+            0.4766,
+            0.8358
+          ],
+          "position": "bottom-left",
+          "id": "d1"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.74023,
+          "confidence_percent": 74.02,
+          "box_xyxy_pixels": [
+            4.78516,
+            51.17188,
+            36.1084,
+            131.83594
+          ],
+          "box_xyxy_normalized": [
+            0.0096,
+            0.1589,
+            0.0722,
+            0.4094
+          ],
+          "position": "top-left",
+          "id": "d2"
+        },
+        {
+          "label": "cow",
+          "confidence": 0.73242,
+          "confidence_percent": 73.24,
+          "box_xyxy_pixels": [
+            222.26562,
+            172.16797,
+            277.34375,
+            222.65625
+          ],
+          "box_xyxy_normalized": [
+            0.4445,
+            0.5347,
+            0.5547,
+            0.6915
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            438.28125,
+            86.08398,
+            458.98438,
+            148.04688
+          ],
+          "box_xyxy_normalized": [
+            0.8766,
+            0.2673,
+            0.918,
+            0.4598
+          ],
+          "position": "middle-right",
+          "id": "d4"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.51172,
+          "confidence_percent": 51.17,
+          "box_xyxy_pixels": [
+            101.75781,
+            77.73438,
+            122.75391,
+            114.25781
+          ],
+          "box_xyxy_normalized": [
+            0.2035,
+            0.2414,
+            0.2455,
+            0.3548
+          ],
+          "position": "top-left",
+          "id": "d5"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.44165,
+          "confidence_percent": 44.16,
+          "box_xyxy_pixels": [
+            195.3125,
+            103.61328,
+            217.96875,
+            143.26172
+          ],
+          "box_xyxy_normalized": [
+            0.3906,
+            0.3218,
+            0.4359,
+            0.4449
+          ],
+          "position": "middle-center",
+          "id": "d6"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.43774,
+          "confidence_percent": 43.77,
+          "box_xyxy_pixels": [
+            102.14844,
+            78.51562,
+            123.04688,
+            112.79297
+          ],
+          "box_xyxy_normalized": [
+            0.2043,
+            0.2438,
+            0.2461,
+            0.3503
+          ],
+          "position": "top-left",
+          "id": "d7"
+        },
+        {
+          "label": "truck",
+          "confidence": 0.43408,
+          "confidence_percent": 43.41,
+          "box_xyxy_pixels": [
+            38.52539,
+            147.16797,
+            66.99219,
+            170.80078
+          ],
+          "box_xyxy_normalized": [
+            0.0771,
+            0.457,
+            0.134,
+            0.5304
+          ],
+          "position": "middle-left",
+          "id": "d8"
+        },
+        {
+          "label": "car",
+          "confidence": 0.32593,
+          "confidence_percent": 32.59,
+          "box_xyxy_pixels": [
+            0.0412,
+            150.48828,
+            7.01294,
+            167.48047
+          ],
+          "box_xyxy_normalized": [
+            0.0001,
+            0.4674,
+            0.014,
+            0.5201
+          ],
+          "position": "middle-left",
+          "id": "d9"
+        },
+        {
+          "label": "traffic light",
+          "confidence": 0.31909,
+          "confidence_percent": 31.91,
+          "box_xyxy_pixels": [
+            438.67188,
+            85.98633,
+            458.98438,
+            148.14453
+          ],
+          "box_xyxy_normalized": [
+            0.8773,
+            0.267,
+            0.918,
+            0.4601
+          ],
+          "position": "middle-right",
+          "id": "d10"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    },
+    {
+      "method": "LLM",
+      "coco_image_id": 43314,
+      "decision": "Take Action",
+      "status": "validated",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": "[d2] confirms the presence of a person in the snow area, requiring verification with another view to ensure safety.",
+      "evidence": [
+        {
+          "label": "skis",
+          "confidence": 0.58154,
+          "confidence_percent": 58.15,
+          "box_xyxy_pixels": [
+            137.89062,
+            139.74609,
+            317.77344,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.2758,
+            0.3717,
+            0.6355,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d1"
+        },
+        {
+          "label": "person",
+          "confidence": 0.47656,
+          "confidence_percent": 47.66,
+          "box_xyxy_pixels": [
+            265.625,
+            104.98047,
+            335.15625,
+            196.28906
+          ],
+          "box_xyxy_normalized": [
+            0.5312,
+            0.2792,
+            0.6703,
+            0.522
+          ],
+          "position": "middle-center",
+          "id": "d2"
+        },
+        {
+          "label": "skis",
+          "confidence": 0.25977,
+          "confidence_percent": 25.98,
+          "box_xyxy_pixels": [
+            208.00781,
+            63.18359,
+            320.70312,
+            246.09375
+          ],
+          "box_xyxy_normalized": [
+            0.416,
+            0.168,
+            0.6414,
+            0.6545
+          ],
+          "position": "middle-center",
+          "id": "d3"
+        }
+      ],
+      "review_plan_cost": null,
+      "review_steps": null
+    }
+  ]
+}

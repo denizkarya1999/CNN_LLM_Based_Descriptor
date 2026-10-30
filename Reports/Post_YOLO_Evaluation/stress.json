@@ -1,0 +1,2618 @@
+[
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.034344,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.019867,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.011541,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.017433,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.011151,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.008455,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.014828,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.008856,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.006833,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.014247,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.008445,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.007184,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.012854,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.011762,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.006562,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "A* Search",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.013786,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "A* Search",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.007975,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "A* Search",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.006152,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.0156,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.007965,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.006853,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {},
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 0,
+    "rep": 0,
+    "latency_ms": 0.167803,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 0,
+      "matched_plans": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 0,
+    "rep": 1,
+    "latency_ms": 0.126667,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 0,
+      "matched_plans": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 0,
+    "rep": 2,
+    "latency_ms": 0.122949,
+    "decision": "No Action",
+    "reference": {
+      "review": "No Action",
+      "robot": "No Action",
+      "robot_plan": "empty_area"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 0,
+      "matched_plans": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.152384,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.105386,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.097071,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.104505,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.50885
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.091201,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.50885
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.071273,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.50885
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.111408,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 3,
+      "generated_states": 4,
+      "peak_frontier_nodes": 2,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.084948,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 3,
+      "generated_states": 4,
+      "peak_frontier_nodes": 2,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.07998,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 3,
+      "generated_states": 4,
+      "peak_frontier_nodes": 2,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.108563,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.082575,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.075371,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.106088,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.083416,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.076072,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "A* Search",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.113452,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "A* Search",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.086842,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "A* Search",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.087353,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "expanded_states": 2,
+      "generated_states": 3,
+      "peak_frontier_nodes": 1,
+      "planned_reviews": 1
+    },
+    "cost": 2.10885
+  },
+  {
+    "method": "Probability",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.202619,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 20,
+      "review_assessments": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.168665,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 20,
+      "review_assessments": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.133199,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 20,
+      "review_assessments": 1
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1,
+    "rep": 0,
+    "latency_ms": 0.109825,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1,
+      "matched_plans": 2
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1,
+    "rep": 1,
+    "latency_ms": 0.094267,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1,
+      "matched_plans": 2
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1,
+    "rep": 2,
+    "latency_ms": 0.081463,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "tool_handling"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1,
+      "matched_plans": 2
+    },
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 1.077283,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 1.019584,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.982436,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 0.234559,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 8.9433
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 0.199222,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 8.9433
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.19796,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 8.9433
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 2.113197,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 171,
+      "generated_states": 499,
+      "peak_frontier_nodes": 21,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 2.103199,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 171,
+      "generated_states": 499,
+      "peak_frontier_nodes": 21,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 2.099913,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 171,
+      "generated_states": 499,
+      "peak_frontier_nodes": 21,
+      "planned_reviews": 5
+    },
+    "cost": 6.9433
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 1.508959,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 1.498539,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 1.49896,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 77,
+      "generated_states": 298,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 0.32661,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 7.3662
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 0.316681,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 7.3662
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.30007,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 6,
+      "generated_states": 26,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 5
+    },
+    "cost": 7.3662
+  },
+  {
+    "method": "A* Search",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 0.657057,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 17,
+      "generated_states": 89,
+      "peak_frontier_nodes": 33,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "A* Search",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 0.628864,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 17,
+      "generated_states": 89,
+      "peak_frontier_nodes": 33,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "A* Search",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.632882,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 17,
+      "generated_states": 89,
+      "peak_frontier_nodes": 33,
+      "planned_reviews": 5
+    },
+    "cost": 6.30885
+  },
+  {
+    "method": "Probability",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 0.281085,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 5
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 0.2567,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 5
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.266487,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 5
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 5,
+    "rep": 0,
+    "latency_ms": 0.172703,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 5,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 5,
+    "rep": 1,
+    "latency_ms": 0.152746,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 5,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 5,
+    "rep": 2,
+    "latency_ms": 0.145481,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 5,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 2.33403,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 2.377411,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 2.331234,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 0.456633,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 17.43485
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 0.415646,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 17.43485
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 0.41182,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 17.43485
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 4.694179,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 342,
+      "generated_states": 944,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 5.291735,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 342,
+      "generated_states": 944,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 5.070041,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 342,
+      "generated_states": 944,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 10
+    },
+    "cost": 14.03485
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 4.203321,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 40,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 4.024698,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 40,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 4.354003,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 154,
+      "generated_states": 563,
+      "peak_frontier_nodes": 40,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 0.807608,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 15.09225
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 0.755872,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 15.09225
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 0.741866,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 12,
+      "generated_states": 50,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 10
+    },
+    "cost": 15.09225
+  },
+  {
+    "method": "A* Search",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 1.536951,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 29,
+      "generated_states": 150,
+      "peak_frontier_nodes": 30,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "A* Search",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 1.523576,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 29,
+      "generated_states": 150,
+      "peak_frontier_nodes": 30,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "A* Search",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 1.645854,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 29,
+      "generated_states": 150,
+      "peak_frontier_nodes": 30,
+      "planned_reviews": 10
+    },
+    "cost": 12.6604
+  },
+  {
+    "method": "Probability",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 0.482712,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 10
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 0.485887,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 10
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 0.422109,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 10
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 10,
+    "rep": 0,
+    "latency_ms": 0.344674,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 10,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 10,
+    "rep": 1,
+    "latency_ms": 0.297246,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 10,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 10,
+    "rep": 2,
+    "latency_ms": 0.318615,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 10,
+      "matched_plans": 3
+    },
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 27.487565,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1540,
+      "generated_states": 5531,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 31.36101,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1540,
+      "generated_states": 5531,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 33.724385,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1540,
+      "generated_states": 5531,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 6.715364,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 175.52745
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 6.485134,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 175.52745
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 6.018532,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 175.52745
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 65.49498,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 3420,
+      "generated_states": 9302,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 63.126256,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 3420,
+      "generated_states": 9302,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 58.300883,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 3420,
+      "generated_states": 9302,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 100
+    },
+    "cost": 142.12745
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 43.353842,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1538,
+      "generated_states": 5529,
+      "peak_frontier_nodes": 50,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 40.272657,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1538,
+      "generated_states": 5529,
+      "peak_frontier_nodes": 50,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 37.697877,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1538,
+      "generated_states": 5529,
+      "peak_frontier_nodes": 50,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 6.680498,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 166.46245000000002
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 6.48839,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 166.46245000000002
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 6.369738,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 120,
+      "generated_states": 518,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 100
+    },
+    "cost": 166.46245000000002
+  },
+  {
+    "method": "A* Search",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 21.589978,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 617,
+      "generated_states": 2957,
+      "peak_frontier_nodes": 47,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "A* Search",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 21.251717,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 617,
+      "generated_states": 2957,
+      "peak_frontier_nodes": 47,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "A* Search",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 19.951648,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 617,
+      "generated_states": 2957,
+      "peak_frontier_nodes": 47,
+      "planned_reviews": 100
+    },
+    "cost": 140.75455
+  },
+  {
+    "method": "Probability",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 1.436964,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 100
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 1.423228,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 100
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 1.372724,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 100
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 100,
+    "rep": 0,
+    "latency_ms": 1.367254,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 100,
+      "matched_plans": 4
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 100,
+    "rep": 1,
+    "latency_ms": 1.318764,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 100,
+      "matched_plans": 4
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 100,
+    "rep": 2,
+    "latency_ms": 1.442314,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 100,
+      "matched_plans": 4
+    },
+    "cost": null
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 176.246277,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15400,
+      "generated_states": 55211,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 153.34618,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15400,
+      "generated_states": 55211,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Breadth-First Search (BFS)",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 139.389951,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15400,
+      "generated_states": 55211,
+      "peak_frontier_nodes": 35,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 23.285335,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1200,
+      "generated_states": 5198,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 1000
+    },
+    "cost": 1760.0118999999997
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 24.680472,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1200,
+      "generated_states": 5198,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 1000
+    },
+    "cost": 1760.0118999999997
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 22.721733,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1200,
+      "generated_states": 5198,
+      "peak_frontier_nodes": 11,
+      "planned_reviews": 1000
+    },
+    "cost": 1760.0118999999997
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 277.680459,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 34200,
+      "generated_states": 92882,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 279.132521,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 34200,
+      "generated_states": 92882,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 290.349684,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 34200,
+      "generated_states": 92882,
+      "peak_frontier_nodes": 26,
+      "planned_reviews": 1000
+    },
+    "cost": 1426.611899999999
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 227.869195,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15354,
+      "generated_states": 55159,
+      "peak_frontier_nodes": 57,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 215.314303,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15354,
+      "generated_states": 55159,
+      "peak_frontier_nodes": 57,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 210.892133,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 15354,
+      "generated_states": 55159,
+      "peak_frontier_nodes": 57,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 35.458164,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1203,
+      "generated_states": 5211,
+      "peak_frontier_nodes": 12,
+      "planned_reviews": 1000
+    },
+    "cost": 1689.572600000001
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 35.434018,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1203,
+      "generated_states": 5211,
+      "peak_frontier_nodes": 12,
+      "planned_reviews": 1000
+    },
+    "cost": 1689.572600000001
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 36.313431,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 1203,
+      "generated_states": 5211,
+      "peak_frontier_nodes": 12,
+      "planned_reviews": 1000
+    },
+    "cost": 1689.572600000001
+  },
+  {
+    "method": "A* Search",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 162.326074,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 5711,
+      "generated_states": 27172,
+      "peak_frontier_nodes": 51,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "A* Search",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 193.044074,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 5711,
+      "generated_states": 27172,
+      "peak_frontier_nodes": 51,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "A* Search",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 232.709927,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "expanded_states": 5711,
+      "generated_states": 27172,
+      "peak_frontier_nodes": 51,
+      "planned_reviews": 1000
+    },
+    "cost": 1403.744599999999
+  },
+  {
+    "method": "Probability",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 17.073212,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 1000
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 15.189072,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 1000
+    },
+    "cost": null
+  },
+  {
+    "method": "Probability",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 16.414291,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "scene_hypotheses": 20,
+      "likelihood_factors": 60,
+      "review_assessments": 1000
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1000,
+    "rep": 0,
+    "latency_ms": 17.723877,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1000,
+      "matched_plans": 4
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1000,
+    "rep": 1,
+    "latency_ms": 16.171267,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1000,
+      "matched_plans": 4
+    },
+    "cost": null
+  },
+  {
+    "method": "Robot plans",
+    "n": 1000,
+    "rep": 2,
+    "latency_ms": 15.120704,
+    "decision": "Take Action",
+    "reference": {
+      "review": "Take Action",
+      "robot": "Take Action",
+      "robot_plan": "signal_review"
+    },
+    "efficiency": {
+      "rules_evaluated": 12,
+      "conditions_evaluated": 18,
+      "detections_assessed": 1000,
+      "matched_plans": 4
+    },
+    "cost": null
+  }
+]

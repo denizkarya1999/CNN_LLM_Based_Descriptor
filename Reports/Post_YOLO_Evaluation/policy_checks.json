@@ -1,0 +1,42 @@
+[
+  {
+    "method": "Breadth-First Search (BFS)",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Depth-First Search (DFS)",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Iterative Deepening Search (IDS)",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Uniform-Cost Search (UCS)",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Greedy Best-First Search (GBFS)",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "A* Search",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Probability",
+    "cases": 423,
+    "errors": []
+  },
+  {
+    "method": "Robot plans",
+    "cases": 423,
+    "errors": []
+  }
+]
