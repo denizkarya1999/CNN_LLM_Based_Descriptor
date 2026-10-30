@@ -1,0 +1,1525 @@
+{
+  "scope": "Saved first measured pass (warm, repetition 0); no new model runs",
+  "tested_commit": "61c9a7f073945b803a0e71c4521ef3ad490c6b23",
+  "source_sha256": {
+    "classical.jsonl": "9f18cc485afc4699a539bc4200657c54a3b7cf7e5ff95fd58c63d44e53a13ded",
+    "llm.jsonl": "93dd461b7ad5e593457ed7da2253ececf3bb06ee9a1eaee2242a68c44ca9fc6d"
+  },
+  "example_image_id": 43314,
+  "evidence": [
+    {
+      "label": "skis",
+      "confidence": 0.58154,
+      "confidence_percent": 58.15,
+      "box_xyxy_pixels": [
+        137.89062,
+        139.74609,
+        317.77344,
+        246.09375
+      ],
+      "box_xyxy_normalized": [
+        0.2758,
+        0.3717,
+        0.6355,
+        0.6545
+      ],
+      "position": "middle-center",
+      "id": "d1"
+    },
+    {
+      "label": "person",
+      "confidence": 0.47656,
+      "confidence_percent": 47.66,
+      "box_xyxy_pixels": [
+        265.625,
+        104.98047,
+        335.15625,
+        196.28906
+      ],
+      "box_xyxy_normalized": [
+        0.5312,
+        0.2792,
+        0.6703,
+        0.522
+      ],
+      "position": "middle-center",
+      "id": "d2"
+    },
+    {
+      "label": "skis",
+      "confidence": 0.25977,
+      "confidence_percent": 25.98,
+      "box_xyxy_pixels": [
+        208.00781,
+        63.18359,
+        320.70312,
+        246.09375
+      ],
+      "box_xyxy_normalized": [
+        0.416,
+        0.168,
+        0.6414,
+        0.6545
+      ],
+      "position": "middle-center",
+      "id": "d3"
+    }
+  ],
+  "reference": {
+    "review": "No Action",
+    "robot": "Take Action",
+    "robot_plan": "people_nearby",
+    "matched_robot_action_rules": [
+      "people_nearby"
+    ],
+    "review_trigger_labels": []
+  },
+  "search": {
+    "Uniform-Cost Search (UCS)": {
+      "algorithm": "Uniform-Cost Search (UCS)",
+      "steps": [
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.1174499999999998
+        },
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.20015,
+      "expanded_states": 4,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": 0.0,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [
+            "verify:d3"
+          ],
+          "depth": 1,
+          "g": 1.1174499999999998,
+          "h": 1.0827,
+          "priority": 1.1174499999999998,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": 1.20015,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 4,
+          "path": [
+            "verify:d3",
+            "verify:d2"
+          ],
+          "depth": 2,
+          "g": 2.20015,
+          "h": 0,
+          "priority": 2.20015,
+          "goal": true,
+          "depth_limit": null,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 5,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.20015,
+          "expanded_states": 4
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": true,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    },
+    "A* Search": {
+      "algorithm": "A* Search",
+      "steps": [
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.1174499999999998
+        },
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.20015,
+      "expanded_states": 3,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": 2.11745,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [
+            "verify:d3"
+          ],
+          "depth": 1,
+          "g": 1.1174499999999998,
+          "h": 1.0827,
+          "priority": 2.20015,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d3",
+            "verify:d2"
+          ],
+          "depth": 2,
+          "g": 2.20015,
+          "h": 0,
+          "priority": 2.20015,
+          "goal": true,
+          "depth_limit": null,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 4,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.20015,
+          "expanded_states": 3
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": true,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    },
+    "Iterative Deepening Search (IDS)": {
+      "algorithm": "Iterative Deepening Search (IDS)",
+      "steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.28285,
+      "expanded_states": 7,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 0,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 1,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 1,
+          "batch": 1
+        },
+        {
+          "visit": 4,
+          "path": [
+            "verify:d3"
+          ],
+          "depth": 1,
+          "g": 1.1174499999999998,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 1,
+          "batch": 1
+        },
+        {
+          "visit": 5,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 2,
+          "batch": 1
+        },
+        {
+          "visit": 6,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": 2,
+          "batch": 1
+        },
+        {
+          "visit": 7,
+          "path": [
+            "verify:d2",
+            "verify:d3"
+          ],
+          "depth": 2,
+          "g": 2.28285,
+          "h": 0,
+          "priority": null,
+          "goal": true,
+          "depth_limit": 2,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 8,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.28285,
+          "expanded_states": 7
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": false,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    },
+    "Greedy Best-First Search (GBFS)": {
+      "algorithm": "Greedy Best-First Search (GBFS)",
+      "steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.28285,
+      "expanded_states": 3,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": 2.11745,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": 1.0827,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d2",
+            "verify:d3"
+          ],
+          "depth": 2,
+          "g": 2.28285,
+          "h": 0,
+          "priority": 0,
+          "goal": true,
+          "depth_limit": null,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 4,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.28285,
+          "expanded_states": 3
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": false,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    },
+    "Depth-First Search (DFS)": {
+      "algorithm": "Depth-First Search (DFS)",
+      "steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.28285,
+      "expanded_states": 3,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": null,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d2",
+            "verify:d3"
+          ],
+          "depth": 2,
+          "g": 2.28285,
+          "h": 0,
+          "priority": null,
+          "goal": true,
+          "depth_limit": null,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 4,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.28285,
+          "expanded_states": 3
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": false,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    },
+    "Breadth-First Search (BFS)": {
+      "algorithm": "Breadth-First Search (BFS)",
+      "steps": [
+        {
+          "choice": "verify:d2",
+          "detection_id": "d2",
+          "rule": "low_score",
+          "cost": 1.20015
+        },
+        {
+          "choice": "verify:d3",
+          "detection_id": "d3",
+          "rule": "low_score",
+          "cost": 1.0827
+        }
+      ],
+      "cost": 2.28285,
+      "expanded_states": 4,
+      "targets": [
+        "d2",
+        "d3"
+      ],
+      "traversal": [
+        {
+          "visit": 1,
+          "path": [],
+          "depth": 0,
+          "g": 0.0,
+          "h": 2.11745,
+          "priority": null,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 2,
+          "path": [
+            "verify:d2"
+          ],
+          "depth": 1,
+          "g": 1.20015,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 3,
+          "path": [
+            "verify:d3"
+          ],
+          "depth": 1,
+          "g": 1.1174499999999998,
+          "h": 1.0827,
+          "priority": null,
+          "goal": false,
+          "depth_limit": null,
+          "batch": 1
+        },
+        {
+          "visit": 4,
+          "path": [
+            "verify:d2",
+            "verify:d3"
+          ],
+          "depth": 2,
+          "g": 2.28285,
+          "h": 0,
+          "priority": null,
+          "goal": true,
+          "depth_limit": null,
+          "batch": 1
+        }
+      ],
+      "trace_omitted": 0,
+      "generated_states": 5,
+      "peak_frontier": 2,
+      "omitted_targets": 0,
+      "batches": [
+        {
+          "targets": [
+            "d2",
+            "d3"
+          ],
+          "cost": 2.28285,
+          "expanded_states": 4
+        }
+      ],
+      "batch_size": 5,
+      "globally_cost_optimal": false,
+      "goal": "Plan a review suggestion for every rule-triggered target; no actions executed.",
+      "cost_basis": "Illustrative effort plus Manhattan attention shift between normalized image box centers, not physical distance or risk.",
+      "optimality_scope": "UCS/A* minimize cost within each batch; multiple batches are not globally optimal.",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true
+        }
+      ]
+    }
+  },
+  "probability": {
+    "scene_inference": {
+      "setting": "unclear",
+      "posterior": {
+        "home": 0.018775145283862316,
+        "kitchen": 0.018775145283862316,
+        "bedroom": 0.018775145283862316,
+        "bathroom": 0.018775145283862316,
+        "office": 0.018775145283862316,
+        "classroom": 0.018775145283862316,
+        "restaurant": 0.018775145283862316,
+        "ballroom": 0.018775145283862316,
+        "shop": 0.018775145283862316,
+        "street": 0.018775145283862316,
+        "park": 0.018775145283862316,
+        "sports_area": 0.018775145283862316,
+        "station": 0.018775145283862316,
+        "vehicle_interior": 0.018775145283862316,
+        "farm": 0.018775145283862316,
+        "wildlife_area": 0.018775145283862316,
+        "waterfront": 0.018775145283862316,
+        "snow_area": 0.2033974072418418,
+        "airport": 0.018775145283862316,
+        "unclear": 0.4586499776486365
+      },
+      "observed_labels": [
+        "person",
+        "skis"
+      ],
+      "label_confidences": {
+        "skis": 0.58154,
+        "person": 0.47656
+      },
+      "priors": {
+        "home": 0.03684210526315789,
+        "kitchen": 0.03684210526315789,
+        "bedroom": 0.03684210526315789,
+        "bathroom": 0.03684210526315789,
+        "office": 0.03684210526315789,
+        "classroom": 0.03684210526315789,
+        "restaurant": 0.03684210526315789,
+        "ballroom": 0.03684210526315789,
+        "shop": 0.03684210526315789,
+        "street": 0.03684210526315789,
+        "park": 0.03684210526315789,
+        "sports_area": 0.03684210526315789,
+        "station": 0.03684210526315789,
+        "vehicle_interior": 0.03684210526315789,
+        "farm": 0.03684210526315789,
+        "wildlife_area": 0.03684210526315789,
+        "waterfront": 0.03684210526315789,
+        "snow_area": 0.03684210526315789,
+        "airport": 0.03684210526315789,
+        "unclear": 0.3
+      },
+      "likelihood_factors": {
+        "home": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "kitchen": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "bedroom": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "bathroom": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "office": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "classroom": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "restaurant": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "ballroom": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "shop": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "street": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "park": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "sports_area": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "station": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "vehicle_interior": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "farm": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "wildlife_area": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "waterfront": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "snow_area": {
+          "skis": 0.65,
+          "person": 0.5499999999999999
+        },
+        "airport": {
+          "skis": 0.06,
+          "person": 0.5499999999999999
+        },
+        "unclear": {
+          "skis": 0.18,
+          "person": 0.5499999999999999
+        }
+      },
+      "raw_likelihoods": {
+        "home": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "kitchen": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "bedroom": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "bathroom": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "office": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "classroom": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "restaurant": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "ballroom": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "shop": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "street": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "park": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "sports_area": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "station": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "vehicle_interior": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "farm": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "wildlife_area": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "waterfront": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "snow_area": {
+          "skis": 0.65,
+          "person": 0.55
+        },
+        "airport": {
+          "skis": 0.06,
+          "person": 0.55
+        },
+        "unclear": {
+          "skis": 0.18,
+          "person": 0.55
+        }
+      },
+      "evidence_weights": {
+        "skis": 1.0,
+        "person": 0.3
+      },
+      "predictive_means": {
+        "skis": 0.11773684210526315,
+        "person": 0.5499999999999999
+      },
+      "log_joint": {
+        "home": -6.71236164062083,
+        "kitchen": -6.71236164062083,
+        "bedroom": -6.71236164062083,
+        "bathroom": -6.71236164062083,
+        "office": -6.71236164062083,
+        "classroom": -6.71236164062083,
+        "restaurant": -6.71236164062083,
+        "ballroom": -6.71236164062083,
+        "shop": -6.71236164062083,
+        "street": -6.71236164062083,
+        "park": -6.71236164062083,
+        "sports_area": -6.71236164062083,
+        "station": -6.71236164062083,
+        "vehicle_interior": -6.71236164062083,
+        "farm": -6.71236164062083,
+        "wildlife_area": -6.71236164062083,
+        "waterfront": -6.71236164062083,
+        "snow_area": -4.3297338399532475,
+        "airport": -6.71236164062083,
+        "unclear": -3.5166082331734834
+      },
+      "normalization_offset": -3.5166082331734834,
+      "scaled_normalizer": 2.180311890838207,
+      "custom_labels": [],
+      "candidates": [
+        "unclear",
+        "snow_area",
+        "airport"
+      ],
+      "method": "Inference by Enumeration",
+      "calibrated": false,
+      "table_version": "teaching-v2-all-labels",
+      "assumption": "Distinct observed labels are conditionally independent given the setting. Missing labels are unobserved. Custom labels have equal neutral likelihoods."
+    },
+    "decision_inference": {
+      "next_step": "verify:d2",
+      "assessments": [
+        {
+          "detection_id": "d1",
+          "label": "skis",
+          "kind": "no_action",
+          "rule": "presence_only",
+          "confidence": 0.58154,
+          "knowledge_base_label": true,
+          "review_probability": 0.15
+        },
+        {
+          "detection_id": "d2",
+          "label": "person",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.47656,
+          "knowledge_base_label": true,
+          "review_probability": 0.8
+        },
+        {
+          "detection_id": "d3",
+          "label": "skis",
+          "kind": "verify",
+          "rule": "low_score",
+          "confidence": 0.25977,
+          "knowledge_base_label": true,
+          "review_probability": 0.8
+        }
+      ],
+      "threshold": 0.5,
+      "selected_probability": 0.8,
+      "calibrated": false,
+      "method": "Conditional probability / maximum-posterior review choice",
+      "meaning": "Illustrative P(review useful | detected label, score band); not a danger or object-correctness probability."
+    }
+  },
+  "robot": {
+    "policy_version": 1,
+    "selected_plan": {
+      "id": "uncertain_detections",
+      "name": "Uncertain-Detection Robot Action Plan",
+      "priority": 6,
+      "action_decision": "Take Action",
+      "conditions": [
+        {
+          "metric": "tentative",
+          "value": 2,
+          "operator": ">=",
+          "threshold": 1,
+          "passed": true
+        }
+      ],
+      "matched": true,
+      "detection_ids": [
+        "d2",
+        "d3"
+      ],
+      "steps": [
+        "Acquire another view to verify the below-50% detections before using those labels for an action."
+      ]
+    },
+    "matched_plans": [
+      {
+        "id": "uncertain_detections",
+        "name": "Uncertain-Detection Robot Action Plan",
+        "priority": 6,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "tentative",
+            "value": 2,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": true
+          }
+        ],
+        "matched": true,
+        "detection_ids": [
+          "d2",
+          "d3"
+        ],
+        "steps": [
+          "Acquire another view to verify the below-50% detections before using those labels for an action."
+        ]
+      }
+    ],
+    "applicable_plans": [
+      {
+        "id": "uncertain_detections",
+        "name": "Uncertain-Detection Robot Action Plan",
+        "priority": 6,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "tentative",
+            "value": 2,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": true
+          }
+        ],
+        "matched": true,
+        "detection_ids": [
+          "d2",
+          "d3"
+        ],
+        "steps": [
+          "Acquire another view to verify the below-50% detections before using those labels for an action."
+        ]
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "crowded_area",
+        "name": "Crowded-Area Robot Action Plan",
+        "priority": 1,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "people",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 5,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "people_and_vehicles",
+        "name": "People-and-Vehicles Robot Action Plan",
+        "priority": 2,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "people",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          },
+          {
+            "metric": "vehicles",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "signal_review",
+        "name": "Signal-Review Robot Action Plan",
+        "priority": 3,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "signals",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "animal_presence",
+        "name": "Animal-Presence Robot Action Plan",
+        "priority": 4,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "animals",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "tool_handling",
+        "name": "Tool-Handling Robot Action Plan",
+        "priority": 5,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "tools",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "uncertain_detections",
+        "name": "Uncertain-Detection Robot Action Plan",
+        "priority": 6,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "tentative",
+            "value": 2,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": true
+          }
+        ],
+        "matched": true
+      },
+      {
+        "id": "dense_objects",
+        "name": "Dense-Object Robot Action Plan",
+        "priority": 7,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "strong",
+            "value": 1,
+            "operator": ">=",
+            "threshold": 10,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "vehicle_presence",
+        "name": "Vehicle-Presence Robot Action Plan",
+        "priority": 8,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "vehicles",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "people_nearby",
+        "name": "People-Presence Robot Action Plan",
+        "priority": 9,
+        "action_decision": "Take Action",
+        "conditions": [
+          {
+            "metric": "people",
+            "value": 0,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": false
+          },
+          {
+            "metric": "people",
+            "value": 0,
+            "operator": "<=",
+            "threshold": 4,
+            "passed": true
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "empty_area",
+        "name": "Empty-Area Robot Action Plan",
+        "priority": 10,
+        "action_decision": "No Action",
+        "conditions": [
+          {
+            "metric": "total",
+            "value": 3,
+            "operator": "==",
+            "threshold": 0,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "sparse_objects",
+        "name": "Sparse-Object Robot Action Plan",
+        "priority": 11,
+        "action_decision": "No Action",
+        "conditions": [
+          {
+            "metric": "strong",
+            "value": 1,
+            "operator": ">=",
+            "threshold": 1,
+            "passed": true
+          },
+          {
+            "metric": "strong",
+            "value": 1,
+            "operator": "<=",
+            "threshold": 3,
+            "passed": true
+          },
+          {
+            "metric": "tentative",
+            "value": 2,
+            "operator": "==",
+            "threshold": 0,
+            "passed": false
+          }
+        ],
+        "matched": false
+      },
+      {
+        "id": "moderate_objects",
+        "name": "Moderate-Object Robot Action Plan",
+        "priority": 12,
+        "action_decision": "No Action",
+        "conditions": [
+          {
+            "metric": "strong",
+            "value": 1,
+            "operator": ">=",
+            "threshold": 4,
+            "passed": false
+          },
+          {
+            "metric": "strong",
+            "value": 1,
+            "operator": "<=",
+            "threshold": 9,
+            "passed": true
+          },
+          {
+            "metric": "tentative",
+            "value": 2,
+            "operator": "==",
+            "threshold": 0,
+            "passed": false
+          }
+        ],
+        "matched": false
+      }
+    ],
+    "counts": {
+      "total": 3,
+      "strong": 1,
+      "tentative": 2,
+      "people": 0,
+      "vehicles": 0,
+      "signals": 0,
+      "animals": 0,
+      "tools": 0
+    },
+    "assessments": [
+      {
+        "detection_id": "d1",
+        "label": "skis",
+        "confidence": 0.58154,
+        "groups": [
+          "total",
+          "strong"
+        ],
+        "matched_plan_ids": []
+      },
+      {
+        "detection_id": "d2",
+        "label": "person",
+        "confidence": 0.47656,
+        "groups": [
+          "total",
+          "tentative"
+        ],
+        "matched_plan_ids": [
+          "uncertain_detections"
+        ]
+      },
+      {
+        "detection_id": "d3",
+        "label": "skis",
+        "confidence": 0.25977,
+        "groups": [
+          "total",
+          "tentative"
+        ],
+        "matched_plan_ids": [
+          "uncertain_detections"
+        ]
+      }
+    ],
+    "confidence_cutoff": 0.5,
+    "rules_evaluated": 12,
+    "conditions_evaluated": 18,
+    "selection_policy": "First matched action plan in priority order; retain every matched action plan. Idle plans apply only if no action rule matches."
+  },
+  "llm": {
+    "555050": {
+      "environment": "unclear",
+      "setting": "unclear",
+      "status": "fallback",
+      "decision": "No Action",
+      "suggested_action": {
+        "kind": "no_action",
+        "detection_id": null,
+        "text": "No action recommendation is available."
+      },
+      "model_explanation": null,
+      "latency_ms": 5602.621334,
+      "efficiency": {
+        "model_calls": 1,
+        "prompt_eval_count": 1312,
+        "eval_count": 27,
+        "load_duration_ms": 3280.771684,
+        "prompt_eval_duration_ms": 1075.082693,
+        "eval_duration_ms": 859.845521,
+        "total_duration_ms": 5591.062173
+      },
+      "responses": [
+        {
+          "route": "/api/chat",
+          "text": "{\n  \"environment\": \"outdoor\",\n  \"setting\": \"shop\",\n  \"next_step\": \"no_action\"\n}"
+        }
+      ]
+    },
+    "43314": {
+      "environment": "outdoor",
+      "setting": "snow_area",
+      "status": "validated",
+      "decision": "Take Action",
+      "suggested_action": {
+        "kind": "verify",
+        "detection_id": "d2",
+        "text": "Confirm the possible person at middle-center in the image with another view before acting on this low-score detection."
+      },
+      "model_explanation": "[d2] confirms the presence of a person in the snow area, requiring verification with another view to ensure safety.",
+      "latency_ms": 9675.346304,
+      "efficiency": {
+        "model_calls": 2,
+        "prompt_eval_count": 1073,
+        "eval_count": 58,
+        "load_duration_ms": 6363.187982,
+        "prompt_eval_duration_ms": 899.138552,
+        "eval_duration_ms": 1776.857889,
+        "total_duration_ms": 9654.540461
+      },
+      "responses": [
+        {
+          "route": "/api/chat",
+          "text": "{\n  \"environment\": \"outdoor\",\n  \"setting\": \"snow_area\",\n  \"next_step\": \"verify:d2\"\n}"
+        },
+        {
+          "route": "/api/generate",
+          "text": "{\"reason\": \"[d2] confirms the presence of a person in the snow area, requiring verification with another view to ensure safety.\"}"
+        }
+      ]
+    }
+  }
+}

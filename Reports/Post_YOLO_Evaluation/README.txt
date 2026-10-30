@@ -1,11 +1,23 @@
 POST-YOLO ACTION EVALUATION - OCTOBER 29, 2026
 
-Post_YOLO_Evaluation.pdf is a six-page report covering all nine implemented
+Post_YOLO_Evaluation.pdf is an eleven-page report covering all nine implemented
 methods: how each processes YOLO evidence, its recorded responses, numerical
 performance against two reference policies, and an efficiency recommendation.
 Ranking is an engineering judgment with explicit tradeoffs, not a universal
 accuracy or throughput leaderboard. Measurements remain from the original
-benchmark; this revision adds derived metrics and reference documentation.
+benchmark; revisions add derived metrics, reference documentation and visual
+explanations without rerunning models.
+
+VISUAL PAGE GUIDE
+
+Pages 7-8: search trees for BFS, DFS, IDS, UCS, greedy best-first and A*.
+Page 9: probability calculations and review selection.
+Page 10: robot-plan counts, rule matches and selected recommendation.
+Page 11: LLM inputs, decision, validation, explanation and fallback.
+
+The drawings use recorded examples; search nodes show actual visit numbers,
+costs and selected paths. visuals/ contains extracted source data and a
+rebuild script. Original metric and reference pages 1-6 are preserved.
 
 FILES
 
